@@ -1,40 +1,46 @@
 package com.tespirit.panda3d.scenegraph;
 
-import java.util.*;
 import com.tespirit.panda3d.vectors.*;
+import java.util.Hashtable;
 
-public class Node extends BaseNode {
+public abstract class Node {
 	
-	private ArrayList<BaseNode> children;
-	private Matrix3d transform;
-	private AxisAlignedBox boundingBox;
+	private String name;
+	
+	static private Hashtable<String, Node> LOOKUP;
 	
 	public Node(){
-		this.children = new ArrayList<BaseNode>();
+		this.name = null;
 	}
 	
-	public Node(String n){
-		super(n);
-		this.children = new ArrayList<BaseNode>();
+	public Node(String name){
+		this.name = name;
+		if(this.name != null){
+			Node.LOOKUP.put(this.name, this);
+		}
 	}
 	
-	@Override
-	public BaseNode getChild(int i) {
-		return this.children.get(i);
+	public abstract Node getChild(int i);
+	
+	public abstract int getChildCount();
+	
+	public abstract Matrix3d getTransform();
+	
+	public abstract AxisAlignedBox getBoundingBox();
+	
+	public String getName() {
+		return this.name;
 	}
 	
-	@Override
-	public int getChildCount(){
-		return this.children.size();
+	public void setName(String n){
+		if(this.name != null){
+			Node.LOOKUP.remove(this.name);
+		}
+		this.name = n;
+		Node.LOOKUP.put(this.name, this);
 	}
 	
-	@Override
-	public  Matrix3d getTransform(){
-		return this.transform;
-	}
-	
-	@Override
-	public AxisAlignedBox getBoundingBox(){
-		return this.boundingBox;
+	public static Node getNode(String name){
+		return Node.LOOKUP.get(name);
 	}
 }

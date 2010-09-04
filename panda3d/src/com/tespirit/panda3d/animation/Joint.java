@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.animation;
 
-import com.tespirit.panda3d.scenegraph.BaseNode;
+import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.vectors.*;
 
 /**
@@ -15,9 +15,9 @@ import com.tespirit.panda3d.vectors.*;
  * @author Dennis McAutoKnight
  *
  */
-public class Joint extends BaseNode{
+public class Joint extends Node{
 	
-	private BaseNode[] children;
+	private Node[] children;
 	
 	public Joint(){
 		this.children = null;
@@ -34,7 +34,7 @@ public class Joint extends BaseNode{
 	}
 
 	@Override
-	public BaseNode getChild(int i) {
+	public Node getChild(int i) {
 		return this.children[i];
 	}
 
@@ -43,7 +43,7 @@ public class Joint extends BaseNode{
 		return this.children.length;
 	}
 	
-	public void setChildren(BaseNode[] c){
+	public void setChildren(Node[] c){
 		this.children = c;
 	}
 

@@ -10,6 +10,7 @@ public class Vector3d {
 		
 	public final static int SIZE4 = 4;
 	public final static int SIZE3 = 3;
+	public final static int SIZE = 4; //generic size info, incase this changes for some reason
 	
 	public Vector3d(){
 		this.v = new float[Vector3d.SIZE4];
