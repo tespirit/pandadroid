@@ -32,7 +32,6 @@ public class Mesh extends Geometry {
 						   GL10.GL_FLOAT, 
 						   0, 
 						   this.vertexBuffer.getBuffer(VertexBuffer.POSITION));
-		
 		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 		gl.glNormalPointer(GL10.GL_FLOAT, 
 						   0, 
@@ -62,5 +61,13 @@ public class Mesh extends Geometry {
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisable(GL10.GL_CULL_FACE);
+	}
+	
+	/**
+	 * This will compute the normals for a mesh.
+	 * Note: importing the normals directly is much faster.
+	 */
+	public void computeNormals(){
+		
 	}
 }

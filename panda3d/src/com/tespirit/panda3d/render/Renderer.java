@@ -107,6 +107,8 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		
 		gl.glEnable (GL10.GL_LIGHTING);
 		
+		gl.glEnable(GL10.GL_COLOR_MATERIAL);
+		
 		for(int i = 0; i < this.lights.size(); i++){
 			this.lights.get(i).init(gl, i);
 		}

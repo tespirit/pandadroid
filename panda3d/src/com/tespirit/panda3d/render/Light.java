@@ -1,8 +1,5 @@
 package com.tespirit.panda3d.render;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import javax.microedition.khronos.opengles.GL10;
 
 public class Light {
