@@ -26,8 +26,25 @@ public class Pandamonium extends Activity {
     }
     
     public Node createTestSG(){
-    	Model m = new Model();
-    	m.setGeometry(new Box());
-    	return m;
+    	Model m1 = new Model();
+    	m1.setGeometry(new Box());
+    	
+    	Model m2 = new Model();
+    	m2.setGeometry(new Box());
+    	
+    	Group g = new Group();
+    	g.appendChild(m1);
+    	g.appendChild(m2);
+    	
+    	//adjust matrices
+    	m1.getTransform().rotateY(45.0f);
+    	
+    	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
+    	m2.getTransform().scale(0.5f);
+    	
+    	g.getTransform().translate(1.0f, 0.0f, 0.0f);
+    	g.getTransform().rotateY(-20.0f);
+    	
+    	return g;
     }
 }

@@ -271,7 +271,7 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d rotateZ(float t){
-		Matrix.rotateM(this.m, this.offset, t, 0, 1, 0);
+		Matrix.rotateM(this.m, this.offset, t, 0, 0, 1);
 		return this;
 	}
 	

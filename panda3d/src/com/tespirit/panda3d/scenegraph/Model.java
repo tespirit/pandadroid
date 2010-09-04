@@ -9,11 +9,12 @@ public class Model extends Node{
 	private Geometry geometry;
 	
 	public Model(){
-		
+		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
 	}
 	
 	public Model(String name){
 		super(name);
+		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
 	}
 	
 	@Override

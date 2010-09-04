@@ -10,11 +10,13 @@ public class Group extends Node {
 	
 	public Group(){
 		this.children = new ArrayList<Node>();
+		this.transform = new Matrix3d();//optimize later to share a single matrix buffer.
 	}
 	
 	public Group(String n){
 		super(n);
 		this.children = new ArrayList<Node>();
+		this.transform = new Matrix3d();//optimize later to share a single matrix buffer.
 	}
 	
 	public void appendChild(Node node){

@@ -24,13 +24,13 @@ public class Box extends Mesh {
 		this.indexBuffer.addTriangle(5, 4, 6);
 		this.indexBuffer.addTriangle(5, 6, 7);
 		
-		this.indexBuffer.addTriangle(0, 6, 1);
-		this.indexBuffer.addTriangle(0, 1, 2);
+		this.indexBuffer.addTriangle(0, 7, 1);
+		this.indexBuffer.addTriangle(6, 1, 7);
 		
 		this.indexBuffer.addTriangle(2, 1, 4);
 		this.indexBuffer.addTriangle(4, 1, 6);
 		
-		this.indexBuffer.addTriangle(0, 7, 3);
+		this.indexBuffer.addTriangle(0, 3, 7);
 		this.indexBuffer.addTriangle(3, 5, 7);
 		
 		this.vertexBuffer.resetBufferPosition();

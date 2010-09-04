@@ -4,6 +4,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.tespirit.panda3d.scenegraph.*;
+import com.tespirit.panda3d.vectors.Matrix3d;
 
 import android.opengl.GLU;
 
@@ -44,15 +45,20 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 	 * @param node
 	 */
 	public void traverseSG(Node node, GL10 gl){
+		gl.glPushMatrix();
+		//load matrix!
+		Matrix3d m = node.getTransform();
+		if(m != null){
+			gl.glMultMatrixf(m.getBuffer(), m.getBufferOffset());
+		}
 		if(node instanceof Model){
 			((Model)node).getGeometry().render(gl);
 		} else {
-			//push matrix on the stack
 			for(int i = 0; i < node.getChildCount(); i++){
 				this.traverseSG(node.getChild(i), gl);
 			}
-			//pop matrix from the stack
 		}
+		gl.glPopMatrix();
 	}
 
 	@Override
