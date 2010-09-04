@@ -3,6 +3,7 @@ package com.tespirit.panda3d;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.tespirit.panda3d.material.Material;
 import com.tespirit.panda3d.render.*;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.geometry.*;
@@ -27,10 +28,12 @@ public class Pandamonium extends Activity {
     
     public Node createTestSG(){
     	Model m1 = new Model();
-    	m1.setGeometry(new Box());
+    	m1.setGeometry(new Plane());
     	
     	Model m2 = new Model();
     	m2.setGeometry(new Box());
+    	m2.setMaterial(new Material());
+    	m2.getMaterial().setColor(0.7f, 0.2f, 0.2f);
     	
     	Group g = new Group();
     	g.appendChild(m1);
@@ -43,7 +46,9 @@ public class Pandamonium extends Activity {
     	m2.getTransform().scale(0.5f);
     	
     	g.getTransform().translate(1.0f, 0.0f, 0.0f);
+    	g.getTransform().rotateX(20.0f);
     	g.getTransform().rotateY(-20.0f);
+    	
     	
     	return g;
     }

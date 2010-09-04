@@ -3,7 +3,7 @@ package com.tespirit.panda3d.geometry;
 public class Box extends Mesh {
 	
 	public Box(){
-		this.vertexBuffer = new VertexBuffer(8);
+		this.vertexBuffer = new VertexBuffer(8, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
 		
 		this.vertexBuffer.addPosition(-1, -1, -1);
 		this.vertexBuffer.addPosition(1, -1, -1);

@@ -2,19 +2,23 @@ package com.tespirit.panda3d.scenegraph;
 
 import com.tespirit.panda3d.vectors.*;
 import com.tespirit.panda3d.geometry.*;
+import com.tespirit.panda3d.material.*;
 
 public class Model extends Node{
 	private Matrix3d transform;
 	private AxisAlignedBox boundingBox;
 	private Geometry geometry;
+	private Material material;
 	
 	public Model(){
 		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
+		this.material = Material.getDefaultMaterial();
 	}
 	
 	public Model(String name){
 		super(name);
 		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
+		this.material = Material.getDefaultMaterial();
 	}
 	
 	@Override
@@ -49,5 +53,13 @@ public class Model extends Node{
 	
 	public void setGeometry(Geometry g){
 		this.geometry = g;
+	}
+	
+	public Material getMaterial(){
+		return this.material;
+	}
+	
+	public void setMaterial(Material material){
+		this.material = material;
 	}
 }

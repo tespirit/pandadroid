@@ -52,6 +52,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 			gl.glMultMatrixf(m.getBuffer(), m.getBufferOffset());
 		}
 		if(node instanceof Model){
+			((Model)node).getMaterial().apply(gl);
 			((Model)node).getGeometry().render(gl);
 		} else {
 			for(int i = 0; i < node.getChildCount(); i++){

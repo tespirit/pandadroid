@@ -14,25 +14,27 @@ public class VertexBuffer {
 	
 	public final static int TEXCOORD = 2;
 	
-	private final static int[] STRIDES = {3,3,2};
+	public final static int COLOR = 3;
+	
+	private final static int[] strides = {3,3,2,4};
 	
 	/**
 	 * Defaultly inits all buffers.
 	 * @param size
 	 */
 	public VertexBuffer(int count){
-		this.buffers = new FloatBuffer[VertexBuffer.STRIDES.length];
+		this.buffers = new FloatBuffer[VertexBuffer.strides.length];
 		this.count = count;
-		for(int i = 0; i < STRIDES.length; i++){
-			this.buffers[i] = this.allocateFloatBuffer(STRIDES[i]);
+		for(int i = 0; i < strides.length; i++){
+			this.buffers[i] = this.allocateFloatBuffer(strides[i]);
 		}
 	}
 	
 	public VertexBuffer(int count, int[] types){
-		this.buffers = new FloatBuffer[VertexBuffer.STRIDES.length];
+		this.buffers = new FloatBuffer[VertexBuffer.strides.length];
 		this.count = count;
 		for(int i = 0; i < types.length; i++){
-			this.buffers[types[i]] = this.allocateFloatBuffer(STRIDES[types[i]]);
+			this.buffers[types[i]] = this.allocateFloatBuffer(strides[types[i]]);
 		}
 	}
 	
@@ -62,6 +64,18 @@ public class VertexBuffer {
 		this.buffers[VertexBuffer.NORMAL].put(z);
 	}
 	
+	public void addTexcoord(float u, float v){
+		this.buffers[VertexBuffer.TEXCOORD].put(u);
+		this.buffers[VertexBuffer.TEXCOORD].put(v);
+	}
+	
+	public void addColor(float r, float g, float b, float a){
+		this.buffers[VertexBuffer.COLOR].put(r);
+		this.buffers[VertexBuffer.COLOR].put(g);
+		this.buffers[VertexBuffer.COLOR].put(b);
+		this.buffers[VertexBuffer.COLOR].put(a);
+	}
+	
 	public FloatBuffer getBuffer(int type){
 		return this.buffers[type];
 	}
@@ -81,13 +95,17 @@ public class VertexBuffer {
 	 */
 	public int getCount(int type){
 		if(this.buffers[type] != null){
-			return this.count * VertexBuffer.STRIDES[type];
+			return this.count * VertexBuffer.strides[type];
 		} else {
 			return 0;
 		}
 	}
 	
 	public int getStride(int type){
-		return VertexBuffer.STRIDES[type];
+		return VertexBuffer.strides[type];
+	}
+	
+	public boolean hasType(int type){
+		return this.buffers[type] != null;
 	}
 }
