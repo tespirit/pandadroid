@@ -1,0 +1,44 @@
+package com.tespirit.panda3d.geometry;
+
+import javax.microedition.khronos.opengles.GL10;
+
+import com.tespirit.panda3d.geometry.Geometry;;
+
+/**
+ * This is a standard mesh class that has a vertex buffer and an index buffer.
+ * @author Todd Espiritu Santo
+ *
+ */
+public class Mesh extends Geometry {
+	
+	protected VertexBuffer vertexBuffer;
+	protected IndexBuffer indexBuffer;
+	
+	//render flags
+	private int cullDirection;
+	
+	public Mesh(){
+		this.cullDirection = GL10.GL_CCW;
+	}
+
+	@Override
+	public void render(GL10 gl) {
+		gl.glFrontFace(this.cullDirection);
+		gl.glEnable(GL10.GL_CULL_FACE);
+		
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		
+		gl.glVertexPointer(this.vertexBuffer.getStride(VertexBuffer.POSITION), 
+						   GL10.GL_FLOAT, 
+						   0, 
+						   this.vertexBuffer.getBuffer(VertexBuffer.POSITION));
+		
+		gl.glDrawElements(GL10.GL_TRIANGLES, 
+						  this.indexBuffer.getCount(), 
+						  this.indexBuffer.getType(), 
+						  this.indexBuffer.getBuffer());
+		
+		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		gl.glDisable(GL10.GL_CULL_FACE);
+	}
+}

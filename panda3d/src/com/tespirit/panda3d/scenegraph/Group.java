@@ -7,7 +7,6 @@ public class Group extends Node {
 	
 	private ArrayList<Node> children;
 	private Matrix3d transform;
-	private AxisAlignedBox boundingBox;
 	
 	public Group(){
 		this.children = new ArrayList<Node>();
