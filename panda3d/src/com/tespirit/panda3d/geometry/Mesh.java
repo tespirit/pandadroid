@@ -33,10 +33,12 @@ public class Mesh extends Geometry {
 						   0, 
 						   this.vertexBuffer.getBuffer(VertexBuffer.POSITION));
 		
+		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 		gl.glNormalPointer(GL10.GL_FLOAT, 
 						   0, 
 						   this.vertexBuffer.getBuffer(VertexBuffer.NORMAL));
 		
+		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glTexCoordPointer(this.vertexBuffer.getStride(VertexBuffer.TEXCOORD), 
 							 GL10.GL_FLOAT, 
 							 0, 
@@ -56,6 +58,8 @@ public class Mesh extends Geometry {
 						  this.indexBuffer.getBuffer());
 		
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisable(GL10.GL_CULL_FACE);
 	}

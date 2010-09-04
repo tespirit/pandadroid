@@ -33,7 +33,7 @@ public class Pandamonium extends Activity {
     	Model m2 = new Model();
     	m2.setGeometry(new Box());
     	m2.setMaterial(new Material());
-    	m2.getMaterial().setColor(0.7f, 0.2f, 0.2f);
+    	m2.getMaterial().setDiffuse(0.7f, 0.2f, 0.2f);
     	
     	Group g = new Group();
     	g.appendChild(m1);

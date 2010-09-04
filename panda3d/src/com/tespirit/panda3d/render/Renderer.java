@@ -1,5 +1,8 @@
 package com.tespirit.panda3d.render;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -15,28 +18,47 @@ import android.opengl.GLU;
  */
 public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 	private Node root;
+	private ArrayList<Light> lights;
 	
 	public Renderer(){
 		super();
 		this.root = null;
+		lights = new ArrayList<Light>();
+		lights.add(new Light());
 	}
 	
 	public Renderer(Node root){
 		super();
 		this.root = root;
+		lights = new ArrayList<Light>();
 	}
 	
 	public void setSceneGraph(Node root){
 		this.root = root;
 	}
 	
+	public void addLight(Light light){
+		lights.add(light);
+	}
+	
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
+		
+		//render lights!
+		this.applyLights(gl);
+		
 		gl.glTranslatef(0, 0, -10);
 		if(this.root != null){
 			this.traverseSG(this.root, gl);
+		}
+	}
+	
+	public void applyLights(GL10 gl){
+		Iterator<Light> itr = this.lights.iterator();
+		while(itr.hasNext()){
+			itr.next().render(gl);
 		}
 	}
 	
@@ -82,6 +104,12 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 		
 		gl.glCullFace(GL10.GL_BACK);
+		
+		gl.glEnable (GL10.GL_LIGHTING);
+		
+		for(int i = 0; i < this.lights.size(); i++){
+			this.lights.get(i).init(gl, i);
+		}
 	}
 
 }

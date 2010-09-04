@@ -14,6 +14,15 @@ public class Box extends Mesh {
 		this.vertexBuffer.addPosition(1, 1, -1);
 		this.vertexBuffer.addPosition(-1, 1, -1);
 		
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		
 		this.indexBuffer = new IndexBuffer(12*3);
 		this.indexBuffer.addTriangle(0, 1, 2);
 		this.indexBuffer.addTriangle(0, 2, 3);

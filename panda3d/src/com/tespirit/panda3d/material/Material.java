@@ -1,66 +1,84 @@
 package com.tespirit.panda3d.material;
 
+
 import javax.microedition.khronos.opengles.GL10;
 
 public class Material {
-	private float red;
-	private float green;
-	private float blue;
-	private float alpha;
+	private float[] ambient;
+	private float[] diffuse;
+	private float[] specular;
+	private float[] emission;
 	
 	private static Material defaultMat = new Material();
 	
 	public Material(){
-		this.red = 0.5f;
-		this.green = 0.5f;
-		this.blue = 0.5f;
-		this.alpha = 1.0f;
+		this.ambient = new float[4];
+		this.setAmbient(0.5f, 0.5f, 0.5f);
+		
+		this.diffuse = new float[4];
+		this.setDiffuse(0.5f, 0.5f, 0.5f);
+		
+		this.specular = new float[4];
+		this.setSpecular(1.0f, 1.0f, 1.0f);
+		
+		this.emission = new float[4];
+		this.setEmission(0.0f, 0.0f, 0.0f);
 	}
 	
-	public float getRed(){
-		return this.red;
+	public void setDiffuse(float r, float g, float b, float a){
+		this.diffuse[0] = r;
+		this.diffuse[1] = b;
+		this.diffuse[2] = g;
+		this.diffuse[3] = a;
 	}
 	
-	public float getGreen(){
-		return this.green;
+	public void setDiffuse(float r, float g, float b){
+		this.diffuse[0] = r;
+		this.diffuse[1] = b;
+		this.diffuse[2] = g;
+		this.diffuse[3] = 1.0f;
 	}
 	
-	public float getBlue(){
-		return this.blue;
+	public float[] getDiffuse(){
+		return this.diffuse;
 	}
 	
-	public void setRed(float r){
-		this.red = r;
+	public void setSpecular(float r, float g, float b){
+		this.specular[0] = r;
+		this.specular[1] = b;
+		this.specular[2] = g;
+		this.specular[3] = 1.0f;
 	}
 	
-	public void setGreen(float g){
-		this.green = g;
+	public float[] getSpecular(){
+		return this.specular;
 	}
 	
-	public void setBlue(float b){
-		this.blue = b;
+	public void setAmbient(float r, float g, float b){
+		this.ambient[0] = r;
+		this.ambient[1] = b;
+		this.ambient[2] = g;
+		this.ambient[3] = 1.0f;
 	}
 	
-	public void setAlpha(float a){
-		this.alpha = a;
+	public float[] getAmbient(){
+		return this.ambient;
 	}
 	
-	public void setColor(float r, float g, float b, float a){
-		this.red = r;
-		this.blue = b;
-		this.green = g;
-		this.alpha = a;
+	public void setEmission(float r, float g, float b){
+		this.emission[0] = r;
+		this.emission[1] = b;
+		this.emission[2] = g;
+		this.emission[3] = 1.0f;
 	}
 	
-	public void setColor(float r, float g, float b){
-		this.red = r;
-		this.blue = b;
-		this.green = g;
-		this.alpha = 1.0f;
+	public float[] getEmission(){
+		return this.emission;
 	}
 	
 	public void apply(GL10 gl){
-		gl.glColor4f(this.red, this.green, this.blue, this.alpha);
+		//gl.glMaterialfv(face, pname, params, offset)
+		gl.glColor4f(this.diffuse[0], this.diffuse[1], this.diffuse[2], this.diffuse[3]);
 	}
 
 	public static Material getDefaultMaterial(){
