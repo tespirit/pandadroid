@@ -64,7 +64,6 @@ public class Matrix3dTest extends TestCase{
 	public void testTranslate(){
 		Matrix3d m = new Matrix3d();
 		Matrix3d m2 = new Matrix3d();
-		Matrix3d i = Matrix3d.IDENTITY;
 		
 		Vector3d v = new Vector3d(2.0f, 3.0f, 4.0f);
 		
@@ -87,11 +86,8 @@ public class Matrix3dTest extends TestCase{
 	
 	public void testRotate(){
 		Matrix3d m = new Matrix3d();
-		Matrix3d r = new Matrix3d();
 		
-		m.rotateX((float)Math.PI/2);
-		
-		
+		m.rotateX((float)Math.PI/2);		
 	}
 
 	public void testMultiply(){
@@ -156,6 +152,6 @@ public class Matrix3dTest extends TestCase{
 	}
 	
 	public void testInvert(){
-		Matrix3d m = new Matrix3d();
+		//Matrix3d m = new Matrix3d();
 	}
 }
