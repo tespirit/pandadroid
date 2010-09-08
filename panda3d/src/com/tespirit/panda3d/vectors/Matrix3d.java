@@ -99,34 +99,6 @@ public class Matrix3d {
 		this.m[14] = c4;
 		this.m[15] = d4;
 	}
-			
-	/**
-	 * if this is attached to a matrix buffer, this is a way to slide to the
-	 * next set of values.
-	 * @return
-	 */
-	public boolean next(){
-		if(this.offset+Matrix3d.SIZE44 < this.m.length){
-			this.offset += Matrix3d.SIZE44;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * if this is attached to a matrix buffer, this is a way to slide to the
-	 * previous set of values.
-	 * @return
-	 */
-	public boolean prev(){
-		if(this.offset-Matrix3d.SIZE44 >= 0){
-			this.offset -= Matrix3d.SIZE44;
-			return true;
-		} else {
-			return false;
-		}
-	}
 	
 	public float[] getBuffer(){
 		return this.m;

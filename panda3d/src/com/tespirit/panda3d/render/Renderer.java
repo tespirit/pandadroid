@@ -47,7 +47,8 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		gl.glLoadIdentity();
 		
 		//render lights!
-		this.applyLights(gl);
+		gl.glEnable(GL10.GL_LIGHTING);
+		//this.applyLights(gl);
 		
 		gl.glTranslatef(0, 0, -10);
 		if(this.root != null){
@@ -97,8 +98,10 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-		gl.glShadeModel(GL10.GL_SMOOTH);
+
 		gl.glClearDepthf(1.0f);
+		gl.glShadeModel(GL10.GL_SMOOTH);
+		gl.glDisable(GL10.GL_DITHER);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL10.GL_LEQUAL);
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
@@ -109,8 +112,11 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		
 		gl.glEnable(GL10.GL_COLOR_MATERIAL);
 		
+		gl.glEnable(GL10.GL_NORMALIZE);
+		
 		for(int i = 0; i < this.lights.size(); i++){
 			this.lights.get(i).init(gl, i);
+			this.lights.get(i).render(gl);
 		}
 	}
 

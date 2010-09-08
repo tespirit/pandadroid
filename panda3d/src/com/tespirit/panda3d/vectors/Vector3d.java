@@ -45,34 +45,6 @@ public class Vector3d {
 		this.offset = offset;
 	}
 	
-	/**
-	 * if this is a vector that is part of a buffer, this can iterate to the
-	 * next vector.
-	 * @return
-	 */
-	public boolean next(){
-		if(this.offset + Vector3d.SIZE4 < this.v.length){
-			this.offset += Vector3d.SIZE4;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * if this is a vector that is part of a buffer, this can iterate to the
-	 * previous vector.
-	 * @return
-	 */
-	public boolean prev(){
-		if(this.offset - Vector3d.SIZE4 >= 0){
-			this.offset -= Vector3d.SIZE4;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	public float[] getBuffer(){
 		return this.v;
 	}

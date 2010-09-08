@@ -1,99 +1,91 @@
 package com.tespirit.panda3d.render;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 import javax.microedition.khronos.opengles.GL10;
 
 public class Light {
-	private float[] ambient;
-	private float[] diffuse;
-	private float[] specular;
-	private float[] position;
+	
+	private static final int COLOR_SIZE = 4;
+	
+	private FloatBuffer ambient;
+	private FloatBuffer diffuse;
+	private FloatBuffer specular;
+	private FloatBuffer position;
 	
 	private int lightId;
 	
-	private static final int[] lightIds = {
-		GL10.GL_LIGHT0,
-		GL10.GL_LIGHT1,
-		GL10.GL_LIGHT2,
-		GL10.GL_LIGHT3,
-		GL10.GL_LIGHT4,
-		GL10.GL_LIGHT5,
-		GL10.GL_LIGHT6,
-		GL10.GL_LIGHT7
-	};
-	
 	public Light(){
-		this.ambient = new float[4];
-		this.setAmbient(0.2f, 0.2f, 0.2f);
+		this.ambient = createBuffer();
+		this.diffuse = createBuffer();
+		this.specular = createBuffer();
+		this.position = createBuffer();
 		
-		this.diffuse = new float[4];
+		this.setAmbient(0.5f, 0.5f, 0.5f);
 		this.setDiffuse(1.0f, 1.0f, 1.0f);
-		
-		this.specular = new float[4];
 		this.setSpecular(1.0f, 1.0f, 1.0f);
-		
-		this.position = new float[4];
-		this.setPosition(2.0f, 10.0f, -15.0f);
+		this.setPosition(0.0f, 0.0f, 2.0f);
+	}
+	
+	private FloatBuffer createBuffer(){
+		ByteBuffer temp = ByteBuffer.allocateDirect(Light.COLOR_SIZE * 4);
+		temp.order(ByteOrder.nativeOrder());
+		return temp.asFloatBuffer();
 	}
 	
 	public void init(GL10 gl, int lightId){
-		this.lightId = Light.lightIds[lightId];
-		gl.glEnable(this.lightId);
+		if(lightId < GL10.GL_MAX_LIGHTS) {
+			this.lightId = GL10.GL_LIGHT0+lightId;
+			gl.glEnable(this.lightId);
+		}
 	}
 	
 	public void render(GL10 gl){
-        gl.glLightfv(this.lightId, GL10.GL_AMBIENT, this.ambient, 0);
-        gl.glLightfv(this.lightId, GL10.GL_DIFFUSE, this.diffuse, 0);
-        gl.glLightfv(this.lightId, GL10.GL_SPECULAR, this.specular, 0);
-		gl.glLightfv(this.lightId, GL10.GL_POSITION, this.position, 0);
+        gl.glLightfv(this.lightId, GL10.GL_AMBIENT, this.ambient);
+        gl.glLightfv(this.lightId, GL10.GL_DIFFUSE, this.diffuse);
+        gl.glLightfv(this.lightId, GL10.GL_SPECULAR, this.specular);
+		gl.glLightfv(this.lightId, GL10.GL_POSITION, this.position);
 	}
 	
 	public void setDiffuse(float r, float g, float b, float a){
-		this.diffuse[0] = r;
-		this.diffuse[1] = b;
-		this.diffuse[2] = g;
-		this.diffuse[3] = a;
+		this.diffuse.put(r);
+		this.diffuse.put(b);
+		this.diffuse.put(g);
+		this.diffuse.put(a);
+		this.diffuse.position(0);
 	}
 	
 	public void setDiffuse(float r, float g, float b){
-		this.diffuse[0] = r;
-		this.diffuse[1] = b;
-		this.diffuse[2] = g;
-		this.diffuse[3] = 1.0f;
-	}
-	
-	public float[] getDiffuse(){
-		return this.diffuse;
+		this.diffuse.put(r);
+		this.diffuse.put(g);
+		this.diffuse.put(b);
+		this.diffuse.put(1.0f);
+		this.diffuse.position(0);
 	}
 	
 	public void setSpecular(float r, float g, float b){
-		this.specular[0] = r;
-		this.specular[1] = b;
-		this.specular[2] = g;
-		this.specular[3] = 1.0f;
-	}
-	
-	public float[] getSpecular(){
-		return this.specular;
+		this.specular.put(r);
+		this.specular.put(g);
+		this.specular.put(b);
+		this.specular.put(1.0f);
+		this.specular.position(0);
 	}
 	
 	public void setAmbient(float r, float g, float b){
-		this.ambient[0] = r;
-		this.ambient[1] = b;
-		this.ambient[2] = g;
-		this.ambient[3] = 1.0f;
-	}
-	
-	public float[] getAmbient(){
-		return this.ambient;
+		this.ambient.put(r);
+		this.ambient.put(g);
+		this.ambient.put(b);
+		this.ambient.put(1.0f);
+		this.ambient.position(0);
 	}
 	
 	public void setPosition(float x, float y, float z){
-		this.position[0] = x;
-		this.position[1] = y;
-		this.position[2] = z;
-	}
-	
-	public float[] getPositon(){
-		return this.position;
+		this.position.put(x);
+		this.position.put(y);
+		this.position.put(z);
+		this.position.put(1.0f);
+		this.position.position(0);
 	}
 }

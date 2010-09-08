@@ -4,6 +4,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 
+import com.tespirit.panda3d.vectors.Vector3d;
+
 public class VertexBuffer {	
 	private FloatBuffer[] buffers;
 	private int count;
@@ -74,6 +76,16 @@ public class VertexBuffer {
 		this.buffers[VertexBuffer.COLOR].put(g);
 		this.buffers[VertexBuffer.COLOR].put(b);
 		this.buffers[VertexBuffer.COLOR].put(a);
+	}
+	
+	public boolean nextVector3d(Vector3d out, int type){
+		FloatBuffer fb = this.buffers[type];
+		if(fb.hasRemaining()){
+		out.set(fb.get(), fb.get(), fb.get());
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public FloatBuffer getBuffer(int type){

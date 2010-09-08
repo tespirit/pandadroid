@@ -2,7 +2,7 @@ package com.tespirit.panda3d.geometry;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.tespirit.panda3d.geometry.Geometry;;
+import com.tespirit.panda3d.geometry.Geometry;
 
 /**
  * This is a standard mesh class that has a vertex buffer and an index buffer.
@@ -27,11 +27,11 @@ public class Mesh extends Geometry {
 		gl.glEnable(GL10.GL_CULL_FACE);
 		
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		
 		gl.glVertexPointer(this.vertexBuffer.getStride(VertexBuffer.POSITION), 
 						   GL10.GL_FLOAT, 
 						   0, 
 						   this.vertexBuffer.getBuffer(VertexBuffer.POSITION));
+		
 		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 		gl.glNormalPointer(GL10.GL_FLOAT, 
 						   0, 
@@ -43,13 +43,13 @@ public class Mesh extends Geometry {
 							 0, 
 							 this.vertexBuffer.getBuffer(VertexBuffer.TEXCOORD));
 		
-		if(this.vertexBuffer.hasType(VertexBuffer.COLOR)){
+		/*if(this.vertexBuffer.hasType(VertexBuffer.COLOR)){
 			gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 			gl.glColorPointer(this.vertexBuffer.getStride(VertexBuffer.COLOR), 
 						 	  GL10.GL_FLOAT, 
 						 	  0, 
 						 	  this.vertexBuffer.getBuffer(VertexBuffer.COLOR));
-		}
+		}*/
 		
 		gl.glDrawElements(GL10.GL_TRIANGLES, 
 						  this.indexBuffer.getCount(), 
@@ -61,13 +61,5 @@ public class Mesh extends Geometry {
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisable(GL10.GL_CULL_FACE);
-	}
-	
-	/**
-	 * This will compute the normals for a mesh.
-	 * Note: importing the normals directly is much faster.
-	 */
-	public void computeNormals(){
-		
 	}
 }

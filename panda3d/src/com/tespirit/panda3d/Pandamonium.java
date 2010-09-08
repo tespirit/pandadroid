@@ -3,7 +3,6 @@ package com.tespirit.panda3d;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.tespirit.panda3d.material.Material;
 import com.tespirit.panda3d.render.*;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.geometry.*;
@@ -27,28 +26,34 @@ public class Pandamonium extends Activity {
     }
     
     public Node createTestSG(){
-    	Model m1 = new Model();
-    	m1.setGeometry(new Plane());
-    	
-    	Model m2 = new Model();
-    	m2.setGeometry(new Box());
-    	m2.setMaterial(new Material());
-    	m2.getMaterial().setDiffuse(0.7f, 0.2f, 0.2f);
-    	
     	Group g = new Group();
-    	g.appendChild(m1);
-    	g.appendChild(m2);
+    	
+    	/*Model m1 = new Model();
+    	m1.setGeometry(new Plane());
+    	m1.setMaterial(new Material());
+
+    	//adjust colors
+    	m1.getMaterial().setDiffuse(1.0f, 1.0f, 1.0f);
+    	m1.getMaterial().setAmbient(1.0f, 1.0f, 1.0f);
+    	m1.getMaterial().setEmission(1.0f, 1.0f, 1.0f);
     	
     	//adjust matrices
     	m1.getTransform().rotateY(45.0f);
     	
-    	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
-    	m2.getTransform().scale(0.5f);
+    	g.appendChild(m1);
+    	*/
+    	Model m2 = new Model();
+    	m2.setGeometry(new Box());
     	
-    	g.getTransform().translate(1.0f, 0.0f, 0.0f);
-    	g.getTransform().rotateX(20.0f);
-    	g.getTransform().rotateY(-20.0f);
+    	//adjust matrix
+//    	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
+//    	m2.getTransform().scale(0.5f);
     	
+    	g.appendChild(m2);
+    	
+   // 	g.getTransform().translate(1.0f, 0.0f, 0.0f);
+   // 	g.getTransform().rotateX(20.0f);
+   // 	g.getTransform().rotateY(-20.0f);
     	
     	return g;
     }
