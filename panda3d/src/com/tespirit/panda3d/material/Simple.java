@@ -63,6 +63,7 @@ public class Simple extends Material{
 	
 	@Override
 	public void apply(GL10 gl){
+		gl.glDisable(GL10.GL_TEXTURE_2D);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, this.values, Simple.ambient);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, this.values, Simple.diffuse);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, this.values, Simple.specular);

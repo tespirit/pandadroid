@@ -1,14 +1,14 @@
 package com.tespirit.panda3d.render;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.tespirit.panda3d.core.Assets;
+import com.tespirit.panda3d.material.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
 
+import android.content.Context;
 import android.opengl.GLU;
 
 /**
@@ -18,27 +18,21 @@ import android.opengl.GLU;
  */
 public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 	private Node root;
-	private ArrayList<Light> lights;
 	
-	public Renderer(){
+	public Renderer(Context context){
 		super();
 		this.root = null;
-		lights = new ArrayList<Light>();
-		lights.add(new Light());
+		Assets.init(context);
 	}
 	
-	public Renderer(Node root){
+	public Renderer(Context context, Node root){
 		super();
 		this.root = root;
-		lights = new ArrayList<Light>();
+		Assets.init(context);
 	}
 	
 	public void setSceneGraph(Node root){
 		this.root = root;
-	}
-	
-	public void addLight(Light light){
-		lights.add(light);
 	}
 	
 	@Override
@@ -47,19 +41,11 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		gl.glLoadIdentity();
 		
 		//render lights!
-		gl.glEnable(GL10.GL_LIGHTING);
-		//this.applyLights(gl);
+		LightManager.getInstance().applyLights(gl);
 		
 		gl.glTranslatef(0, 0, -10);
 		if(this.root != null){
 			this.traverseSG(this.root, gl);
-		}
-	}
-	
-	public void applyLights(GL10 gl){
-		Iterator<Light> itr = this.lights.iterator();
-		while(itr.hasNext()){
-			itr.next().render(gl);
 		}
 	}
 	
@@ -101,23 +87,15 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 
 		gl.glClearDepthf(1.0f);
 		gl.glShadeModel(GL10.GL_SMOOTH);
-		gl.glDisable(GL10.GL_DITHER);
+		//gl.glDisable(GL10.GL_DITHER);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL10.GL_LEQUAL);
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 		
 		gl.glCullFace(GL10.GL_BACK);
 		
-		gl.glEnable (GL10.GL_LIGHTING);
-		
-		gl.glEnable(GL10.GL_COLOR_MATERIAL);
-		
-		gl.glEnable(GL10.GL_NORMALIZE);
-		
-		for(int i = 0; i < this.lights.size(); i++){
-			this.lights.get(i).init(gl, i);
-			this.lights.get(i).render(gl);
-		}
+		LightManager.getInstance().initLights(gl);
+		TextureManager.getInstance().initTextures(gl);
 	}
 
 }

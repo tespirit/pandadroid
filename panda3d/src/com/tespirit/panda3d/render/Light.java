@@ -26,7 +26,7 @@ public class Light {
 		this.setAmbient(0.5f, 0.5f, 0.5f);
 		this.setDiffuse(1.0f, 1.0f, 1.0f);
 		this.setSpecular(1.0f, 1.0f, 1.0f);
-		this.setPosition(0.0f, 0.0f, 2.0f);
+		this.setPosition(3.0f, 1.0f, 2.0f);
 	}
 	
 	private FloatBuffer createBuffer(){
