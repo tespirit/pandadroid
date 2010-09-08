@@ -21,6 +21,7 @@ public class IndexBufferTest extends TestCase {
 		
 		i.resetBufferPosition();
 		
+		Assert.assertEquals(6, i.getCount());
 	}
 	
 	

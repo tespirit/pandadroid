@@ -3,6 +3,8 @@ package com.tespirit.panda3d.geometry;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.tespirit.panda3d.geometry.Geometry;
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
+import com.tespirit.panda3d.vectors.Vector3d;
 
 /**
  * This is a standard mesh class that has a vertex buffer and an index buffer.
@@ -14,11 +16,14 @@ public class Mesh extends Geometry {
 	protected VertexBuffer vertexBuffer;
 	protected IndexBuffer indexBuffer;
 	
+	protected AxisAlignedBox boundingBox;
+	
 	//render flags
 	private int cullDirection;
 	
 	public Mesh(){
 		this.cullDirection = GL10.GL_CCW;
+		this.boundingBox = new AxisAlignedBox();
 	}
 
 	@Override
@@ -32,24 +37,28 @@ public class Mesh extends Geometry {
 						   0, 
 						   this.vertexBuffer.getBuffer(VertexBuffer.POSITION));
 		
-		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-		gl.glNormalPointer(GL10.GL_FLOAT, 
-						   0, 
-						   this.vertexBuffer.getBuffer(VertexBuffer.NORMAL));
+		if(this.vertexBuffer.hasType(VertexBuffer.NORMAL)){
+			gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
+			gl.glNormalPointer(GL10.GL_FLOAT, 
+							   0, 
+							   this.vertexBuffer.getBuffer(VertexBuffer.NORMAL));
+		}
 		
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		gl.glTexCoordPointer(this.vertexBuffer.getStride(VertexBuffer.TEXCOORD), 
-							 GL10.GL_FLOAT, 
-							 0, 
-							 this.vertexBuffer.getBuffer(VertexBuffer.TEXCOORD));
+		if(this.vertexBuffer.hasType(VertexBuffer.TEXCOORD)){
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glTexCoordPointer(this.vertexBuffer.getStride(VertexBuffer.TEXCOORD), 
+								 GL10.GL_FLOAT, 
+								 0, 
+								 this.vertexBuffer.getBuffer(VertexBuffer.TEXCOORD));
+		}
 		
-		/*if(this.vertexBuffer.hasType(VertexBuffer.COLOR)){
+		if(this.vertexBuffer.hasType(VertexBuffer.COLOR)){
 			gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 			gl.glColorPointer(this.vertexBuffer.getStride(VertexBuffer.COLOR), 
 						 	  GL10.GL_FLOAT, 
 						 	  0, 
 						 	  this.vertexBuffer.getBuffer(VertexBuffer.COLOR));
-		}*/
+		}
 		
 		gl.glDrawElements(GL10.GL_TRIANGLES, 
 						  this.indexBuffer.getCount(), 
@@ -61,5 +70,18 @@ public class Mesh extends Geometry {
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisable(GL10.GL_CULL_FACE);
+	}
+
+	@Override
+	public AxisAlignedBox getBoundingBox() {
+		return this.boundingBox;
+	}
+	
+	public void computeBoundingBox(){
+		Vector3d position = new Vector3d();
+		while(this.vertexBuffer.nextVector3d(position, VertexBuffer.POSITION)){
+			this.boundingBox.grow(position);
+		}
+		vertexBuffer.resetBufferPosition();
 	}
 }

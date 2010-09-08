@@ -6,7 +6,6 @@ import com.tespirit.panda3d.material.*;
 
 public class Model extends Node{
 	private Matrix3d transform;
-	private AxisAlignedBox boundingBox;
 	private Geometry geometry;
 	private Material material;
 	
@@ -23,7 +22,7 @@ public class Model extends Node{
 	
 	@Override
 	public AxisAlignedBox getBoundingBox() {
-		return boundingBox;
+		return this.geometry.getBoundingBox();
 	}
 
 	/**

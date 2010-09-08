@@ -8,17 +8,15 @@ public class Vector3d {
 	private float[] v;
 	private int offset;
 		
-	public final static int SIZE4 = 4;
-	public final static int SIZE3 = 3;
 	public final static int SIZE = 4; //generic size info, incase this changes for some reason
 	
 	public Vector3d(){
-		this.v = new float[Vector3d.SIZE4];
+		this.v = new float[Vector3d.SIZE];
 		this.offset = 0;
 	}
 	
 	public Vector3d(float x, float y, float z){
-		this.v = new float[Vector3d.SIZE4];
+		this.v = new float[Vector3d.SIZE];
 		this.v[0] = x;
 		this.v[1] = y;
 		this.v[2] = z;
@@ -85,6 +83,10 @@ public class Vector3d {
 		this.v[0] = x;
 		this.v[1] = y;
 		this.v[2] = z;
+	}
+	
+	public void setAt(float f, int i){
+		this.v[i] = f;
 	}
 	
 	public void copy(Vector3d v){

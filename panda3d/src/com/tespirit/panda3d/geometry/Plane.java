@@ -3,6 +3,8 @@ package com.tespirit.panda3d.geometry;
 public class Plane extends Mesh{
 	
 	public Plane(){
+		super();
+		
 		this.vertexBuffer = new VertexBuffer(4, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
 		
 		this.vertexBuffer.addPosition(-1.0f,  1.0f, 0.0f);
@@ -26,6 +28,8 @@ public class Plane extends Mesh{
 				
 		this.vertexBuffer.resetBufferPosition();
 		this.indexBuffer.resetBufferPosition();
+		
+		//this.computeBoundingBox();
 
 	}
 }
