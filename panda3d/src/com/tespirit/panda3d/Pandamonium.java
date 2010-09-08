@@ -22,7 +22,20 @@ public class Pandamonium extends Activity {
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
     	GLSurfaceView view = new GLSurfaceView(this);
-   		view.setRenderer(new Renderer(this, createTestSG()));
+    	Renderer r = new Renderer(this);
+    	
+    	Camera camera = new Camera();
+    	//camera.getTransform().rotateX(45);
+    	camera.getTransform().translate(0, 0, -10);
+    	r.setCamera(camera);
+    	
+    	LightManager lights = new LightManager();
+    	lights.createSimple();
+    	r.setLightManager(lights);
+    	
+    	r.setSceneGraph(createTestSG());
+    	
+   		view.setRenderer(r);
    		setContentView(view);
     }
     
@@ -54,9 +67,6 @@ public class Pandamonium extends Activity {
     	g.getTransform().rotateX(20.0f);
     	g.getTransform().rotateY(-20.0f);
     	
-    	//create lighting
-    	Light light = new Light();
-    	LightManager.getInstance().addLight(light);
     	
     	return g;
     }

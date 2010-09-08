@@ -9,17 +9,8 @@ public class LightManager {
 	
 	private ArrayList<Light> lights;
 	
-	private static LightManager lm;
-	
-	private LightManager(){
+	public LightManager(){
 		this.lights = new ArrayList<Light>();
-	}
-	
-	public static LightManager getInstance(){
-		if(LightManager.lm == null){
-			LightManager.lm = new LightManager();
-		}
-		return lm;
 	}
 	
 	public void addLight(Light light){
@@ -40,5 +31,9 @@ public class LightManager {
 		while(itr.hasNext()){
 			itr.next().render(gl);
 		}
+	}
+	
+	public void createSimple(){
+		this.addLight(new Light());
 	}
 }

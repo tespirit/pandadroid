@@ -18,6 +18,8 @@ import android.opengl.GLU;
  */
 public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 	private Node root;
+	private Camera camera;
+	private LightManager lights;
 	
 	public Renderer(Context context){
 		super();
@@ -25,14 +27,16 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		Assets.init(context);
 	}
 	
-	public Renderer(Context context, Node root){
-		super();
-		this.root = root;
-		Assets.init(context);
-	}
-	
 	public void setSceneGraph(Node root){
 		this.root = root;
+	}
+	
+	public void setCamera(Camera camera){
+		this.camera = camera;
+	}
+	
+	public void setLightManager(LightManager lights){
+		this.lights = lights;
 	}
 	
 	@Override
@@ -41,9 +45,9 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 		gl.glLoadIdentity();
 		
 		//render lights!
-		LightManager.getInstance().applyLights(gl);
+		this.lights.applyLights(gl);
 		
-		gl.glTranslatef(0, 0, -10);
+		this.camera.render(gl);
 		if(this.root != null){
 			this.traverseSG(this.root, gl);
 		}
@@ -73,12 +77,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
-		gl.glViewport(0, 0, width, height);
-		gl.glMatrixMode(GL10.GL_PROJECTION);
-		gl.glLoadIdentity();
-		GLU.gluPerspective(gl, 45.0f, (float) width / (float) height, 0.1f, 100.0f);
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
-		gl.glLoadIdentity();
+		this.camera.setupView(gl, width, height);
 	}
 
 	@Override
@@ -87,14 +86,12 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 
 		gl.glClearDepthf(1.0f);
 		gl.glShadeModel(GL10.GL_SMOOTH);
-		//gl.glDisable(GL10.GL_DITHER);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL10.GL_LEQUAL);
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
-		
 		gl.glCullFace(GL10.GL_BACK);
 		
-		LightManager.getInstance().initLights(gl);
+		this.lights.initLights(gl);
 		TextureManager.getInstance().initTextures(gl);
 	}
 
