@@ -9,7 +9,6 @@ import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
 
 import android.content.Context;
-import android.opengl.GLU;
 
 /**
  * 

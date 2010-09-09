@@ -4,7 +4,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLU;
 
+import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.vectors.Matrix3d;
+import com.tespirit.panda3d.vectors.Vector3d;
 
 public class Camera {
 	private Matrix3d camera;
@@ -53,5 +55,31 @@ public class Camera {
 	
 	public Matrix3d getTransform(){
 		return this.camera;
+	}
+	
+	public void pan(float x, float y){
+		//TODO: implement
+		this.camera.translate(x, y, 0.0f);
+	}
+	
+	public void zoom(float z){
+		//TODO: implement
+		this.camera.translate(0.0f, 0.0f, z);
+	}
+	
+	public void roll(float a){
+		//TODO: implement
+	}
+	
+	public void pitch(float a){
+		//TODO: implement
+	}
+	
+	public void aim(Matrix3d m){
+		//TODO: implement
+	}
+	
+	public void aim(Node node){
+		//TODO: implement
 	}
 }

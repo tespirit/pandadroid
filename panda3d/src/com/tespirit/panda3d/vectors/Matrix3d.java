@@ -317,6 +317,11 @@ public class Matrix3d {
 		return this;
 	}
 	
+	public Matrix3d aim(Matrix3d m){
+		//TODO: implement
+		return this;
+	}
+	
 	@Override
 	public boolean equals(Object o){
 		if(o instanceof Matrix3d){

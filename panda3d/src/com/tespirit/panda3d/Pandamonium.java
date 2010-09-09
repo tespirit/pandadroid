@@ -25,8 +25,8 @@ public class Pandamonium extends Activity {
     	Renderer r = new Renderer(this);
     	
     	Camera camera = new Camera();
-    	//camera.getTransform().rotateX(45);
-    	camera.getTransform().translate(0, 0, -10);
+    	camera.getTransform().rotateX(10);
+    	camera.getTransform().translate(0, -2, -10);
     	r.setCamera(camera);
     	
     	LightManager lights = new LightManager();
