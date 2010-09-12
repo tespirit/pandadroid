@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import javax.microedition.khronos.opengles.GL10;
+import com.tespirit.panda3d.core.ComponentRenderer;
 
 public class Light {
 	
@@ -35,18 +35,12 @@ public class Light {
 		return temp.asFloatBuffer();
 	}
 	
-	public void init(GL10 gl, int lightId){
-		if(lightId < GL10.GL_MAX_LIGHTS) {
-			this.lightId = GL10.GL_LIGHT0+lightId;
-			gl.glEnable(this.lightId);
-		}
+	public void setLightId(int id){
+		this.lightId = id;
 	}
 	
-	public void render(GL10 gl){
-        gl.glLightfv(this.lightId, GL10.GL_AMBIENT, this.ambient);
-        gl.glLightfv(this.lightId, GL10.GL_DIFFUSE, this.diffuse);
-        gl.glLightfv(this.lightId, GL10.GL_SPECULAR, this.specular);
-		gl.glLightfv(this.lightId, GL10.GL_POSITION, this.position);
+	public int getLightId(){
+		return this.lightId;
 	}
 	
 	public void setDiffuse(float r, float g, float b, float a){
@@ -65,12 +59,20 @@ public class Light {
 		this.diffuse.position(0);
 	}
 	
+	public FloatBuffer getDiffuseBuffer(){
+		return this.diffuse;
+	}
+	
 	public void setSpecular(float r, float g, float b){
 		this.specular.put(r);
 		this.specular.put(g);
 		this.specular.put(b);
 		this.specular.put(1.0f);
 		this.specular.position(0);
+	}
+	
+	public FloatBuffer getSpecularBuffer(){
+		return this.diffuse;
 	}
 	
 	public void setAmbient(float r, float g, float b){
@@ -81,11 +83,37 @@ public class Light {
 		this.ambient.position(0);
 	}
 	
+	public FloatBuffer getAmbientBuffer(){
+		return this.diffuse;
+	}
+	
 	public void setPosition(float x, float y, float z){
 		this.position.put(x);
 		this.position.put(y);
 		this.position.put(z);
 		this.position.put(1.0f);
 		this.position.position(0);
+	}
+	
+	public FloatBuffer getPositionBuffer(){
+		return this.diffuse;
+	}
+	
+	public void render(){
+		Light.renderer.render(this);
+	}
+	
+	public void setup(){
+		Light.renderer.setup(this);
+	}
+	
+	private static Renderer renderer;
+	
+	public static abstract class Renderer implements ComponentRenderer{
+		public void activate(){
+			Light.renderer = this;
+		}
+		public abstract void render(Light light);
+		public abstract void setup(Light light);
 	}
 }

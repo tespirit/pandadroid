@@ -1,15 +1,14 @@
-package com.tespirit.panda3d.material;
+package com.tespirit.panda3d.surfaces;
 
-
-import javax.microedition.khronos.opengles.GL10;
-
-public abstract class Material {
+public abstract class Surface {
 	
-	private static Material defaultMat = new Simple();
-	
-	public abstract void apply(GL10 gl);
+	private static Surface defaultSurface = new Material();
 
-	public static Material getDefaultMaterial(){
-		return defaultMat;
+	public static Surface getDefaultSurface(){
+		return Surface.defaultSurface;
 	}
+	
+	public abstract void render();
+	
+	public abstract void setup();
 }

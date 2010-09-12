@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.test;
 
-import com.tespirit.panda3d.geometry.VertexBuffer;
+import com.tespirit.panda3d.primitives.VertexBuffer;
 import com.tespirit.panda3d.vectors.Vector3d;
 
 import junit.framework.Assert;

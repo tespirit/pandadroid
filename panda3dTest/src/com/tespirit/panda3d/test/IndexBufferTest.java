@@ -3,7 +3,7 @@ package com.tespirit.panda3d.test;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import com.tespirit.panda3d.geometry.*;
+import com.tespirit.panda3d.primitives.IndexBuffer;
 
 public class IndexBufferTest extends TestCase {
 	

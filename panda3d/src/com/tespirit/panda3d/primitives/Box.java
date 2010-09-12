@@ -1,11 +1,9 @@
-package com.tespirit.panda3d.geometry;
+package com.tespirit.panda3d.primitives;
 
-public class Box extends Mesh {
+public class Box extends TriangleIndices {
 	
 	public Box(){
-		super();
-		
-		this.vertexBuffer = new VertexBuffer(24, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
+		super(12*3, 24, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
 		
 		this.vertexBuffer.addPosition(-1, -1, -1);
 		this.vertexBuffer.addPosition(1, -1, -1);
@@ -66,8 +64,7 @@ public class Box extends Mesh {
 		this.vertexBuffer.addNormal(-1, 0, 0);
 		this.vertexBuffer.addNormal(-1, 0, 0);
 		this.vertexBuffer.addNormal(-1, 0, 0);
-		
-		this.indexBuffer = new IndexBuffer(12*3);
+
 		this.indexBuffer.addTriangle(0, 1, 2);
 		this.indexBuffer.addTriangle(0, 2, 3);
 		
@@ -88,8 +85,5 @@ public class Box extends Mesh {
 		
 		this.vertexBuffer.resetBufferPosition();
 		this.indexBuffer.resetBufferPosition();
-		
-		this.computeBoundingBox();
-
 	}
 }

@@ -1,28 +1,31 @@
 package com.tespirit.panda3d.scenegraph;
 
+import com.tespirit.panda3d.surfaces.Surface;
 import com.tespirit.panda3d.vectors.*;
-import com.tespirit.panda3d.geometry.*;
-import com.tespirit.panda3d.material.*;
+import com.tespirit.panda3d.primitives.Primitive;
 
 public class Model extends Node{
 	private Matrix3d transform;
-	private Geometry geometry;
-	private Material material;
+	private Primitive primitive;
+	private Surface surface;
+	
+	private AxisAlignedBox boundingBox;
 	
 	public Model(){
 		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
-		this.material = Material.getDefaultMaterial();
+		this.surface = Surface.getDefaultSurface();
+		this.boundingBox = new AxisAlignedBox();
 	}
 	
 	public Model(String name){
 		super(name);
 		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
-		this.material = Material.getDefaultMaterial();
+		this.surface = Surface.getDefaultSurface();
 	}
 	
 	@Override
 	public AxisAlignedBox getBoundingBox() {
-		return this.geometry.getBoundingBox();
+		return this.boundingBox;
 	}
 
 	/**
@@ -46,19 +49,20 @@ public class Model extends Node{
 		return transform;
 	}
 	
-	public Geometry getGeometry(){
-		return this.geometry;
+	public Primitive getPrimitive(){
+		return this.primitive;
 	}
 	
-	public void setGeometry(Geometry g){
-		this.geometry = g;
+	public void setPrimative(Primitive primitive){
+		this.primitive = primitive;
+		this.primitive.computeBoundingBox(this.boundingBox);
 	}
 	
-	public Material getMaterial(){
-		return this.material;
+	public Surface getSurface(){
+		return this.surface;
 	}
 	
-	public void setMaterial(Material material){
-		this.material = material;
+	public void setSurface(Surface surface){
+		this.surface = surface;
 	}
 }

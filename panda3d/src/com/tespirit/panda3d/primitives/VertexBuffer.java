@@ -1,9 +1,10 @@
-package com.tespirit.panda3d.geometry;
+package com.tespirit.panda3d.primitives;
 
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
 import com.tespirit.panda3d.vectors.Vector3d;
 
 public class VertexBuffer {	
@@ -119,5 +120,13 @@ public class VertexBuffer {
 	
 	public boolean hasType(int type){
 		return this.buffers[type] != null;
+	}
+	
+	public void computeBoundingBox(AxisAlignedBox boundingBox){
+		Vector3d position = new Vector3d();
+		while(this.nextVector3d(position, VertexBuffer.POSITION)){
+			boundingBox.grow(position);
+		}
+		this.resetBufferPosition();
 	}
 }

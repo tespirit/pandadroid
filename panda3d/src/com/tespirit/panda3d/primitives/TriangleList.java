@@ -1,27 +1,36 @@
-package com.tespirit.panda3d.primatives;
+package com.tespirit.panda3d.primitives;
 
+import com.tespirit.panda3d.core.ComponentRenderer;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
-import com.tespirit.panda3d.vectors.Vector3d;
 
-public class TriangleList extends Primative{
+public class TriangleList extends Primitive{
 	protected VertexBuffer vertexBuffer;
 	
-	protected AxisAlignedBox boundingBox;
-	
-	public TriangleList(){
-		this.boundingBox = new AxisAlignedBox();
+	public TriangleList(int vertexCount, int[] vertexTypes){
+		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
+		this.renderAsTriangleStrip(); //default setting.
 	}
 	
+	public VertexBuffer getVertexBuffer(){
+		return this.vertexBuffer;
+	}
+
 	@Override
-	public AxisAlignedBox getBoundingBox() {
-		return this.boundingBox;
+	public void computeBoundingBox(AxisAlignedBox boundingBox) {
+		this.vertexBuffer.computeBoundingBox(boundingBox);
+	}
+
+	@Override
+	public void render() {
+		TriangleList.renderer.render(this);
 	}
 	
-	public void computeBoundingBox(){
-		Vector3d position = new Vector3d();
-		while(this.vertexBuffer.nextVector3d(position, VertexBuffer.POSITION)){
-			this.boundingBox.grow(position);
+	private static Renderer renderer;
+	
+	public static abstract class Renderer implements ComponentRenderer{
+		public void activate(){
+			TriangleList.renderer = this;
 		}
-		vertexBuffer.resetBufferPosition();
+		public abstract void render(TriangleList triangles);
 	}
 }

@@ -1,10 +1,10 @@
 package com.tespirit.panda3d.render;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
+import java.util.ArrayList;
 
 import com.tespirit.panda3d.core.Assets;
-import com.tespirit.panda3d.material.TextureManager;
+import com.tespirit.panda3d.core.ComponentRenderer;
+import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
 
@@ -15,40 +15,57 @@ import android.content.Context;
  * @author Todd Espiritu Santo
  *
  */
-public class Renderer implements android.opengl.GLSurfaceView.Renderer{
+public abstract class Renderer {
 	private Node root;
 	private Camera camera;
-	private LightManager lights;
+	private LightGroup lights;
+	private TextureManager textures;
+	private ArrayList<ComponentRenderer> renderers;
 	
 	public Renderer(Context context){
 		super();
 		this.root = null;
 		Assets.init(context);
+		//change this later.
+		this.textures = TextureManager.getInstance();
+		this.renderers = new ArrayList<ComponentRenderer>();
 	}
 	
 	public void setSceneGraph(Node root){
 		this.root = root;
 	}
 	
+	public Node getSceneGraph(){
+		return this.root;
+	}
+	
 	public void setCamera(Camera camera){
 		this.camera = camera;
 	}
 	
-	public void setLightManager(LightManager lights){
+	public Camera getCamera(){
+		return this.camera;
+	}
+	
+	public void setLightGroup(LightGroup lights){
 		this.lights = lights;
 	}
 	
-	@Override
-	public void onDrawFrame(GL10 gl) {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glLoadIdentity();
-		
-		//render lights!
-		this.lights.applyLights(gl);
-		
-		this.camera.render(gl);
+	public LightGroup getLightGroup(){
+		return this.lights;
+	}
+	
+	public void renderScene(){
+		if(this.lights != null){
+			for(int i = 0; i < this.lights.getLightCount(); i++){
+				this.lights.getLight(i).render();
+			}
+		}
+		if(this.camera != null){
+			this.camera.render();
+		}
 		if(this.root != null){
-			this.traverseSG(this.root, gl);
+			this.traverseSG(this.root);
 		}
 	}
 	
@@ -56,42 +73,69 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer{
 	 * This is for testing. i'm not sure how i want to handle this.
 	 * @param node
 	 */
-	public void traverseSG(Node node, GL10 gl){
-		gl.glPushMatrix();
-		//load matrix!
-		Matrix3d m = node.getTransform();
-		if(m != null){
-			gl.glMultMatrixf(m.getBuffer(), m.getBufferOffset());
+	public void traverseSG(Node node){
+		if(node.getTransform() != null) {
+			this.pushMatrix(node.getTransform());
 		}
 		if(node instanceof Model){
-			((Model)node).getMaterial().apply(gl);
-			((Model)node).getGeometry().render(gl);
+			((Model)node).getSurface().render();
+			((Model)node).getPrimitive().render();
 		} else {
 			for(int i = 0; i < node.getChildCount(); i++){
-				this.traverseSG(node.getChild(i), gl);
+				this.traverseSG(node.getChild(i));
 			}
 		}
-		gl.glPopMatrix();
+		if(node.getTransform() != null){
+			this.popMatrix();
+		}
 	}
 
-	@Override
-	public void onSurfaceChanged(GL10 gl, int width, int height) {
-		this.camera.setupView(gl, width, height);
+	/**
+	 * This should be called to initialize any render settings before rendering
+	 * takes place.
+	 */
+	public void initRender(){
+		this.reactivateComponentRenderers();
+		if(this.lights != null){
+			this.enableLights();
+			for(int i = 0; i < this.lights.getLightCount(); i++){
+				this.lights.getLight(i).setup();
+			}
+		}
+		if(this.textures != null){
+			this.enableTextures();
+			for(int i = 0; i < this.textures.getTextureCount(); i++){
+				this.textures.getTexture(i).setup();
+			}
+		}
 	}
 
-	@Override
-	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-
-		gl.glClearDepthf(1.0f);
-		gl.glShadeModel(GL10.GL_SMOOTH);
-		gl.glEnable(GL10.GL_DEPTH_TEST);
-		gl.glDepthFunc(GL10.GL_LEQUAL);
-		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
-		gl.glCullFace(GL10.GL_BACK);
-		
-		this.lights.initLights(gl);
-		TextureManager.getInstance().initTextures(gl);
+	/**
+	 * This should be called any time when setting up the view.
+	 * @param width
+	 * @param height
+	 */
+	public void setupView(int width, int height){
+		if(this.camera != null){
+			this.camera.setup(width, height);
+		}
 	}
-
+	
+	/* scenegraph manipulation */
+	public abstract void popMatrix();
+	public abstract void pushMatrix(Matrix3d transform);
+	
+	/* render settings */
+	public abstract void enableTextures();
+	public abstract void enableLights();
+	
+	public void addComponentRenderer(ComponentRenderer r){
+		this.renderers.add(r);
+	}
+	
+	public void reactivateComponentRenderers(){
+		for(int i = 0; i < this.renderers.size(); i++){
+			this.renderers.get(i).activate();
+		}
+	}
 }

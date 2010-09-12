@@ -6,12 +6,12 @@ public class LOD extends Node{
 	
 	private Node[] lods;
 	private float[] maxDistances;
-	private Vector3d center;
+//	private Vector3d center;
 	private int currentLevel;
 	
 	
 	public LOD(){
-		this.center = new Vector3d();
+//		this.center = new Vector3d();
 		this.currentLevel = 0;
 		
 	}

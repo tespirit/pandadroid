@@ -1,15 +1,12 @@
 package com.tespirit.panda3d.render;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import javax.microedition.khronos.opengles.GL10;
-
-public class LightManager {
+public class LightGroup {
 	
 	private ArrayList<Light> lights;
 	
-	public LightManager(){
+	public LightGroup(){
 		this.lights = new ArrayList<Light>();
 	}
 	
@@ -17,23 +14,32 @@ public class LightManager {
 		this.lights.add(light);
 	}
 	
-	public void initLights(GL10 gl){
-		gl.glEnable(GL10.GL_LIGHTING);
-		gl.glEnable(GL10.GL_COLOR_MATERIAL);
-		gl.glEnable(GL10.GL_NORMALIZE);
-		for(int i = 0; i < this.lights.size(); i++){
-			this.lights.get(i).init(gl, i);
-		}
+	public int getLightCount(){
+		return this.lights.size();
 	}
 	
-	public void applyLights(GL10 gl){
-		Iterator<Light> itr = this.lights.iterator();
-		while(itr.hasNext()){
-			itr.next().render(gl);
-		}
+	public Light getLight(int i){
+		return this.lights.get(i);
 	}
 	
-	public void createSimple(){
+	/**
+	 * This is a quick light initialization to some preset settings.
+	 */
+	public void createBasic(){
 		this.addLight(new Light());
+	}
+	
+	/**
+	 * This is a quick light initialization for day time looking lighting.
+	 */
+	public void createDayTime(){
+		//TODO: implement later
+	}
+	
+	/**
+	 * This is a quick light initialization for night time looking lighting.
+	 */
+	public void createNightTime(){
+		//TODO: implement later
 	}
 }

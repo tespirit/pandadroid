@@ -3,10 +3,13 @@ package com.tespirit.panda3d;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.tespirit.panda3d.material.Texture;
-import com.tespirit.panda3d.render.*;
+import com.tespirit.panda3d.surfaces.Texture;
+import com.tespirit.panda3d.render.Camera;
+import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
-import com.tespirit.panda3d.geometry.*;
+import com.tespirit.panda3d.opengl1x.Renderer;
+import com.tespirit.panda3d.primitives.Box;
+import com.tespirit.panda3d.primitives.Plane;
 
 import android.opengl.GLSurfaceView;
 import android.view.*;
@@ -29,9 +32,9 @@ public class Pandamonium extends Activity {
     	camera.getTransform().translate(0, -2, -10);
     	r.setCamera(camera);
     	
-    	LightManager lights = new LightManager();
-    	lights.createSimple();
-    	r.setLightManager(lights);
+    	LightGroup lights = new LightGroup();
+    	lights.createBasic();
+    	r.setLightGroup(lights);
     	
     	r.setSceneGraph(createTestSG());
     	
@@ -43,19 +46,19 @@ public class Pandamonium extends Activity {
     	Group g = new Group();
     	
     	Texture t1 = new Texture();
-    	t1.setTexture("test.bmp");
+    	t1.setDiffuseTextureName("test.bmp");
     	
     	Model m1 = new Model();
-    	m1.setGeometry(new Plane());
-    	m1.setMaterial(t1);
+    	m1.setPrimative(new Plane());
+    	m1.setSurface(t1);
 
     	//adjust matrices
     	m1.getTransform().rotateY(45.0f);
     	
     	g.appendChild(m1);
-    	
+
     	Model m2 = new Model();
-    	m2.setGeometry(new Box());
+    	m2.setPrimative(new Box());
     	
     	//adjust matrix
     	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);

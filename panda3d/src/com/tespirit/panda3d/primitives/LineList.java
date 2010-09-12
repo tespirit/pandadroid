@@ -1,39 +1,26 @@
-package com.tespirit.panda3d.primatives;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
+package com.tespirit.panda3d.primitives;
 
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
 
-public class Lines extends Primative{
-	private FloatBuffer points;
-	private int count;
+public class LineList extends Primitive{
+	private VertexBuffer vertexBuffer;
 	
-	private static int stride = 3;
-	
-	public Lines(int pointCount){
-		this.count = pointCount;
-		ByteBuffer temp = ByteBuffer.allocateDirect(this.count*Lines.stride*4);
-		temp.order(ByteOrder.nativeOrder());
-		this.points = temp.asFloatBuffer();
+	public LineList(int vertexCount, int[] vertexTypes){
+		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
 	}
 	
+	public VertexBuffer getVertexBuffer(){
+		return this.vertexBuffer;
+	}
+
 	@Override
-	public AxisAlignedBox getBoundingBox() {
+	public void computeBoundingBox(AxisAlignedBox boundingBox) {
+		vertexBuffer.computeBoundingBox(boundingBox);
+	}
+
+	@Override
+	public void render() {
 		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public FloatBuffer getPoints(){
-		return this.points;
-	}
-	
-	public int getPointCount(){
-		return this.count;
-	}
-	
-	public int getPointStride(){
-		return Lines.stride;
+		
 	}
 }

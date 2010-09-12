@@ -1,9 +1,6 @@
 package com.tespirit.panda3d.render;
 
-import javax.microedition.khronos.opengles.GL10;
-
-import android.opengl.GLU;
-
+import com.tespirit.panda3d.core.ComponentRenderer;
 import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
@@ -36,43 +33,61 @@ public class Camera {
 		this.camera = new Matrix3d();
 	}
 	
-	public void render(GL10 gl){
-		gl.glMultMatrixf(this.camera.getBuffer(),this.camera.getBufferOffset());
-	}
-	
-	public void setupView(GL10 gl, int width, int height){
-		if(height == 0){
-			height = 1;
-		}
-		
-		gl.glViewport(0, 0, width, height);
-		gl.glMatrixMode(GL10.GL_PROJECTION);
-		gl.glLoadIdentity();
-		GLU.gluPerspective(gl, this.fov, (float) width / (float) height, this.near, this.far);
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
-		gl.glLoadIdentity();
-	}
-	
 	public Matrix3d getTransform(){
 		return this.camera;
 	}
 	
+	public float getFov(){
+		return this.fov;
+	}
+	
+	public void setFov(float fov){
+		this.fov = fov;
+	}
+	
+	public float getNear(){
+		return this.near;
+	}
+	
+	public void setNear(float near){
+		this.near = near;
+	}
+	
+	public float getFar(){
+		return this.far;
+	}
+	
+	public void setFar(float far){
+		this.far = far;
+	}
+	
 	public void pan(float x, float y){
-		//TODO: implement
-		this.camera.translate(x, y, 0.0f);
+		this.camera.translate(this.camera.transform(new Vector3d(x, y, 0.0f)));
 	}
 	
 	public void zoom(float z){
-		//TODO: implement
-		this.camera.translate(0.0f, 0.0f, z);
+		this.camera.translate(this.camera.transform(new Vector3d(0.0f, 0.0f, z)));
 	}
 	
 	public void roll(float a){
-		//TODO: implement
+		this.camera.rotateAxis(a, 
+							   this.camera.getValue(2, 0), 
+							   this.camera.getValue(2, 1), 
+							   this.camera.getValue(2, 2));
 	}
 	
 	public void pitch(float a){
-		//TODO: implement
+		this.camera.rotateAxis(a, 
+							   this.camera.getValue(0, 0), 
+							   this.camera.getValue(0, 1), 
+							   this.camera.getValue(0, 2));
+	}
+	
+	public void yawn(float a){
+		this.camera.rotateAxis(a, 
+							   this.camera.getValue(1, 0), 
+							   this.camera.getValue(1, 1), 
+							   this.camera.getValue(1, 2));
 	}
 	
 	public void aim(Matrix3d m){
@@ -81,5 +96,24 @@ public class Camera {
 	
 	public void aim(Node node){
 		//TODO: implement
+	}
+	
+	public void render(){
+		Camera.renderer.render(this);
+	}
+	
+	public void setup(int width, int height){
+		Camera.renderer.setup(this, width, height);
+	}
+	
+	private static Renderer renderer;
+	
+	public static abstract class Renderer implements ComponentRenderer{
+		public void activate(){
+			Camera.renderer = this;
+		}
+		
+		public abstract void render(Camera camera);
+		public abstract void setup(Camera camera, int width, int height);
 	}
 }

@@ -1,9 +1,6 @@
-package com.tespirit.panda3d.material;
+package com.tespirit.panda3d.surfaces;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.microedition.khronos.opengles.GL10;
 
 public class TextureManager {
 	private static TextureManager tm;
@@ -18,11 +15,12 @@ public class TextureManager {
 		this.textures.add(t);
 	}
 	
-	public void initTextures(GL10 gl){
-		Iterator<Texture> itr = this.textures.iterator();
-		while(itr.hasNext()){
-			itr.next().init(gl);
-		}
+	public int getTextureCount(){
+		return this.textures.size();
+	}
+	
+	public Texture getTexture(int i){
+		return this.textures.get(i);
 	}
 	
 	public static TextureManager getInstance(){
