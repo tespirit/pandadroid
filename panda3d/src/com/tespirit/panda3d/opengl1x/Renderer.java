@@ -6,6 +6,8 @@ import javax.microedition.khronos.opengles.GL11;
 
 import com.tespirit.panda3d.core.Assets;
 import com.tespirit.panda3d.primitives.IndexBuffer;
+import com.tespirit.panda3d.primitives.LineIndices;
+import com.tespirit.panda3d.primitives.LineList;
 import com.tespirit.panda3d.primitives.Primitive;
 import com.tespirit.panda3d.primitives.TriangleIndices;
 import com.tespirit.panda3d.primitives.TriangleList;
@@ -16,7 +18,6 @@ import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.vectors.Matrix3d;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
@@ -25,8 +26,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 	private GL10 gl;
 	private int currentLightId;
 	
-	public Renderer(Context context) {
-		super(context);
+	public Renderer() {
 		this.currentLightId = 0;
 	}
 
@@ -64,7 +64,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.initRender();
 	}
 	
-	//easy overriding
+	//easy over
 	public void createRenderers(){
 		//create renderers!
 		this.addComponentRenderer(new TriangleIndicesRenderer());
@@ -73,6 +73,8 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.addComponentRenderer(new LightRenderer());
 		this.addComponentRenderer(new CameraRenderer());
 		this.addComponentRenderer(new TextureRenderer());
+		this.addComponentRenderer(new LineIndicesRenderer());
+		this.addComponentRenderer(new LineListRenderer());
 	}
 
 	@Override
@@ -122,6 +124,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		@Override
 		public void render(Camera camera) {
 			gl.glMultMatrixf(camera.getTransform().getBuffer(),camera.getTransform().getBufferOffset());
+			gl.glMultMatrixf(camera.getPivot().getBuffer(),camera.getPivot().getBufferOffset());
 		}
 		
 		@Override
@@ -293,6 +296,40 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 			
 			renderVertexBuffer(triangles.getVertexBuffer());
 			gl.glDrawArrays(triangles.getTypeEnum(), 0, triangles.getVertexBuffer().getCount());
+			
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			gl.glDisable(GL10.GL_CULL_FACE);
+		}
+	}
+	
+	class LineIndicesRenderer extends LineIndices.Renderer{
+		@Override
+		public void render(LineIndices lines) {
+			
+			renderVertexBuffer(lines.getVertexBuffer());
+			
+			IndexBuffer indexBuffer = lines.getIndexBuffer();
+			gl.glDrawElements(lines.getTypeEnum(), 
+					  indexBuffer.getCount(), 
+					  indexBuffer.getTypeEnum(), 
+					  indexBuffer.getBuffer());
+			
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			gl.glDisable(GL10.GL_CULL_FACE);
+		}
+	}
+	
+	class LineListRenderer extends LineList.Renderer{
+		@Override
+		public void render(LineList lines) {
+			renderVertexBuffer(lines.getVertexBuffer());
+			gl.glDrawArrays(lines.getTypeEnum(), 0, lines.getVertexBuffer().getCount());
 			
 			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);

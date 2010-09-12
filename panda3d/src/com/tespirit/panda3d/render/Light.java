@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import com.tespirit.panda3d.core.ComponentRenderer;
 
 public class Light {
 	

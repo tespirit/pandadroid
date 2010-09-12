@@ -7,11 +7,11 @@ import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.Camera;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
-import com.tespirit.panda3d.opengl1x.Renderer;
+import com.tespirit.panda3d.app.Panda3dView;
+import com.tespirit.panda3d.render.Renderer;
 import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.Plane;
 
-import android.opengl.GLSurfaceView;
 import android.view.*;
 
 public class Pandamonium extends Activity {
@@ -24,12 +24,13 @@ public class Pandamonium extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
-    	GLSurfaceView view = new GLSurfaceView(this);
-    	Renderer r = new Renderer(this);
+    	Panda3dView view = new Panda3dView(this);
+    	
+    	Renderer r = view.getRenderer();
     	
     	Camera camera = new Camera();
-    	camera.getTransform().rotateX(10);
-    	camera.getTransform().translate(0, -2, -10);
+    	camera.getPivot().rotateX(10);
+    	camera.zoom(-10);
     	r.setCamera(camera);
     	
     	LightGroup lights = new LightGroup();
@@ -38,7 +39,6 @@ public class Pandamonium extends Activity {
     	
     	r.setSceneGraph(createTestSG());
     	
-   		view.setRenderer(r);
    		setContentView(view);
     }
     

@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.core;
+package com.tespirit.panda3d.render;
 
 public interface ComponentRenderer {
 	void activate();

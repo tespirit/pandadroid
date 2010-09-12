@@ -61,10 +61,20 @@ public class VertexBuffer {
 		this.buffers[VertexBuffer.POSITION].put(z);
 	}
 	
+	public void setPosition(float[] values){
+		this.buffers[VertexBuffer.POSITION].put(values);
+		this.buffers[VertexBuffer.POSITION].position(0);
+	}
+	
 	public void addNormal(float x, float y, float z){
 		this.buffers[VertexBuffer.NORMAL].put(x);
 		this.buffers[VertexBuffer.NORMAL].put(y);
 		this.buffers[VertexBuffer.NORMAL].put(z);
+	}
+	
+	public void setNormal(float[] values){
+		this.buffers[VertexBuffer.NORMAL].put(values);
+		this.buffers[VertexBuffer.NORMAL].position(0);
 	}
 	
 	public void addTexcoord(float u, float v){
@@ -72,11 +82,28 @@ public class VertexBuffer {
 		this.buffers[VertexBuffer.TEXCOORD].put(v);
 	}
 	
+	public void setTexcoord(float[] values){
+		this.buffers[VertexBuffer.TEXCOORD].put(values);
+		this.buffers[VertexBuffer.TEXCOORD].position(0);
+	}
+	
 	public void addColor(float r, float g, float b, float a){
 		this.buffers[VertexBuffer.COLOR].put(r);
 		this.buffers[VertexBuffer.COLOR].put(g);
 		this.buffers[VertexBuffer.COLOR].put(b);
 		this.buffers[VertexBuffer.COLOR].put(a);
+	}
+	
+	public void addColor(float r, float g, float b){
+		this.buffers[VertexBuffer.COLOR].put(r);
+		this.buffers[VertexBuffer.COLOR].put(g);
+		this.buffers[VertexBuffer.COLOR].put(b);
+		this.buffers[VertexBuffer.COLOR].put(1.0f);
+	}
+	
+	public void setColor(float[] values){
+		this.buffers[VertexBuffer.TEXCOORD].put(values);
+		this.buffers[VertexBuffer.TEXCOORD].position(0);
 	}
 	
 	public boolean nextVector3d(Vector3d out, int type){

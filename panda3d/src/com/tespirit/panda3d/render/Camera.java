@@ -1,29 +1,23 @@
 package com.tespirit.panda3d.render;
 
-import com.tespirit.panda3d.core.ComponentRenderer;
 import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
 
 public class Camera {
 	private Matrix3d camera;
+	private Matrix3d pivot;
 	
 	private float fov;
 	private float near;
 	private float far;
 	
 	public Camera(){
-		this.fov = 45.0f;
-		this.near = 0.1f;
-		this.far = 100.0f;
-		this.camera = new Matrix3d();
+		this(45.0f,0.1f,100.0f);
 	}
 	
 	public Camera(float fov){
-		this.fov = fov;
-		this.near = 0.1f;
-		this.far = 100.0f;
-		this.camera = new Matrix3d();
+		this(fov,0.1f,100.0f);
 	}
 	
 	public Camera(float fov, float near, float far){
@@ -31,10 +25,15 @@ public class Camera {
 		this.near = near;
 		this.far = far;
 		this.camera = new Matrix3d();
+		this.pivot = new Matrix3d();
 	}
 	
 	public Matrix3d getTransform(){
 		return this.camera;
+	}
+	
+	public Matrix3d getPivot(){
+		return this.pivot;
 	}
 	
 	public float getFov(){
@@ -70,24 +69,15 @@ public class Camera {
 	}
 	
 	public void roll(float a){
-		this.camera.rotateAxis(a, 
-							   this.camera.getValue(2, 0), 
-							   this.camera.getValue(2, 1), 
-							   this.camera.getValue(2, 2));
+		this.camera.rotateY(a);
 	}
 	
 	public void pitch(float a){
-		this.camera.rotateAxis(a, 
-							   this.camera.getValue(0, 0), 
-							   this.camera.getValue(0, 1), 
-							   this.camera.getValue(0, 2));
+		this.camera.rotateX(a);
 	}
 	
 	public void yawn(float a){
-		this.camera.rotateAxis(a, 
-							   this.camera.getValue(1, 0), 
-							   this.camera.getValue(1, 1), 
-							   this.camera.getValue(1, 2));
+		this.camera.rotateZ(a);
 	}
 	
 	public void aim(Matrix3d m){

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import com.tespirit.panda3d.core.ComponentRenderer;
+import com.tespirit.panda3d.render.ComponentRenderer;
 
 /**
  * This is a simple material that is just solid colors.

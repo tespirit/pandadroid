@@ -2,13 +2,9 @@ package com.tespirit.panda3d.render;
 
 import java.util.ArrayList;
 
-import com.tespirit.panda3d.core.Assets;
-import com.tespirit.panda3d.core.ComponentRenderer;
 import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
-
-import android.content.Context;
 
 /**
  * 
@@ -22,10 +18,9 @@ public abstract class Renderer {
 	private TextureManager textures;
 	private ArrayList<ComponentRenderer> renderers;
 	
-	public Renderer(Context context){
+	public Renderer(){
 		super();
 		this.root = null;
-		Assets.init(context);
 		//change this later.
 		this.textures = TextureManager.getInstance();
 		this.renderers = new ArrayList<ComponentRenderer>();

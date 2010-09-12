@@ -1,12 +1,14 @@
 package com.tespirit.panda3d.primitives;
 
+import com.tespirit.panda3d.render.ComponentRenderer;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
 
 public class LineList extends Primitive{
-	private VertexBuffer vertexBuffer;
+	protected VertexBuffer vertexBuffer;
 	
 	public LineList(int vertexCount, int[] vertexTypes){
 		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
+		this.renderAsLines();
 	}
 	
 	public VertexBuffer getVertexBuffer(){
@@ -20,7 +22,16 @@ public class LineList extends Primitive{
 
 	@Override
 	public void render() {
-		// TODO Auto-generated method stub
+		LineList.renderer.render(this);
+	}
+	
+	private static Renderer renderer;
+	
+	public static abstract class Renderer implements ComponentRenderer{
+		public void activate(){
+			LineList.renderer = this;
+		}
 		
+		public abstract void render(LineList lines);
 	}
 }

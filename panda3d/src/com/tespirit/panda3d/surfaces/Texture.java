@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.surfaces;
 
-import com.tespirit.panda3d.core.ComponentRenderer;
+import com.tespirit.panda3d.render.ComponentRenderer;
 
 public class Texture extends Surface{
 	

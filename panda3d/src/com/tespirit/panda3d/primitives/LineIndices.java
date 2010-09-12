@@ -1,14 +1,20 @@
 package com.tespirit.panda3d.primitives;
 
+import com.tespirit.panda3d.render.ComponentRenderer;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
 
 public class LineIndices extends Primitive{
-	private VertexBuffer vertexBuffer;
-	private IndexBuffer indexBuffer;
+	protected VertexBuffer vertexBuffer;
+	protected IndexBuffer indexBuffer;
 	
 	public LineIndices(int indexCount, int vertexCount, int[] vertexTypes){
 		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
 		this.indexBuffer = new IndexBuffer(indexCount, vertexCount);
+		this.renderAsLines();
+	}
+	
+	public VertexBuffer getVertexBuffer(){
+		return this.vertexBuffer;
 	}
 	
 	public IndexBuffer getIndexBuffer(){
@@ -22,7 +28,16 @@ public class LineIndices extends Primitive{
 
 	@Override
 	public void render() {
-		// TODO Auto-generated method stub
+		LineIndices.renderer.render(this);
+	}
+	
+	private static Renderer renderer;
+	
+	public static abstract class Renderer implements ComponentRenderer{
+		public void activate(){
+			LineIndices.renderer = this;
+		}
 		
+		public abstract void render(LineIndices lines);
 	}
 }

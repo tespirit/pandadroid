@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.primitives;
 
-import com.tespirit.panda3d.core.ComponentRenderer;
+import com.tespirit.panda3d.render.ComponentRenderer;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
 
 /**
