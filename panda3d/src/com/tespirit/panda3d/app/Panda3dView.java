@@ -117,7 +117,7 @@ public class Panda3dView extends GLSurfaceView {
 		camera.zoom(zoomDistance);
 		this.renderer.setCamera(camera);
 		
-		TranslateController2d m = new TranslateController2d(Dof3.X, Dof3.negativeY);
+		TranslateController2d m = new TranslateController2d(Dof3.negativeX, Dof3.Y);
 		m.setControlled(camera);
 		m.setScale(0.01f);
 		this.addTouchMoveController(m);
