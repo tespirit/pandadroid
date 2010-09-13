@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.tespirit.panda3d.surfaces.Texture;
-import com.tespirit.panda3d.render.Camera;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.app.Panda3dView;
