@@ -25,7 +25,7 @@ public class Pandamonium extends Activity {
         
     	Panda3dView view = new Panda3dView(this);
     	
-    	view.createTouchPanCamera(-10);
+    	view.createTouchRotateCamera(-10);
     	
     	Renderer r = view.getRenderer();
     	

@@ -1,8 +1,7 @@
 package com.tespirit.panda3d.app;
 
-import java.util.ArrayList;
-
 import com.tespirit.panda3d.controllers.Controller2d;
+import com.tespirit.panda3d.controllers.ControllerDummy;
 import com.tespirit.panda3d.controllers.Dof3;
 import com.tespirit.panda3d.controllers.RotateController2d;
 import com.tespirit.panda3d.controllers.TranslateController2d;
@@ -15,9 +14,9 @@ import android.view.MotionEvent;
 
 public class Panda3dView extends GLSurfaceView {
 	private com.tespirit.panda3d.render.Renderer renderer;
-	private ArrayList<Controller2d> touchUpControllers;
-	private ArrayList<Controller2d> touchMoveControllers;
-	private ArrayList<Controller2d> touchDownControllers;
+	private Controller2d touchUpController;
+	private Controller2d touchMoveController;
+	private Controller2d touchDownController;
 
 	public Panda3dView(Context context) {
 		super(context);
@@ -26,9 +25,9 @@ public class Panda3dView extends GLSurfaceView {
 		//TODO:smartly create a renderer based on the availible graphics api.
 		this.initOpenGl1x();
 		
-		this.touchUpControllers = new ArrayList<Controller2d>();
-		this.touchMoveControllers = new ArrayList<Controller2d>();
-		this.touchDownControllers = new ArrayList<Controller2d>();
+		this.touchUpController = ControllerDummy.getInstance();
+		this.touchMoveController = ControllerDummy.getInstance();
+		this.touchDownController = ControllerDummy.getInstance();
 	}
 	
 	public void initOpenGl1x(){
@@ -41,18 +40,48 @@ public class Panda3dView extends GLSurfaceView {
 		return this.renderer;
 	}
 	
-	public void addTouchUpController(Controller2d m){
-		this.touchUpControllers.add(m);
+	/**
+	 * The controller is passed in the total distance travel and total time from
+	 * when the first touchDown event is called.
+	 * @param m
+	 */
+	public void setTouchUpController(Controller2d m){
+		this.touchUpController = m;
 	}
 	
-	public void addTouchDownController(Controller2d m){
-		this.touchDownControllers.add(m);
+	/**
+	 * The controller is passed in the absolute position of the press (typically
+	 * you'll have to make a custom controller for this to behave reasonably)
+	 * @param m
+	 */
+	public void setTouchDownController(Controller2d m){
+		this.touchDownController = m;
 	}
 	
-	public void addTouchMoveController(Controller2d m){
-		this.touchMoveControllers.add(m);
+	/**
+	 * This controller is passed in the change in position and time from the last
+	 * touch event.
+	 * @param m
+	 */
+	public void setTouchMoveController(Controller2d m){
+		this.touchMoveController = m;
 	}
 	
+	public Controller2d getTouchUpController(){
+		return this.touchUpController;
+	}
+	
+	public Controller2d getTouchDownController(){
+		return this.touchDownController;
+	}
+	
+	public Controller2d getTouchMoveController(){
+		return this.touchMoveController;
+	}
+	
+	float startX;
+	float startY;
+	long startTime;
 	float prevX;//figure out a better way to do this...
 	float prevY;//figure out a better way to do this...
 	long prevTime;
@@ -65,19 +94,16 @@ public class Panda3dView extends GLSurfaceView {
 		
 		switch(event.getAction()){
 		case MotionEvent.ACTION_UP:
-			for(Controller2d m : this.touchUpControllers){
-				m.update(x-this.prevX, y-this.prevY, time-this.prevTime);
-			}
+			this.touchUpController.update(x-this.startX, y-this.startY, time-this.startTime);
 			break;
 		case MotionEvent.ACTION_DOWN:
-			for(Controller2d m : this.touchDownControllers){
-				m.update(x, y);
-			}
+			this.startX = x;
+			this.startY = y;
+			this.startTime = time;
+			this.touchDownController.update(x, y);
 			break;
 		case MotionEvent.ACTION_MOVE:
-			for(Controller2d m : this.touchMoveControllers){
-				m.update(x-this.prevX, y-this.prevY, time-this.prevTime);
-			}
+			this.touchMoveController.update(x-this.prevX, y-this.prevY, time-this.prevTime);
 			break;
 		default:
 			break;
@@ -103,7 +129,7 @@ public class Panda3dView extends GLSurfaceView {
 		RotateController2d m = new RotateController2d(Dof3.Y, Dof3.X);
 		m.setControlled(camera.getPivotTransform());
 		m.setScale(0.25f);
-		this.addTouchMoveController(m);
+		this.setTouchMoveController(m);
 		
 		return camera;
 	}
@@ -120,7 +146,7 @@ public class Panda3dView extends GLSurfaceView {
 		TranslateController2d m = new TranslateController2d(Dof3.negativeX, Dof3.Y);
 		m.setControlled(camera);
 		m.setScale(0.01f);
-		this.addTouchMoveController(m);
+		this.setTouchMoveController(m);
 		
 		return camera;
 	}
