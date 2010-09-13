@@ -7,7 +7,7 @@ public abstract class Node {
 	
 	private String name;
 	
-	static private Hashtable<String, Node> LOOKUP;
+	static private Hashtable<String, Node> LOOKUP = new Hashtable<String, Node>();
 	
 	public Node(){
 		this.name = null;

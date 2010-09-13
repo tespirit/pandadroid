@@ -42,7 +42,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		this.gl = gl;
-		this.setupView(width, height);
+		this.setDisplay(width, height);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		
 		this.createRenderers();
 		
-		this.initRender();
+		this.setupRender();
 	}
 	
 	//easy over
@@ -124,11 +124,11 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		@Override
 		public void render(Camera camera) {
 			gl.glMultMatrixf(camera.getTransform().getBuffer(),camera.getTransform().getBufferOffset());
-			gl.glMultMatrixf(camera.getPivot().getBuffer(),camera.getPivot().getBufferOffset());
+			gl.glMultMatrixf(camera.getPivotTransform().getBuffer(),camera.getPivotTransform().getBufferOffset());
 		}
 		
 		@Override
-		public void setup(Camera camera, int width, int height) {
+		public void setDisplay(Camera camera, int width, int height) {
 			if(height == 0){
 				height = 1;
 			}

@@ -4,8 +4,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import com.tespirit.panda3d.scenegraph.Node;
+import com.tespirit.panda3d.scenegraph.RenderableNode;
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
+import com.tespirit.panda3d.vectors.Matrix3d;
 
-public class Light {
+
+public class Light extends Node implements RenderableNode{
 	
 	private static final int COLOR_SIZE = 4;
 	
@@ -32,6 +37,26 @@ public class Light {
 		ByteBuffer temp = ByteBuffer.allocateDirect(Light.COLOR_SIZE * 4);
 		temp.order(ByteOrder.nativeOrder());
 		return temp.asFloatBuffer();
+	}
+	
+	@Override
+	public AxisAlignedBox getBoundingBox() {
+		return null;
+	}
+
+	@Override
+	public Node getChild(int i) {
+		return null;
+	}
+
+	@Override
+	public int getChildCount() {
+		return 0;
+	}
+
+	@Override
+	public Matrix3d getTransform() {
+		return null;
 	}
 	
 	public void setLightId(int id){
@@ -98,12 +123,19 @@ public class Light {
 		return this.diffuse;
 	}
 	
+	@Override
 	public void render(){
 		Light.renderer.render(this);
 	}
 	
+	@Override
 	public void setup(){
 		Light.renderer.setup(this);
+	}
+	
+	@Override
+	public void setDisplay(int width, int height) {
+		//VOID for now
 	}
 	
 	private static Renderer renderer;

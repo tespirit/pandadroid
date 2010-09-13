@@ -1,10 +1,12 @@
 package com.tespirit.panda3d.render;
 
 import com.tespirit.panda3d.scenegraph.Node;
+import com.tespirit.panda3d.scenegraph.RenderableNode;
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
 
-public class Camera {
+public class Camera extends Node implements RenderableNode{
 	private Matrix3d camera;
 	private Matrix3d pivot;
 	
@@ -28,11 +30,12 @@ public class Camera {
 		this.pivot = new Matrix3d();
 	}
 	
+	@Override
 	public Matrix3d getTransform(){
 		return this.camera;
 	}
 	
-	public Matrix3d getPivot(){
+	public Matrix3d getPivotTransform(){
 		return this.pivot;
 	}
 	
@@ -88,12 +91,19 @@ public class Camera {
 		//TODO: implement
 	}
 	
+	@Override
 	public void render(){
 		Camera.renderer.render(this);
 	}
 	
-	public void setup(int width, int height){
-		Camera.renderer.setup(this, width, height);
+	@Override
+	public void setup() {
+		//VOID for now		
+	}
+
+	@Override
+	public void setDisplay(int width, int height) {
+		Camera.renderer.setDisplay(this, width, height);
 	}
 	
 	private static Renderer renderer;
@@ -104,6 +114,21 @@ public class Camera {
 		}
 		
 		public abstract void render(Camera camera);
-		public abstract void setup(Camera camera, int width, int height);
+		public abstract void setDisplay(Camera camera, int width, int height);
+	}
+
+	@Override
+	public AxisAlignedBox getBoundingBox() {
+		return null;
+	}
+
+	@Override
+	public Node getChild(int i) {
+		return null;
+	}
+
+	@Override
+	public int getChildCount() {
+		return 0;
 	}
 }

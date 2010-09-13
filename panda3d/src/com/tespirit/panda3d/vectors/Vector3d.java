@@ -12,6 +12,7 @@ public class Vector3d {
 	
 	public Vector3d(){
 		this.v = new float[Vector3d.SIZE];
+		this.v[3] = 1;
 		this.offset = 0;
 	}
 	

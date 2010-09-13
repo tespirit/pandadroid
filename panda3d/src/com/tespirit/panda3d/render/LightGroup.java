@@ -2,7 +2,11 @@ package com.tespirit.panda3d.render;
 
 import java.util.ArrayList;
 
-public class LightGroup {
+import com.tespirit.panda3d.scenegraph.Node;
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
+import com.tespirit.panda3d.vectors.Matrix3d;
+
+public class LightGroup extends Node{
 	
 	private ArrayList<Light> lights;
 	
@@ -14,12 +18,24 @@ public class LightGroup {
 		this.lights.add(light);
 	}
 	
-	public int getLightCount(){
+	@Override
+	public AxisAlignedBox getBoundingBox() {
+		return null;
+	}
+
+	@Override
+	public Node getChild(int i) {
+		return this.lights.get(i);
+	}
+
+	@Override
+	public int getChildCount() {
 		return this.lights.size();
 	}
-	
-	public Light getLight(int i){
-		return this.lights.get(i);
+
+	@Override
+	public Matrix3d getTransform() {
+		return null;
 	}
 	
 	/**

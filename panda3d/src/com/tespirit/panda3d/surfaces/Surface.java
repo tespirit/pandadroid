@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.surfaces;
 
-public abstract class Surface {
+public abstract class Surface{
 	
 	private static Surface defaultSurface = new Material();
 

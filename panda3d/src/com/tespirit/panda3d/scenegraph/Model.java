@@ -4,7 +4,7 @@ import com.tespirit.panda3d.surfaces.Surface;
 import com.tespirit.panda3d.vectors.*;
 import com.tespirit.panda3d.primitives.Primitive;
 
-public class Model extends Node{
+public class Model extends Node implements RenderableNode{
 	private Matrix3d transform;
 	private Primitive primitive;
 	private Surface surface;
@@ -64,5 +64,21 @@ public class Model extends Node{
 	
 	public void setSurface(Surface surface){
 		this.surface = surface;
+	}
+
+	@Override
+	public void render() {
+		this.surface.render();
+		this.primitive.render();
+	}
+
+	@Override
+	public void setDisplay(int width, int height) {
+		//VOID for now
+	}
+
+	@Override
+	public void setup() {
+		//VOID for now
 	}
 }

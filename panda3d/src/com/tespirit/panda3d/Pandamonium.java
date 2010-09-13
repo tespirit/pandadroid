@@ -26,12 +26,9 @@ public class Pandamonium extends Activity {
         
     	Panda3dView view = new Panda3dView(this);
     	
-    	Renderer r = view.getRenderer();
+    	view.createTouchPanCamera(-10);
     	
-    	Camera camera = new Camera();
-    	camera.getPivot().rotateX(10);
-    	camera.zoom(-10);
-    	r.setCamera(camera);
+    	Renderer r = view.getRenderer();
     	
     	LightGroup lights = new LightGroup();
     	lights.createBasic();

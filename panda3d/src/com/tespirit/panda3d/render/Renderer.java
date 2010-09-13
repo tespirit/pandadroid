@@ -51,37 +51,61 @@ public abstract class Renderer {
 	}
 	
 	public void renderScene(){
-		if(this.lights != null){
-			for(int i = 0; i < this.lights.getLightCount(); i++){
-				this.lights.getLight(i).render();
-			}
-		}
 		if(this.camera != null){
 			this.camera.render();
 		}
+		
+		if(this.lights != null){
+			for(int i = 0; i < this.lights.getChildCount(); i++){
+				((Light)this.lights.getChild(i)).render();
+			}
+		}
+		
 		if(this.root != null){
-			this.traverseSG(this.root);
+			this.traverseNode(this.root);
+		}
+		if(this.camera != null){
+			this.popMatrix();
 		}
 	}
 	
 	/**
-	 * This is for testing. i'm not sure how i want to handle this.
+	 * This traverses nodes and correctly pushes and pops matrices.
 	 * @param node
 	 */
-	public void traverseSG(Node node){
+	public void traverseNode(Node node){
 		if(node.getTransform() != null) {
 			this.pushMatrix(node.getTransform());
 		}
-		if(node instanceof Model){
-			((Model)node).getSurface().render();
-			((Model)node).getPrimitive().render();
+		if(node instanceof RenderableNode){
+			((RenderableNode)node).render();
 		} else {
 			for(int i = 0; i < node.getChildCount(); i++){
-				this.traverseSG(node.getChild(i));
+				this.traverseNode(node.getChild(i));
 			}
 		}
 		if(node.getTransform() != null){
 			this.popMatrix();
+		}
+	}
+	
+	public void traverseSetup(Node node){
+		if(node instanceof RenderableNode){
+			((RenderableNode)node).setup();
+		} else {
+			for(int i = 0; i < node.getChildCount(); i++){
+				traverseSetup(node.getChild(i));
+			}
+		}
+	}
+	
+	public void traverseSetDisplay(Node node, int width, int height){
+		if(node instanceof RenderableNode){
+			((RenderableNode)node).setDisplay(width, height);
+		} else {
+			for(int i = 0; i < node.getChildCount(); i++){
+				traverseSetDisplay(node.getChild(i), width, height);
+			}
 		}
 	}
 
@@ -89,13 +113,11 @@ public abstract class Renderer {
 	 * This should be called to initialize any render settings before rendering
 	 * takes place.
 	 */
-	public void initRender(){
+	public void setupRender(){
 		this.reactivateComponentRenderers();
 		if(this.lights != null){
 			this.enableLights();
-			for(int i = 0; i < this.lights.getLightCount(); i++){
-				this.lights.getLight(i).setup();
-			}
+			this.traverseSetup(this.lights);
 		}
 		if(this.textures != null){
 			this.enableTextures();
@@ -110,9 +132,9 @@ public abstract class Renderer {
 	 * @param width
 	 * @param height
 	 */
-	public void setupView(int width, int height){
+	public void setDisplay(int width, int height){
 		if(this.camera != null){
-			this.camera.setup(width, height);
+			this.traverseSetDisplay(this.camera, width, height);
 		}
 	}
 	
