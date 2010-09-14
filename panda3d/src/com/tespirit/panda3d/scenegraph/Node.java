@@ -2,22 +2,31 @@ package com.tespirit.panda3d.scenegraph;
 
 import com.tespirit.panda3d.vectors.*;
 import java.util.Hashtable;
+import java.util.Vector;
 
 public abstract class Node {
 	
 	private String name;
-	
-	static private Hashtable<String, Node> LOOKUP = new Hashtable<String, Node>();
+	private int uid;
+		
+	static private Hashtable<String, Node> nameLookup = new Hashtable<String, Node>();
+	static private Vector<Node> nodes = new Vector<Node>(); 
 	
 	public Node(){
-		this.name = null;
+		this(null);
 	}
 	
 	public Node(String name){
 		this.name = name;
 		if(this.name != null){
-			Node.LOOKUP.put(this.name, this);
+			Node.nameLookup.put(this.name, this);
 		}
+		this.uid = Node.nodes.size();
+		Node.nodes.add(this);
+	}
+	
+	public int getUid(){
+		return this.uid;
 	}
 	
 	public abstract Node getChild(int i);
@@ -34,13 +43,17 @@ public abstract class Node {
 	
 	public void setName(String n){
 		if(this.name != null){
-			Node.LOOKUP.remove(this.name);
+			Node.nameLookup.remove(this.name);
 		}
 		this.name = n;
-		Node.LOOKUP.put(this.name, this);
+		Node.nameLookup.put(this.name, this);
 	}
 	
 	public static Node getNode(String name){
-		return Node.LOOKUP.get(name);
+		return Node.nameLookup.get(name);
+	}
+	
+	public static Node getNode(int uid){
+		return Node.nodes.get(uid);
 	}
 }

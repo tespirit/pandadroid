@@ -14,6 +14,10 @@ public class Camera extends Node implements RenderableNode{
 	private float near;
 	private float far;
 	
+	/* computed values */
+	private float nearHeight;
+	private float aspectRatio;
+	
 	public Camera(){
 		this(45.0f,0.1f,100.0f);
 	}
@@ -63,6 +67,26 @@ public class Camera extends Node implements RenderableNode{
 		this.far = far;
 	}
 	
+	/**
+	 * This is the height from the center of the camera view
+	 * @return
+	 */
+	public float getNearHeight(){
+		return this.nearHeight;
+	}
+	
+	/**
+	 * This is the width from the center of the camera view
+	 * @return
+	 */
+	public float getNearWidth(){
+		return this.nearHeight * this.aspectRatio;
+	}
+	
+	public float getAspectRatio(){
+		return this.aspectRatio;
+	}
+	
 	public void pan(float x, float y){
 		this.camera.translate(this.camera.transform(new Vector3d(x, y, 0.0f)));
 	}
@@ -103,6 +127,9 @@ public class Camera extends Node implements RenderableNode{
 
 	@Override
 	public void setDisplay(int width, int height) {
+		//compute near and far heights
+		this.nearHeight = (float)(this.near * Math.tan(this.fov/2.0));
+		this.aspectRatio = (float)width/(float)height;
 		Camera.renderer.setDisplay(this, width, height);
 	}
 	

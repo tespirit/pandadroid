@@ -24,4 +24,9 @@ public class AxisAlignedBox {
 			}
 		}
 	}
+	
+	public void grow(AxisAlignedBox box){
+		this.grow(box.min);
+		this.grow(box.max);
+	}
 }

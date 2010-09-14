@@ -8,15 +8,20 @@ public class Group extends Node {
 	private ArrayList<Node> children;
 	private Matrix3d transform;
 	
+	private AxisAlignedBox boundingBox;
+	
 	public Group(){
+		super();
 		this.children = new ArrayList<Node>();
 		this.transform = new Matrix3d();//optimize later to share a single matrix buffer.
+		this.boundingBox = new AxisAlignedBox();
 	}
 	
 	public Group(String n){
 		super(n);
 		this.children = new ArrayList<Node>();
 		this.transform = new Matrix3d();//optimize later to share a single matrix buffer.
+		this.boundingBox = new AxisAlignedBox();
 	}
 	
 	public void appendChild(Node node){
@@ -43,6 +48,6 @@ public class Group extends Node {
 	 */
 	@Override
 	public AxisAlignedBox getBoundingBox(){
-		return null;
+		return boundingBox;
 	}
 }

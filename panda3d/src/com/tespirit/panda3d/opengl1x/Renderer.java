@@ -136,11 +136,11 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 			gl.glViewport(0, 0, width, height);
 			gl.glMatrixMode(GL10.GL_PROJECTION);
 			gl.glLoadIdentity();
-			GLU.gluPerspective(gl, 
-							   camera.getFov(), 
-							   (float) width / (float) height, 
-							   camera.getNear(), 
-							   camera.getFar());
+			gl.glFrustumf(-camera.getNearWidth(), 
+						  camera.getNearWidth(),
+						  -camera.getNearHeight(),
+						  camera.getNearHeight(), 
+						  camera.getNear(), camera.getFar());
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 		}

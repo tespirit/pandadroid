@@ -12,6 +12,7 @@ public class Model extends Node implements RenderableNode{
 	private AxisAlignedBox boundingBox;
 	
 	public Model(){
+		super();
 		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
 		this.surface = Surface.getDefaultSurface();
 		this.boundingBox = new AxisAlignedBox();

@@ -82,8 +82,8 @@ public class Panda3dView extends GLSurfaceView {
 	float startX;
 	float startY;
 	long startTime;
-	float prevX;//figure out a better way to do this...
-	float prevY;//figure out a better way to do this...
+	float prevX;
+	float prevY;
 	long prevTime;
 	
 	@Override
