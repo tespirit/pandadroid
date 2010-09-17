@@ -34,9 +34,13 @@ public class Camera extends Node implements RenderableNode{
 		this.fov = fov;
 		this.near = near;
 		this.far = far;
-		this.camera = new Matrix3d();
-		this.pivot = new Matrix3d();
-		this.worldTransform = new Matrix3d();
+		
+		float[] buffer = new float[Matrix3d.SIZE*3];
+		this.camera = new Matrix3d(buffer);
+		this.camera.identity();
+		this.pivot = new Matrix3d(buffer, Matrix3d.SIZE);
+		this.pivot.identity();
+		this.worldTransform = new Matrix3d(buffer, Matrix3d.SIZE *2);
 	}
 	
 	@Override

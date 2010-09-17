@@ -81,13 +81,13 @@ public class Vector3d {
 	}
 		
 	public void set(float x, float y, float z){
-		this.v[0] = x;
-		this.v[1] = y;
-		this.v[2] = z;
+		this.v[this.offset] = x;
+		this.v[this.offset+1] = y;
+		this.v[this.offset+2] = z;
 	}
 	
 	public void setAt(float f, int i){
-		this.v[i] = f;
+		this.v[this.offset+i] = f;
 	}
 	
 	/**
@@ -95,7 +95,15 @@ public class Vector3d {
 	 * that will only get rotational and scalar information applied to it
 	 */
 	public void setDirectional(){
-		this.v[3] = 0.0f;
+		this.v[this.offset+3] = 0.0f;
+	}
+	
+	/**
+	 * when using a float buffer, this should be called to make this a normal
+	 * vector.
+	 */
+	public void setPositional(){
+		this.v[this.offset+3] = 1.0f;
 	}
 	
 	public void copy(Vector3d v){
@@ -180,6 +188,22 @@ public class Vector3d {
 		float y = this.v[this.offset+1];
 		float z = this.v[this.offset+2];
 		return x*x + y*y + z*z;
+	}
+	
+	public Vector3d project(Vector3d v){
+		this.scale(this.dot(v)/this.magnitude2());
+		return this;
+	}
+	
+	/**
+	 * Convenience function for projecting onto v, instead of v
+	 * being projected on this.
+	 * @param v
+	 * @return v
+	 */
+	public Vector3d projectOnTo(Vector3d v){
+		this.scale(v.dot(this)/v.magnitude2());
+		return v;
 	}
 	
 	@Override 

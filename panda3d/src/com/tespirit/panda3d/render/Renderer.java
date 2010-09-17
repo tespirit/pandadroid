@@ -1,10 +1,13 @@
 package com.tespirit.panda3d.render;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
+import com.tespirit.panda3d.vectors.Ray;
 
 /**
  * 
@@ -19,6 +22,21 @@ public abstract class Renderer {
 	private ArrayList<ComponentRenderer> renderers;
 	
 	private ArrayList<RenderableNode> renderableNodes;
+	
+	private static final RenderableSort renderableSort = new RenderableSort();
+	
+	private static class RenderableSort implements Comparator<RenderableNode>{
+
+		@Override
+		public int compare(RenderableNode object1, RenderableNode object2) {
+			float z1 = object1.getWorldTransform().getTranslation().getZ();
+			float z2 = object2.getWorldTransform().getTranslation().getZ();
+			if(z1 < z2) return 1;
+			else if(z1 > z2) return -1;
+			else return 0;
+		}
+		
+	}
 	
 	public Renderer(){
 		super();
@@ -66,6 +84,7 @@ public abstract class Renderer {
 		
 		if(this.root != null){
 			root.update(this.camera.getWorldTransform());
+			Collections.sort(this.renderableNodes, Renderer.renderableSort);
 			for(RenderableNode node : this.renderableNodes){
 				this.pushMatrix(node.getWorldTransform());
 				node.render();
@@ -153,5 +172,31 @@ public abstract class Renderer {
 		}
 	}
 	
-	public abstract Node select(float x, float y);
+	public RenderableNode select(float x, float y){
+		Ray ray = camera.createRay(x, y);
+		Ray objectRay = ray.clone();
+		Matrix3d invertWT = new Matrix3d();
+		for(RenderableNode node : this.renderableNodes){
+			objectRay.transformBy(ray, invertWT.invert(node.getWorldTransform()));
+			if(node.getBoundingBox().intersectsRay(objectRay)){
+				return node;
+			}
+		}
+		return null;
+	}
+	
+	public Model selectModel(float x, float y){
+		Ray ray = camera.createRay(x, y);
+		Ray objectRay = ray.clone();
+		Matrix3d invertWT = new Matrix3d();
+		for(RenderableNode node : this.renderableNodes){
+			if(node instanceof Model){
+				objectRay.transformBy(ray, invertWT.invert(node.getWorldTransform()));
+				if(node.getBoundingBox().intersectsRay(objectRay)){
+					return (Model)node;
+				}
+			}
+		}
+		return null;
+	}
 }

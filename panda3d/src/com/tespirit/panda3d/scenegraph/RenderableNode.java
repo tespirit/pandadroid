@@ -1,5 +1,6 @@
 package com.tespirit.panda3d.scenegraph;
 
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
 import com.tespirit.panda3d.vectors.Matrix3d;
 
 public interface RenderableNode {
@@ -14,6 +15,8 @@ public interface RenderableNode {
 	public void setup();
 	
 	public Matrix3d getWorldTransform();
+	
+	public AxisAlignedBox getBoundingBox();
 	
 	/**
 	 * This is called if the view size changes objects that

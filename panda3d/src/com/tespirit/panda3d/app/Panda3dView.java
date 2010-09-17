@@ -7,6 +7,8 @@ import com.tespirit.panda3d.controllers.RotateController2d;
 import com.tespirit.panda3d.controllers.TranslateController2d;
 import com.tespirit.panda3d.core.Assets;
 import com.tespirit.panda3d.render.Camera;
+import com.tespirit.panda3d.scenegraph.Model;
+import com.tespirit.panda3d.surfaces.Material;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -86,6 +88,9 @@ public class Panda3dView extends GLSurfaceView {
 	float prevY;
 	long prevTime;
 	
+	//HACK for testing
+	private TranslateController2d selectController;
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		float x = event.getX();
@@ -100,6 +105,10 @@ public class Panda3dView extends GLSurfaceView {
 			this.startX = x;
 			this.startY = y;
 			this.startTime = time;
+			Model m = this.getRenderer().selectModel(x, y);
+			if(m != null){
+				m.getTransform().rotateX(10);
+			}
 			this.touchDownController.update(x, y);
 			break;
 		case MotionEvent.ACTION_MOVE:

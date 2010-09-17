@@ -1,13 +1,34 @@
 package com.tespirit.panda3d.vectors;
 
 public class Ray {
-	Vector3d position;
-	Vector3d direction;
+	private Vector3d position;
+	private Vector3d direction;
 	
 	public Ray(){
 		float[] buffer = new float[Vector3d.SIZE*2];
 		this.position = new Vector3d(buffer);
+		this.position.setPositional();
 		this.direction = new Vector3d(buffer, Vector3d.SIZE);
+		this.direction.setDirectional();
+	}
+	
+	public void copy(Ray ray){
+		this.position.copy(ray.position);
+		this.direction.copy(ray.direction);
+	}
+	
+	public Ray clone(){
+		Ray ray = new Ray();
+		ray.copy(this);
+		return ray;
+	}
+	
+	public Vector3d getDirection(){
+		return this.direction;
+	}
+	
+	public Vector3d getPosition(){
+		return this.position;
 	}
 	
 	public void setPostion(float x, float y, float z){
@@ -16,8 +37,13 @@ public class Ray {
 	
 	public void setDirection(float x, float y, float z){
 		this.direction.set(x, y, z);
-		this.direction.setDirectional();
 		this.direction.normalize();
+	}
+	
+	public Ray transformBy(Ray in, Matrix3d m){
+		m.transform(in.position, this.position);
+		m.transform(in.direction, this.direction);
+		return this;
 	}
 	
 	public Ray transformBy(Matrix3d m){
