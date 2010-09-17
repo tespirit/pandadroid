@@ -3,10 +3,9 @@ package com.tespirit.panda3d.scenegraph;
 import java.util.*;
 import com.tespirit.panda3d.vectors.*;
 
-public class Group extends Node {
+public class Group extends Transform {
 	
 	private ArrayList<Node> children;
-	private Matrix3d transform;
 	
 	private AxisAlignedBox boundingBox;
 	
@@ -36,11 +35,6 @@ public class Group extends Node {
 	@Override
 	public int getChildCount(){
 		return this.children.size();
-	}
-	
-	@Override
-	public  Matrix3d getTransform(){
-		return this.transform;
 	}
 	
 	/**

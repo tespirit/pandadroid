@@ -90,6 +90,14 @@ public class Vector3d {
 		this.v[i] = f;
 	}
 	
+	/**
+	 * this converts the the vector to only a directional vector
+	 * that will only get rotational and scalar information applied to it
+	 */
+	public void setDirectional(){
+		this.v[3] = 0.0f;
+	}
+	
 	public void copy(Vector3d v){
 		this.v[this.offset] = v.v[v.offset];
 		this.v[this.offset+1] = v.v[v.offset+1];
@@ -103,7 +111,7 @@ public class Vector3d {
 								this.v[this.offset+2]);
 		return v;
 	}
-	
+		
 	public Vector3d add(Vector3d v){
 		this.v[this.offset] += v.v[v.offset];
 		this.v[this.offset+1] += v.v[v.offset+1];

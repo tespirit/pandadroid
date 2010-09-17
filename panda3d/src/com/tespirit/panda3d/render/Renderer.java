@@ -18,12 +18,15 @@ public abstract class Renderer {
 	private TextureManager textures;
 	private ArrayList<ComponentRenderer> renderers;
 	
+	private ArrayList<RenderableNode> renderableNodes;
+	
 	public Renderer(){
 		super();
 		this.root = null;
 		//change this later.
 		this.textures = TextureManager.getInstance();
 		this.renderers = new ArrayList<ComponentRenderer>();
+		this.renderableNodes = new ArrayList<RenderableNode>();
 	}
 	
 	public void setSceneGraph(Node root){
@@ -62,6 +65,12 @@ public abstract class Renderer {
 		}
 		
 		if(this.root != null){
+			root.update(Matrix3d.IDENTITY);
+			for(RenderableNode node : this.renderableNodes){
+				this.pushMatrix(node.getWorldTransform());
+				node.render();
+				this.popMatrix();
+			}
 			this.traverseNode(this.root);
 		}
 		if(this.camera != null){
@@ -74,18 +83,14 @@ public abstract class Renderer {
 	 * @param node
 	 */
 	public void traverseNode(Node node){
-		if(node.getTransform() != null) {
-			this.pushMatrix(node.getTransform());
-		}
 		if(node instanceof RenderableNode){
+			this.pushMatrix(node.getWorldTransform());
 			((RenderableNode)node).render();
+			this.popMatrix();
 		} else {
 			for(int i = 0; i < node.getChildCount(); i++){
 				this.traverseNode(node.getChild(i));
 			}
-		}
-		if(node.getTransform() != null){
-			this.popMatrix();
 		}
 	}
 	
@@ -125,6 +130,18 @@ public abstract class Renderer {
 				this.textures.getTexture(i).setup();
 			}
 		}
+		if(this.root != null){
+			this.gatherRenderables(this.root);
+		}
+	}
+	
+	private void gatherRenderables(Node node){
+		if(node instanceof RenderableNode){
+			this.renderableNodes.add((RenderableNode)node);
+		}
+		for(int i = 0; i < node.getChildCount(); i++){
+			this.gatherRenderables(node.getChild(i));
+		}
 	}
 
 	/**
@@ -155,4 +172,6 @@ public abstract class Renderer {
 			this.renderers.get(i).activate();
 		}
 	}
+	
+	public abstract Node select(float x, float y);
 }

@@ -1,6 +1,7 @@
 package com.tespirit.panda3d.animation;
 
 import com.tespirit.panda3d.scenegraph.Node;
+import com.tespirit.panda3d.scenegraph.Transform;
 import com.tespirit.panda3d.vectors.*;
 
 /**
@@ -15,7 +16,7 @@ import com.tespirit.panda3d.vectors.*;
  * @author Dennis McAutoKnight
  *
  */
-public class Joint extends Node{
+public class Joint extends Transform{
 	
 	private Node[] children;
 	

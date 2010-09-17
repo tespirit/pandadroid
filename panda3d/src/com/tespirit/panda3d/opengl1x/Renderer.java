@@ -14,20 +14,23 @@ import com.tespirit.panda3d.primitives.TriangleList;
 import com.tespirit.panda3d.primitives.VertexBuffer;
 import com.tespirit.panda3d.render.Camera;
 import com.tespirit.panda3d.render.Light;
+import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.vectors.Matrix3d;
+import com.tespirit.panda3d.vectors.Ray;
 
 import android.graphics.Bitmap;
-import android.opengl.GLU;
 import android.opengl.GLUtils;
 
 public class Renderer extends com.tespirit.panda3d.render.Renderer implements android.opengl.GLSurfaceView.Renderer{
 	private GL10 gl;
 	private int currentLightId;
+	Matrix3d modelView;
 	
 	public Renderer() {
 		this.currentLightId = 0;
+		modelView = new Matrix3d();
 	}
 
 	@Override
@@ -64,7 +67,21 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.setupRender();
 	}
 	
-	//easy over
+	/**
+	 * This currently only works with opengl es 1.1.
+	 */
+	@Override
+	public Node select(float x, float y){
+		if(this.gl instanceof GL11){
+			GL11 gl11 = (GL11)this.gl;
+			gl11.glGetFloatv(GL10.GL_MODELVIEW, this.modelView.getBuffer(), this.modelView.getBufferOffset());
+			this.modelView.invert();
+			Ray ray = this.getCamera().createRay(x, y);
+			ray.transformBy(this.modelView);
+		}
+		return null;
+	}
+	
 	public void createRenderers(){
 		//create renderers!
 		this.addComponentRenderer(new TriangleIndicesRenderer());

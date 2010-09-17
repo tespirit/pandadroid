@@ -6,18 +6,31 @@ public class LOD extends Node{
 	
 	private Node[] lods;
 	private float[] maxDistances;
-//	private Vector3d center;
 	private int currentLevel;
 	
 	
 	public LOD(){
-//		this.center = new Vector3d();
+		super();
 		this.currentLevel = 0;
 		
 	}
 	
 	public LOD(String name){
 		super(name);
+		this.currentLevel = 0;
+	}
+	
+	@Override
+	public Matrix3d getWorldTransform(){
+		//TODO: see about maybe handling this...
+		return null;
+	}
+	
+	@Override
+	public void update(Matrix3d transform){
+		for(int i = 0; i < this.getChildCount(); i++){
+			this.getChild(i).update(transform);
+		}
 	}
 	
 	public void setLODCount(int count){

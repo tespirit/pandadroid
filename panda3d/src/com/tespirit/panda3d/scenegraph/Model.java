@@ -4,8 +4,7 @@ import com.tespirit.panda3d.surfaces.Surface;
 import com.tespirit.panda3d.vectors.*;
 import com.tespirit.panda3d.primitives.Primitive;
 
-public class Model extends Node implements RenderableNode{
-	private Matrix3d transform;
+public class Model extends Transform implements RenderableNode{
 	private Primitive primitive;
 	private Surface surface;
 	
@@ -13,15 +12,14 @@ public class Model extends Node implements RenderableNode{
 	
 	public Model(){
 		super();
-		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
 		this.surface = Surface.getDefaultSurface();
 		this.boundingBox = new AxisAlignedBox();
 	}
 	
 	public Model(String name){
 		super(name);
-		this.transform = new Matrix3d(); //optimize later to share a single matrix buffer.
 		this.surface = Surface.getDefaultSurface();
+		this.boundingBox = new AxisAlignedBox();
 	}
 	
 	@Override
@@ -43,11 +41,6 @@ public class Model extends Node implements RenderableNode{
 	@Override
 	public int getChildCount() {
 		return 0;
-	}
-
-	@Override
-	public Matrix3d getTransform() {
-		return transform;
 	}
 	
 	public Primitive getPrimitive(){

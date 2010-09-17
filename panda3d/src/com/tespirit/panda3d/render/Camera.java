@@ -4,6 +4,7 @@ import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.scenegraph.RenderableNode;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
 import com.tespirit.panda3d.vectors.Matrix3d;
+import com.tespirit.panda3d.vectors.Ray;
 import com.tespirit.panda3d.vectors.Vector3d;
 
 public class Camera extends Node implements RenderableNode{
@@ -13,6 +14,8 @@ public class Camera extends Node implements RenderableNode{
 	private float fov;
 	private float near;
 	private float far;
+	private int width;
+	private int height;
 	
 	/* computed values */
 	private float nearHeight;
@@ -32,6 +35,17 @@ public class Camera extends Node implements RenderableNode{
 		this.far = far;
 		this.camera = new Matrix3d();
 		this.pivot = new Matrix3d();
+	}
+	
+	@Override
+	public Matrix3d getWorldTransform(){
+		//TODO: see about maybe handling this...
+		return null;
+	}
+	
+	@Override
+	public void update(Matrix3d transform){
+		//VOID for now.
 	}
 	
 	@Override
@@ -127,23 +141,14 @@ public class Camera extends Node implements RenderableNode{
 
 	@Override
 	public void setDisplay(int width, int height) {
+		this.width = width;
+		this.height = height;
 		//compute near and far heights
 		this.nearHeight = (float)(this.near * Math.tan(this.fov/2.0));
 		this.aspectRatio = (float)width/(float)height;
 		Camera.renderer.setDisplay(this, width, height);
 	}
 	
-	private static Renderer renderer;
-	
-	public static abstract class Renderer implements ComponentRenderer{
-		public void activate(){
-			Camera.renderer = this;
-		}
-		
-		public abstract void render(Camera camera);
-		public abstract void setDisplay(Camera camera, int width, int height);
-	}
-
 	@Override
 	public AxisAlignedBox getBoundingBox() {
 		return null;
@@ -157,5 +162,31 @@ public class Camera extends Node implements RenderableNode{
 	@Override
 	public int getChildCount() {
 		return 0;
+	}
+	
+	public Ray createRay(float x, float y){
+		float halfHeight = (float)this.height/2;
+		float halfWidth = (float)this.width/2;
+		
+		float xUnit = (this.width - halfWidth - x)/((float)this.width/2);
+		float yUnit = (this.height - halfHeight - x)/((float)this.height/2);
+		
+		Ray ray = new Ray();
+		ray.setDirection(xUnit*this.nearHeight*this.aspectRatio, 
+						 yUnit*this.nearHeight, 
+						 this.near);
+		ray.setPostion(0.0f, 0.0f, 0.0f);
+		return ray;
+	}
+	
+	private static Renderer renderer;
+	
+	public static abstract class Renderer implements ComponentRenderer{
+		public void activate(){
+			Camera.renderer = this;
+		}
+		
+		public abstract void render(Camera camera);
+		public abstract void setDisplay(Camera camera, int width, int height);
 	}
 }

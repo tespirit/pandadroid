@@ -35,11 +35,19 @@ public abstract class Node {
 	
 	public abstract Matrix3d getTransform();
 	
+	public abstract Matrix3d getWorldTransform();
+	
 	public abstract AxisAlignedBox getBoundingBox();
 	
 	public String getName() {
 		return this.name;
 	}
+	
+	/**
+	 * this updates the nodes with the new tranformation
+	 * @param m
+	 */
+	public abstract void update(Matrix3d transform);
 	
 	public void setName(String n){
 		if(this.name != null){

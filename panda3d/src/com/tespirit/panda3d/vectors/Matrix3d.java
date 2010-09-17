@@ -7,11 +7,16 @@ public class Matrix3d {
 	private float[] m;
 	private int offset;
 	
-	public static final int SIZE44 = 16;
+	private Vector3d xAxis;
+	private Vector3d yAxis;
+	private Vector3d zAxis;
+	private Vector3d translation;
+	
+	public static final int SIZE = 16;
+	
+	private static final int SIZE44 = 16;
 	
 	public static final int SIZEROW = 4;
-	
-	public static final int SIZE34 = 12;
 	
 	
 	public static final Matrix3d IDENTITY = new Matrix3d();
@@ -20,10 +25,7 @@ public class Matrix3d {
 	 * creates a matrix with its own float buffer.
 	 */
 	public Matrix3d(){
-		this.m = new float[Matrix3d.SIZE44];
-
-		this.offset = 0;
-
+		this(new float[Matrix3d.SIZE44]);
 		Matrix.setIdentityM(this.m, this.offset);
 	}
 	
@@ -32,8 +34,7 @@ public class Matrix3d {
 	 * @param values
 	 */
 	public Matrix3d(float[] values){
-		this.m = values;
-		this.offset = 0;
+		this(values, 0);
 	}
 		
 	/**
@@ -43,13 +44,16 @@ public class Matrix3d {
 	public Matrix3d(float[] values, int offset){
 		this.m = values;
 		this.offset = offset;
+		this.xAxis = new Vector3d(this.m);
+		this.yAxis = new Vector3d(this.m, Vector3d.SIZE);
+		this.zAxis = new Vector3d(this.m, Vector3d.SIZE*2);
+		this.translation = new Vector3d(this.m, Vector3d.SIZE*3);
 	}
 	
 	public Matrix3d(float a1, float a2, float a3, float a4, 
 					float b1, float b2, float b3, float b4, 
 					float c1, float c2, float c3, float c4){
-		this.m = new float[Matrix3d.SIZE44];
-		this.offset = 0;
+		this(new float[Matrix3d.SIZE44]);
 		
 		this.m[0] = a1;
 		this.m[1] = b1;
@@ -70,14 +74,15 @@ public class Matrix3d {
 		this.m[13] = b4;
 		this.m[14] = c4;
 		this.m[15] = 1;
+		
+		
 	}
 	
 	public Matrix3d(float a1, float a2, float a3, float a4, 
 					float b1, float b2, float b3, float b4, 
 					float c1, float c2, float c3, float c4, 
 					float d1, float d2, float d3, float d4){
-		this.m = new float[Matrix3d.SIZE44];
-		this.offset = 0;
+		this(new float[Matrix3d.SIZE44]);
 		
 		this.m[0] = a1;
 		this.m[1] = b1;
@@ -98,6 +103,22 @@ public class Matrix3d {
 		this.m[13] = b4;
 		this.m[14] = c4;
 		this.m[15] = d4;
+	}
+	
+	public Vector3d getXAxis(){
+		return this.xAxis;
+	}
+	
+	public Vector3d getYAxis(){
+		return this.yAxis;
+	}
+	
+	public Vector3d getZAxis(){
+		return this.zAxis;
+	}
+	
+	public Vector3d getTranslation(){
+		return this.translation;
 	}
 	
 	public float[] getBuffer(){
@@ -308,7 +329,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d multiply(Matrix3d m1, Matrix3d m2){
-		Matrix.multiplyMM(this.m, this.offset, m1.m, m2.offset, m2.m, m2.offset);
+		Matrix.multiplyMM(this.m, this.offset, m1.m, m1.offset, m2.m, m2.offset);
 		return this;
 	}
 	

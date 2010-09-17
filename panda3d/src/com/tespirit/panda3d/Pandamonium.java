@@ -44,7 +44,7 @@ public class Pandamonium extends Activity {
     	Texture t1 = new Texture();
     	t1.setDiffuseTextureName("test.bmp");
     	
-    	Model m1 = new Model();
+    	Model m1 = new Model("plane");
     	m1.setPrimative(new Plane());
     	m1.setSurface(t1);
 
@@ -53,7 +53,7 @@ public class Pandamonium extends Activity {
     	
     	g.appendChild(m1);
 
-    	Model m2 = new Model();
+    	Model m2 = new Model("box");
     	m2.setPrimative(new Box());
     	
     	//adjust matrix
@@ -65,7 +65,6 @@ public class Pandamonium extends Activity {
     	g.getTransform().translate(1.0f, 0.0f, 0.0f);
     	g.getTransform().rotateX(20.0f);
     	g.getTransform().rotateY(-20.0f);
-    	
     	
     	return g;
     }

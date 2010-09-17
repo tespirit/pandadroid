@@ -40,6 +40,17 @@ public class Light extends Node implements RenderableNode{
 	}
 	
 	@Override
+	public Matrix3d getWorldTransform(){
+		//TODO: see about maybe handling this...
+		return null;
+	}
+	
+	@Override
+	public void update(Matrix3d transform){
+		
+	}
+	
+	@Override
 	public AxisAlignedBox getBoundingBox() {
 		return null;
 	}
