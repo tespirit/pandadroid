@@ -31,6 +31,14 @@ public class TriangleIndices extends Primitive {
 		this.vertexBuffer.computeBoundingBox(boundingBox);
 	}
 	
+	public void renderWireFrame(){
+		this.renderAsLineStrip();
+	}
+	
+	public void renderSolid(){
+		this.renderAsTriangleStrip();
+	}
+	
 	@Override
 	public void render() {
 		TriangleIndices.renderer.render(this);

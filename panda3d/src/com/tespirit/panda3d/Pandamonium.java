@@ -3,6 +3,7 @@ package com.tespirit.panda3d;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
@@ -29,9 +30,9 @@ public class Pandamonium extends Activity {
     	
     	Renderer r = view.getRenderer();
     	
-    	LightGroup lights = new LightGroup();
-    	lights.createBasic();
-    	r.setLightGroup(lights);
+    	//LightGroup lights = new LightGroup();
+    	//lights.createBasic();
+    	//r.setLightGroup(lights);
     	
     	r.setSceneGraph(createTestSG());
     	
@@ -41,7 +42,7 @@ public class Pandamonium extends Activity {
     public Node createTestSG(){
     	Group g = new Group();
     	
-    	Texture t1 = new Texture();
+    	/*Texture t1 = new Texture();
     	t1.setDiffuseTextureName("test.bmp");
     	
     	Model m1 = new Model("plane");
@@ -52,20 +53,25 @@ public class Pandamonium extends Activity {
     	m1.getTransform().rotateY(45.0f);
     	
     	g.appendChild(m1);
-
+*/
     	Model m2 = new Model("box");
     	m2.setPrimative(new Box());
+    //	Material mat1 = new Material();
+    //	mat1.setDiffuse(1, 1, 0);
+    //	m2.setSurface(mat1);
+    	
+    	return m2;
     	
     	//adjust matrix
-    	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
-    	m2.getTransform().scale(0.5f);
+ //   	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
+ //   	m2.getTransform().scale(0.5f);
     	
-    	g.appendChild(m2);
+//    	g.appendChild(m2);
     	
-    	g.getTransform().translate(1.0f, 0.0f, 0.0f);
-    	g.getTransform().rotateX(20.0f);
-    	g.getTransform().rotateY(-20.0f);
+//    	g.getTransform().translate(1.0f, 0.0f, 0.0f);
+//    	g.getTransform().rotateX(20.0f);
+//    	g.getTransform().rotateY(-20.0f);
     	
-    	return g;
+ //   	return g;
     }
 }

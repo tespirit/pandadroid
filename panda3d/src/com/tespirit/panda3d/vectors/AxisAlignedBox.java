@@ -12,6 +12,28 @@ public class AxisAlignedBox {
 		this.min.setPositional();
 	}
 	
+	public AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ){
+		this();
+		this.min.set(minX, minY, minZ);
+		this.max.set(maxX, maxY, maxZ);
+	}
+	
+	public void setMin(float x, float y, float z){
+		this.min.set(x, y, z);
+	}
+	
+	public void setMax(float x, float y, float z){
+		this.max.set(x, y, z);
+	}
+	
+	public void setMin(Vector3d v){
+		this.min.copy(v);
+	}
+	
+	public void setMax(Vector3d v){
+		this.max.copy(v);
+	}
+	
 	public boolean pointInside(Vector3d point){
 		return this.min.getX() <= point.getX() && 
 			   this.min.getY() <= point.getY() && 
@@ -28,7 +50,7 @@ public class AxisAlignedBox {
 		float distanceNear = Float.NEGATIVE_INFINITY;
 		float distanceFar = Float.POSITIVE_INFINITY;
 		
-		for(int i = 0; i < Vector3d.SIZE; i++){
+		for(int i = 0; i < 3; i++){
 			float boxMin = this.min.get(i);
 			float boxMax = this.max.get(i);
 			float slope = direction.get(i);
@@ -68,9 +90,9 @@ public class AxisAlignedBox {
 	public void grow(Vector3d point){
 		for(int i = 0; i < Vector3d.SIZE; i++){
 			if(point.get(i) < this.min.get(i)){
-				this.min.setAt(point.get(i), i);
+				this.min.setAt(i, point.get(i));
 			} else if (point.get(i) > this.max.get(i)){
-				this.max.setAt(point.get(i), i);
+				this.max.setAt(i, point.get(i));
 			}
 		}
 	}
@@ -85,6 +107,6 @@ public class AxisAlignedBox {
 	}
 	
 	public Vector3d getMax(){
-		return this.min;
+		return this.max;
 	}
 }

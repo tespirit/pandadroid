@@ -8,7 +8,7 @@ public class LineList extends Primitive{
 	
 	public LineList(int vertexCount, int[] vertexTypes){
 		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
-		this.renderAsLines();
+		this.renderAsLineStrip();
 	}
 	
 	public VertexBuffer getVertexBuffer(){

@@ -19,6 +19,14 @@ public class TriangleList extends Primitive{
 	public void computeBoundingBox(AxisAlignedBox boundingBox) {
 		this.vertexBuffer.computeBoundingBox(boundingBox);
 	}
+	
+	public void renderWireFrame(){
+		this.renderAsLineStrip();
+	}
+	
+	public void renderSolid(){
+		this.renderAsTriangleStrip();
+	}
 
 	@Override
 	public void render() {

@@ -10,6 +10,14 @@ public class Vector3d {
 		
 	public final static int SIZE = 4; //generic size info, incase this changes for some reason
 	
+	public static float[] createBuffer(int vectorCount){
+		float[] buffer = new float[Vector3d.SIZE*vectorCount];
+		for(int i = 0; i < vectorCount; i++){
+			buffer[3+Vector3d.SIZE*i] = 1.0f;
+		}
+		return buffer;
+	}
+	
 	public Vector3d(){
 		this.v = new float[Vector3d.SIZE];
 		this.v[3] = 1;
@@ -86,7 +94,7 @@ public class Vector3d {
 		this.v[this.offset+2] = z;
 	}
 	
-	public void setAt(float f, int i){
+	public void setAt(int i, float f){
 		this.v[this.offset+i] = f;
 	}
 	

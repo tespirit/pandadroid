@@ -29,6 +29,18 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 	public Renderer() {
 		this.currentLightId = 0;
 		modelView = new Matrix3d();
+		
+		IndexBuffer.setTypeEnum(0, 
+								GL10.GL_UNSIGNED_SHORT, 
+								GL10.GL_UNSIGNED_BYTE);
+		
+		Primitive.setTypeEnums(GL10.GL_TRIANGLES, 
+							   GL10.GL_TRIANGLE_STRIP, 
+							   GL10.GL_TRIANGLE_FAN, 
+							   GL10.GL_LINES,
+							   GL10.GL_LINE_STRIP,
+							   GL10.GL_POINTS);
+	
 	}
 
 	@Override
@@ -37,7 +49,8 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		gl.glLoadIdentity();
 		
 		this.gl = gl;
-		this.renderScene();
+		//this.renderScene();
+		this.renderSceneDebug();
 	}
 
 	@Override
@@ -56,9 +69,6 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.gl.glDepthFunc(GL10.GL_LEQUAL);
 		this.gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 		this.gl.glCullFace(GL10.GL_BACK);
-		
-		IndexBuffer.setTypeEnum(0, GL10.GL_UNSIGNED_SHORT, GL10.GL_UNSIGNED_BYTE);
-		Primitive.setTypeEnums(GL10.GL_TRIANGLES, GL10.GL_TRIANGLE_STRIP, GL10.GL_TRIANGLE_FAN, GL10.GL_LINES);	
 		
 		this.createRenderers();
 		
@@ -99,7 +109,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.gl.glPushMatrix();
 		this.gl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
-
+	
 	class LightRenderer extends Light.Renderer{
 		@Override
 		public void render(Light light) {
@@ -150,10 +160,16 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		@Override
 		public void render(Material material) {
 			gl.glDisable(GL10.GL_TEXTURE_2D);
-			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
-			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
-			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());
-			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_EMISSION, material.getEmissionBuffer());
+			material.getDiffuseBuffer();
+			gl.glColor4f(material.getDiffuseBuffer().get(), 
+						 material.getDiffuseBuffer().get(), 
+						 material.getDiffuseBuffer().get(), 
+						 material.getDiffuseBuffer().get());
+			material.getDiffuseBuffer().position(0);
+			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
+			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
+			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());
+			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_EMISSION, material.getEmissionBuffer());
 		}
 
 		@Override
@@ -166,6 +182,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		@Override
 		public void render(Texture texture) {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
+			gl.glColor4f(1,1,1,1);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, texture.getDiffuseTextureId());
 		}
 		

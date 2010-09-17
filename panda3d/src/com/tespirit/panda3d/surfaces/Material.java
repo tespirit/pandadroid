@@ -41,16 +41,16 @@ public class Material extends Surface{
 	
 	public void setDiffuse(float r, float g, float b, float a){
 		this.diffuse.put(r);
-		this.diffuse.put(b);
 		this.diffuse.put(g);
+		this.diffuse.put(b);
 		this.diffuse.put(a);
 		this.diffuse.position(0);
 	}
 	
 	public void setDiffuse(float r, float g, float b){
 		this.diffuse.put(r);
-		this.diffuse.put(b);
 		this.diffuse.put(g);
+		this.diffuse.put(b);
 		this.diffuse.put(1.0f);
 		this.diffuse.position(0);
 	}
@@ -61,8 +61,8 @@ public class Material extends Surface{
 	
 	public void setSpecular(float r, float g, float b){
 		this.specular.put(r);
-		this.specular.put(b);
 		this.specular.put(g);
+		this.specular.put(b);
 		this.specular.put(1.0f);
 		this.specular.position(0);
 	}
@@ -73,8 +73,8 @@ public class Material extends Surface{
 	
 	public void setAmbient(float r, float g, float b){
 		this.ambient.put(r);
-		this.ambient.put(b);
 		this.ambient.put(g);
+		this.ambient.put(b);
 		this.ambient.put(1.0f);
 		this.ambient.position(0);
 	}
@@ -85,8 +85,8 @@ public class Material extends Surface{
 	
 	public void setEmission(float r, float g, float b){
 		this.emission.put(r);
-		this.emission.put(b);
 		this.emission.put(g);
+		this.emission.put(b);
 		this.emission.put(1.0f);
 		this.emission.position(0);
 	}

@@ -10,7 +10,7 @@ public class LineIndices extends Primitive{
 	public LineIndices(int indexCount, int vertexCount, int[] vertexTypes){
 		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
 		this.indexBuffer = new IndexBuffer(indexCount, vertexCount);
-		this.renderAsLines();
+		this.renderAsLineStrip();
 	}
 	
 	public VertexBuffer getVertexBuffer(){

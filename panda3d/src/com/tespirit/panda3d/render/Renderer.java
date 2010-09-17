@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.tespirit.panda3d.primitives.Box;
+import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Ray;
+import com.tespirit.panda3d.vectors.Vector3d;
 
 /**
  * 
@@ -88,6 +91,49 @@ public abstract class Renderer {
 			for(RenderableNode node : this.renderableNodes){
 				this.pushMatrix(node.getWorldTransform());
 				node.render();
+				this.popMatrix();
+			}
+		}
+	}
+	
+	//debug settings:
+	public boolean drawBB = true;
+	public boolean drawRenderables = true;
+	
+	public void renderSceneDebug(){
+		if(this.camera != null){
+			this.camera.update(Matrix3d.IDENTITY);
+		}
+		
+		if(this.lights != null){
+			for(int i = 0; i < this.lights.getChildCount(); i++){
+				((Light)this.lights.getChild(i)).render();
+			}
+		}
+		
+		//bounding box debug
+		Box box = null;
+		Material mat = null;
+		if(this.drawBB){
+			box = new Box();
+			box.renderWireFrame();
+			mat = new Material();
+			mat.setDiffuse(1, 1, 0);
+		}
+		
+		if(this.root != null){
+			root.update(this.camera.getWorldTransform());
+			Collections.sort(this.renderableNodes, Renderer.renderableSort);
+			for(RenderableNode node : this.renderableNodes){
+				this.pushMatrix(node.getWorldTransform());
+				if(box != null && mat != null){
+					box.setBox(node.getBoundingBox());
+					mat.render();
+					box.render();
+				}
+				if(this.drawRenderables){
+					node.render();
+				}
 				this.popMatrix();
 			}
 		}

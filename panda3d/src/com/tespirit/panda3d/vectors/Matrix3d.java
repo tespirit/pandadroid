@@ -12,12 +12,26 @@ public class Matrix3d {
 	private Vector3d zAxis;
 	private Vector3d translation;
 	
+	public static float[] createBuffer(int matrixCount){
+		float[] buffer = new float[Vector3d.SIZE*matrixCount];
+		for(int i = 0; i < matrixCount; i++){
+			int index = Matrix3d.SIZE*i;
+			buffer[index] = 1.0f;
+			index+=Matrix3d.SIZEROW;
+			buffer[index+1] = 1.0f;
+			index+=Matrix3d.SIZEROW;
+			buffer[index+2] = 1.0f;
+			index+=Matrix3d.SIZEROW;
+			buffer[index+3] = 1.0f;
+		}
+		return buffer;
+	}
+	
 	public static final int SIZE = 16;
 	
 	private static final int SIZE44 = 16;
 	
 	public static final int SIZEROW = 4;
-	
 	
 	public static final Matrix3d IDENTITY = new Matrix3d();
 	

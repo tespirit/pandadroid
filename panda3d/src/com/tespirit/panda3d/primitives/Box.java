@@ -1,15 +1,17 @@
 package com.tespirit.panda3d.primitives;
 
+import com.tespirit.panda3d.vectors.AxisAlignedBox;
+import com.tespirit.panda3d.vectors.Vector3d;
+
 public class Box extends TriangleIndices {
 	
-	public Box(){
+	public Box(AxisAlignedBox box){
+		this(box.getMin(), box.getMax());
+	}
+	
+	public Box(Vector3d min, Vector3d max){
 		super(12*3, 24, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
-		
-		this.vertexBuffer.addPosition(-1, -1, -1);
-		this.vertexBuffer.addPosition(1, -1, -1);
-		this.vertexBuffer.addPosition(1, -1, 1);
-		this.vertexBuffer.addPosition(-1, -1, 1);
-		
+	
 		this.vertexBuffer.addNormal(0, -1, 0);
 		this.vertexBuffer.addNormal(0, -1, 0);
 		this.vertexBuffer.addNormal(0, -1, 0);
@@ -19,11 +21,6 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
-		
-		this.vertexBuffer.addPosition(-1, -1, 1);
-		this.vertexBuffer.addPosition(1, -1, 1);
-		this.vertexBuffer.addPosition(1, 1, 1);
-		this.vertexBuffer.addPosition(-1, 1, 1);
 		
 		this.vertexBuffer.addNormal(0, 0, 1);
 		this.vertexBuffer.addNormal(0, 0, 1);
@@ -35,11 +32,6 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
 		
-		this.vertexBuffer.addPosition(-1, 1, 1);
-		this.vertexBuffer.addPosition(1, 1, 1);
-		this.vertexBuffer.addPosition(1, 1, -1);
-		this.vertexBuffer.addPosition(-1, 1, -1);
-		
 		this.vertexBuffer.addNormal(0, 1, 0);
 		this.vertexBuffer.addNormal(0, 1, 0);
 		this.vertexBuffer.addNormal(0, 1, 0);
@@ -49,12 +41,7 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
-		
-		this.vertexBuffer.addPosition(-1, 1, -1);
-		this.vertexBuffer.addPosition(1, 1, -1);
-		this.vertexBuffer.addPosition(1, -1, -1);
-		this.vertexBuffer.addPosition(-1, -1, -1);
-		
+	
 		this.vertexBuffer.addNormal(0, 0, -1);
 		this.vertexBuffer.addNormal(0, 0, -1);
 		this.vertexBuffer.addNormal(0, 0, -1);
@@ -64,12 +51,7 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
-		
-		this.vertexBuffer.addPosition(1, -1, -1);
-		this.vertexBuffer.addPosition(1, -1, 1);
-		this.vertexBuffer.addPosition(1, 1, 1);
-		this.vertexBuffer.addPosition(1, 1, -1);
-		
+
 		this.vertexBuffer.addNormal(1, 0, 0);
 		this.vertexBuffer.addNormal(1, 0, 0);
 		this.vertexBuffer.addNormal(1, 0, 0);
@@ -80,11 +62,6 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
 		
-		this.vertexBuffer.addPosition(-1, -1, 1);
-		this.vertexBuffer.addPosition(-1, -1, -1);
-		this.vertexBuffer.addPosition(-1, 1, -1);
-		this.vertexBuffer.addPosition(-1, 1, 1);
-		
 		this.vertexBuffer.addNormal(-1, 0, 0);
 		this.vertexBuffer.addNormal(-1, 0, 0);
 		this.vertexBuffer.addNormal(-1, 0, 0);
@@ -94,6 +71,8 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
+		
+		this.setBox(min, max);
 
 		this.indexBuffer.addTriangle(0, 1, 2);
 		this.indexBuffer.addTriangle(0, 2, 3);
@@ -113,7 +92,48 @@ public class Box extends TriangleIndices {
 		this.indexBuffer.addTriangle(20, 22, 21);
 		this.indexBuffer.addTriangle(20, 23, 22);
 		
-		this.vertexBuffer.resetBufferPosition();
 		this.indexBuffer.resetBufferPosition();
+	}
+	
+	public Box(){
+		this(new AxisAlignedBox(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f));
+	}
+	
+	public void setBox(Vector3d min, Vector3d max){
+		this.vertexBuffer.addPosition(min.getX(), min.getY(), min.getZ());
+		this.vertexBuffer.addPosition(max.getX(), min.getY(), min.getZ());
+		this.vertexBuffer.addPosition(max.getX(), min.getY(), max.getZ());
+		this.vertexBuffer.addPosition(min.getX(), min.getY(), max.getZ());
+		
+		this.vertexBuffer.addPosition(min.getX(), max.getY(), max.getZ());
+		this.vertexBuffer.addPosition(max.getX(), max.getY(), max.getZ());
+		this.vertexBuffer.addPosition(max.getX(), max.getY(), min.getZ());
+		this.vertexBuffer.addPosition(min.getX(), max.getY(), min.getZ());
+		
+		this.vertexBuffer.addPosition(min.getX(), min.getY(), max.getZ());
+		this.vertexBuffer.addPosition(max.getX(), min.getY(), max.getZ());
+		this.vertexBuffer.addPosition(max.getX(), max.getY(), max.getZ());
+		this.vertexBuffer.addPosition(min.getX(), max.getY(), max.getZ());
+		
+		this.vertexBuffer.addPosition(min.getX(), max.getY(), min.getZ());
+		this.vertexBuffer.addPosition(max.getX(), max.getY(), min.getZ());
+		this.vertexBuffer.addPosition(max.getX(), min.getY(), min.getZ());
+		this.vertexBuffer.addPosition(min.getX(), min.getY(), min.getZ());
+		
+		this.vertexBuffer.addPosition(max.getX(), min.getY(), min.getZ());
+		this.vertexBuffer.addPosition(max.getX(), min.getY(), max.getZ());
+		this.vertexBuffer.addPosition(max.getX(), max.getY(), max.getZ());
+		this.vertexBuffer.addPosition(max.getX(), max.getY(), min.getZ());
+		
+		this.vertexBuffer.addPosition(min.getX(), min.getY(), max.getZ());
+		this.vertexBuffer.addPosition(min.getX(), min.getY(), min.getZ());
+		this.vertexBuffer.addPosition(min.getX(), max.getY(), min.getZ());
+		this.vertexBuffer.addPosition(min.getX(), max.getY(), max.getZ());
+		
+		this.vertexBuffer.resetBufferPosition();
+	}
+	
+	public void setBox(AxisAlignedBox box){
+		this.setBox(box.getMin(), box.getMax());
 	}
 }
