@@ -8,7 +8,6 @@ import com.tespirit.panda3d.controllers.TranslateController2d;
 import com.tespirit.panda3d.core.Assets;
 import com.tespirit.panda3d.render.Camera;
 import com.tespirit.panda3d.scenegraph.Model;
-import com.tespirit.panda3d.surfaces.Material;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -87,9 +86,6 @@ public class Panda3dView extends GLSurfaceView {
 	float prevX;
 	float prevY;
 	long prevTime;
-	
-	//HACK for testing
-	private TranslateController2d selectController;
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
