@@ -55,7 +55,7 @@ public abstract class Renderer {
 	
 	public void renderScene(){
 		if(this.camera != null){
-			this.camera.render();
+			this.camera.update(Matrix3d.IDENTITY);
 		}
 		
 		if(this.lights != null){
@@ -65,31 +65,11 @@ public abstract class Renderer {
 		}
 		
 		if(this.root != null){
-			root.update(Matrix3d.IDENTITY);
+			root.update(this.camera.getWorldTransform());
 			for(RenderableNode node : this.renderableNodes){
 				this.pushMatrix(node.getWorldTransform());
 				node.render();
 				this.popMatrix();
-			}
-			this.traverseNode(this.root);
-		}
-		if(this.camera != null){
-			this.popMatrix();
-		}
-	}
-	
-	/**
-	 * This traverses nodes and correctly pushes and pops matrices.
-	 * @param node
-	 */
-	public void traverseNode(Node node){
-		if(node instanceof RenderableNode){
-			this.pushMatrix(node.getWorldTransform());
-			((RenderableNode)node).render();
-			this.popMatrix();
-		} else {
-			for(int i = 0; i < node.getChildCount(); i++){
-				this.traverseNode(node.getChild(i));
 			}
 		}
 	}

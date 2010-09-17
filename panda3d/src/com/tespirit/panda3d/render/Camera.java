@@ -10,6 +10,7 @@ import com.tespirit.panda3d.vectors.Vector3d;
 public class Camera extends Node implements RenderableNode{
 	private Matrix3d camera;
 	private Matrix3d pivot;
+	private Matrix3d worldTransform;
 	
 	private float fov;
 	private float near;
@@ -35,17 +36,17 @@ public class Camera extends Node implements RenderableNode{
 		this.far = far;
 		this.camera = new Matrix3d();
 		this.pivot = new Matrix3d();
+		this.worldTransform = new Matrix3d();
 	}
 	
 	@Override
 	public Matrix3d getWorldTransform(){
-		//TODO: see about maybe handling this...
-		return null;
+		return this.worldTransform;
 	}
 	
 	@Override
 	public void update(Matrix3d transform){
-		//VOID for now.
+		this.worldTransform.multiply(transform, this.pivot).multiply(this.camera);
 	}
 	
 	@Override
