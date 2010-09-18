@@ -30,17 +30,14 @@ public class Pandamonium extends Activity {
     	
     	view.createTouchRotateCamera(-5);
     	
-    	Material pick = new Material();
-    	pick.setDiffuse(0, 1, 1);
-    	
     	view.setTouchDownController(new MatrixSelect(view, true));
     	
     	
     	Renderer r = view.getRenderer();
     	
-    	//LightGroup lights = new LightGroup();
-    	//lights.createBasic();
-    	//r.setLightGroup(lights);
+    	LightGroup lights = new LightGroup();
+    	lights.createBasic();
+    	r.setLightGroup(lights);
     	
     	r.setSceneGraph(createTestSG());
     	

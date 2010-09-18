@@ -76,6 +76,14 @@ public class Vector3d {
 		return this.v[this.offset+2];
 	}
 	
+	public float getExtra(){
+		return this.v[this.offset+3];
+	}
+	
+	public void setExtra(float extra){
+		this.v[this.offset+3] = extra;
+	}
+	
 	public void setX(float x){
 		this.v[this.offset] = x;
 	}
@@ -94,24 +102,15 @@ public class Vector3d {
 		this.v[this.offset+2] = z;
 	}
 	
+	public void set(float x, float y, float z, float extra){
+		this.v[this.offset] = x;
+		this.v[this.offset+1] = y;
+		this.v[this.offset+2] = z;
+		this.v[this.offset+3] = extra;
+	}
+	
 	public void setAt(int i, float f){
 		this.v[this.offset+i] = f;
-	}
-	
-	/**
-	 * this converts the the vector to only a directional vector
-	 * that will only get rotational and scalar information applied to it
-	 */
-	public void setDirectional(){
-		this.v[this.offset+3] = 0.0f;
-	}
-	
-	/**
-	 * when using a float buffer, this should be called to make this a normal
-	 * vector.
-	 */
-	public void setPositional(){
-		this.v[this.offset+3] = 1.0f;
 	}
 	
 	public void copy(Vector3d v){
@@ -123,8 +122,8 @@ public class Vector3d {
 	
 	public Vector3d clone(){
 		Vector3d v = new Vector3d(this.v[this.offset], 
-								this.v[this.offset+1], 
-								this.v[this.offset+2]);
+								  this.v[this.offset+1], 
+								  this.v[this.offset+2]);
 		return v;
 	}
 		

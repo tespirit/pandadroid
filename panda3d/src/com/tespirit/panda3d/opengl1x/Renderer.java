@@ -15,6 +15,7 @@ import com.tespirit.panda3d.primitives.TriangleList;
 import com.tespirit.panda3d.primitives.VertexBuffer;
 import com.tespirit.panda3d.render.Camera;
 import com.tespirit.panda3d.render.Light;
+import com.tespirit.panda3d.surfaces.Color;
 import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.vectors.Matrix3d;
@@ -53,23 +54,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 			this.gl = gl;
 
 			this.renderSceneDebug();
-			
-			if(this.touch != null){
-				this.gl.glDisable(GL10.GL_DEPTH_TEST);
-				this.touch.render();
-				this.gl.glEnable(GL10.GL_DEPTH_TEST);
-			}
 		}
-		
-		private Points touch;
-		
-		/*public void showTouch(float x, float y){
-			Ray ray = this.getCamera().createRay(x, y);
-			Vector3d point = new Vector3d();
-			point.add(ray.getPosition(), ray.getDirection());
-			point.scale((this.getCamera().getNear()+this.getCamera().getFar())/2);
-			this.touch = new Points(point);
-		}*/
 	}
 
 	@Override
@@ -111,6 +96,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.addComponentRenderer(new LightRenderer());
 		this.addComponentRenderer(new CameraRenderer());
 		this.addComponentRenderer(new TextureRenderer());
+		this.addComponentRenderer(new ColorRenderer());
 		this.addComponentRenderer(new LineIndicesRenderer());
 		this.addComponentRenderer(new LineListRenderer());
 		this.addComponentRenderer(new PointsRenderer());
@@ -143,10 +129,10 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		@Override
 		public void render(Light light) {
 			int id = light.getLightId();
-	        gl.glLightfv(id, GL10.GL_AMBIENT, light.getAmbientBuffer());
-	        gl.glLightfv(id, GL10.GL_DIFFUSE, light.getDiffuseBuffer());
-	        gl.glLightfv(id, GL10.GL_SPECULAR, light.getSpecularBuffer());
-			gl.glLightfv(id, GL10.GL_POSITION, light.getPositionBuffer());
+	        gl.glLightfv(id, GL10.GL_AMBIENT, light.getAmbient().getBuffer(), light.getAmbient().getBufferOffset());
+	        gl.glLightfv(id, GL10.GL_DIFFUSE, light.getDiffuse().getBuffer(), light.getDiffuse().getBufferOffset());
+	        gl.glLightfv(id, GL10.GL_SPECULAR, light.getSpecular().getBuffer(), light.getSpecular().getBufferOffset());
+			gl.glLightfv(id, GL10.GL_POSITION, light.getWorldPosition().getBuffer(), light.getWorldPosition().getBufferOffset());
 		}
 		
 		@Override
@@ -184,21 +170,27 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 			gl.glLoadIdentity();
 		}
 	}
+	
+	class ColorRenderer extends Color.Renderer{
+		@Override
+		public void render(Color color) {
+			gl.glDisable(GL10.GL_TEXTURE_2D);
+			gl.glColor4f(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		}
+
+		@Override
+		public void setup(Color color) {
+			//VOID
+		}
+	}
 
 	class MaterialRenderer extends Material.Renderer{
 		@Override
 		public void render(Material material) {
-			gl.glDisable(GL10.GL_TEXTURE_2D);
-			material.getDiffuseBuffer();
-			gl.glColor4f(material.getDiffuseBuffer().get(), 
-						 material.getDiffuseBuffer().get(), 
-						 material.getDiffuseBuffer().get(), 
-						 material.getDiffuseBuffer().get());
-			material.getDiffuseBuffer().position(0);
-			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
-			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
-			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());
-			//gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_EMISSION, material.getEmissionBuffer());
+			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
+			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
+			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());
+			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_EMISSION, material.getEmissionBuffer());
 		}
 
 		@Override

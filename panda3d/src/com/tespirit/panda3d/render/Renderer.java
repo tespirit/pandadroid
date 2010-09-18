@@ -79,6 +79,7 @@ public abstract class Renderer {
 		}
 		
 		if(this.lights != null){
+			this.lights.update(this.camera.getWorldTransform());
 			for(int i = 0; i < this.lights.getChildCount(); i++){
 				((Light)this.lights.getChild(i)).render();
 			}
@@ -105,8 +106,12 @@ public abstract class Renderer {
 		}
 		
 		if(this.lights != null){
+			this.lights.update(this.camera.getWorldTransform());
 			for(int i = 0; i < this.lights.getChildCount(); i++){
-				((Light)this.lights.getChild(i)).render();
+				Light light = (Light)this.lights.getChild(i);
+				this.pushMatrix(light.getWorldTransform());
+				light.render();
+				this.popMatrix();
 			}
 		}
 		

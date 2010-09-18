@@ -5,11 +5,11 @@ public class Ray {
 	private Vector3d direction;
 	
 	public Ray(){
-		float[] buffer = new float[Vector3d.SIZE*2];
+		float[] buffer = Vector3d.createBuffer(2);
 		this.position = new Vector3d(buffer);
-		this.position.setPositional();
 		this.direction = new Vector3d(buffer, Vector3d.SIZE);
-		this.direction.setDirectional();
+		//this will make sure that this vector only rotates when transformed.
+		this.direction.setExtra(0);
 	}
 	
 	public void copy(Ray ray){

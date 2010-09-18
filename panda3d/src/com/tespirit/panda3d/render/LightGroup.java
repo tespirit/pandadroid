@@ -20,7 +20,9 @@ public class LightGroup extends Node{
 	
 	@Override
 	public void update(Matrix3d transform){
-		
+		for(int i = 0; i < this.lights.size(); i++){
+			this.lights.get(i).update(transform);
+		}
 	}
 	
 	@Override

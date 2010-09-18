@@ -5,11 +5,9 @@ public class AxisAlignedBox {
 	private Vector3d max;
 	
 	public AxisAlignedBox(){
-		float[] buffer = new float[Vector3d.SIZE*2];
+		float[] buffer = Vector3d.createBuffer(2);
 		this.min = new Vector3d(buffer);
-		this.min.setPositional();
 		this.max = new Vector3d(buffer,Vector3d.SIZE);
-		this.min.setPositional();
 	}
 	
 	public AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ){
