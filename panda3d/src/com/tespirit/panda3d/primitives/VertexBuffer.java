@@ -61,6 +61,12 @@ public class VertexBuffer {
 		this.buffers[VertexBuffer.POSITION].put(z);
 	}
 	
+	public void setPosition(Vector3d point){
+		this.buffers[VertexBuffer.POSITION].put(point.getX());
+		this.buffers[VertexBuffer.POSITION].put(point.getY());
+		this.buffers[VertexBuffer.POSITION].put(point.getZ());
+	}
+	
 	public void setPosition(float[] values){
 		this.buffers[VertexBuffer.POSITION].put(values);
 		this.buffers[VertexBuffer.POSITION].position(0);
@@ -70,6 +76,12 @@ public class VertexBuffer {
 		this.buffers[VertexBuffer.NORMAL].put(x);
 		this.buffers[VertexBuffer.NORMAL].put(y);
 		this.buffers[VertexBuffer.NORMAL].put(z);
+	}
+	
+	public void addNormal(Vector3d point){
+		this.buffers[VertexBuffer.NORMAL].put(point.getX());
+		this.buffers[VertexBuffer.NORMAL].put(point.getY());
+		this.buffers[VertexBuffer.NORMAL].put(point.getZ());
 	}
 	
 	public void setNormal(float[] values){

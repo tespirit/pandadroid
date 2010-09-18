@@ -172,9 +172,9 @@ public class Camera extends Node implements RenderableNode{
 	public Ray createRay(float x, float y){
 		float halfHeight = (float)this.height/2;
 		float halfWidth = (float)this.width/2;
-		
-		float xUnit = (this.width - halfWidth - x)/((float)this.width/2);
-		float yUnit = (this.height - halfHeight - x)/((float)this.height/2);
+			
+		float xUnit = (halfWidth - x)/halfWidth;
+		float yUnit = (y - halfHeight)/halfHeight;
 		
 		Ray ray = new Ray();
 		ray.setDirection(xUnit*this.nearHeight*this.aspectRatio, 

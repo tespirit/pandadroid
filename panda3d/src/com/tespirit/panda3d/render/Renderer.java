@@ -10,7 +10,6 @@ import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Ray;
-import com.tespirit.panda3d.vectors.Vector3d;
 
 /**
  * 

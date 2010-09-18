@@ -2,10 +2,29 @@ package com.tespirit.panda3d.primitives;
 
 import com.tespirit.panda3d.render.ComponentRenderer;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
+import com.tespirit.panda3d.vectors.Vector3d;
 
 public class Points extends Primitive{
 	
 	VertexBuffer vertexBuffer;
+	
+	public Points(Vector3d[] points){
+		this(points.length);
+		for(Vector3d point : points){
+			this.vertexBuffer.setPosition(point);
+		}
+		this.vertexBuffer.resetBufferPosition();
+	}
+	
+	public Points(Vector3d point){
+		this(1);
+		this.vertexBuffer.setPosition(point);
+		this.vertexBuffer.resetBufferPosition();
+	}
+	
+	public Points(int vertexCount){
+		this(vertexCount, false);
+	}
 	
 	public Points(int vertexCount, boolean hasCpvs){
 		int[] types;
@@ -16,6 +35,10 @@ public class Points extends Primitive{
 		}
 		this.vertexBuffer = new VertexBuffer(vertexCount, types);
 		this.renderAsPoints();
+	}
+
+	public VertexBuffer getVertexBuffer(){
+		return this.vertexBuffer;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import com.tespirit.panda3d.core.Assets;
 import com.tespirit.panda3d.primitives.IndexBuffer;
 import com.tespirit.panda3d.primitives.LineIndices;
 import com.tespirit.panda3d.primitives.LineList;
+import com.tespirit.panda3d.primitives.Points;
 import com.tespirit.panda3d.primitives.Primitive;
 import com.tespirit.panda3d.primitives.TriangleIndices;
 import com.tespirit.panda3d.primitives.TriangleList;
@@ -22,13 +23,11 @@ import android.graphics.Bitmap;
 import android.opengl.GLUtils;
 
 public class Renderer extends com.tespirit.panda3d.render.Renderer implements android.opengl.GLSurfaceView.Renderer{
-	private GL10 gl;
-	private int currentLightId;
-	Matrix3d modelView;
+	protected GL10 gl;
+	protected int currentLightId;
 	
 	public Renderer() {
 		this.currentLightId = 0;
-		modelView = new Matrix3d();
 		
 		IndexBuffer.setTypeEnum(0, 
 								GL10.GL_UNSIGNED_SHORT, 
@@ -40,7 +39,37 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 							   GL10.GL_LINES,
 							   GL10.GL_LINE_STRIP,
 							   GL10.GL_POINTS);
+	}
 	
+	public static class Debug extends Renderer{
+		@Override
+		public void onDrawFrame(GL10 gl) {
+			gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+			gl.glLoadIdentity();
+			
+			gl.glPointSize(3);
+			gl.glLineWidthx(3);
+			
+			this.gl = gl;
+
+			this.renderSceneDebug();
+			
+			if(this.touch != null){
+				this.gl.glDisable(GL10.GL_DEPTH_TEST);
+				this.touch.render();
+				this.gl.glEnable(GL10.GL_DEPTH_TEST);
+			}
+		}
+		
+		private Points touch;
+		
+		/*public void showTouch(float x, float y){
+			Ray ray = this.getCamera().createRay(x, y);
+			Vector3d point = new Vector3d();
+			point.add(ray.getPosition(), ray.getDirection());
+			point.scale((this.getCamera().getNear()+this.getCamera().getFar())/2);
+			this.touch = new Points(point);
+		}*/
 	}
 
 	@Override
@@ -49,8 +78,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		gl.glLoadIdentity();
 		
 		this.gl = gl;
-		//this.renderScene();
-		this.renderSceneDebug();
+		this.renderScene();
 	}
 
 	@Override
@@ -85,6 +113,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.addComponentRenderer(new TextureRenderer());
 		this.addComponentRenderer(new LineIndicesRenderer());
 		this.addComponentRenderer(new LineListRenderer());
+		this.addComponentRenderer(new PointsRenderer());
 	}
 
 	@Override
@@ -347,6 +376,20 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		public void render(LineList lines) {
 			renderVertexBuffer(lines.getVertexBuffer());
 			gl.glDrawArrays(lines.getTypeEnum(), 0, lines.getVertexBuffer().getCount());
+			
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			gl.glDisable(GL10.GL_CULL_FACE);
+		}
+	}
+	
+	class PointsRenderer extends Points.Renderer{
+		@Override
+		public void render(Points points) {
+			renderVertexBuffer(points.getVertexBuffer());
+			gl.glDrawArrays(points.getTypeEnum(), 0, points.getVertexBuffer().getCount());
 			
 			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);

@@ -15,7 +15,7 @@ public class AxisAlignedBoxTest extends TestCase {
 		Assert.assertTrue(v.equals(a.getMax()));
 	}
 	
-	public void grow(){
+	public void testGrow(){
 		AxisAlignedBox a = new AxisAlignedBox();
 		
 		Vector3d v = new Vector3d();

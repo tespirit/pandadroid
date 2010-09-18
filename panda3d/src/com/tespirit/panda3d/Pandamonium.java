@@ -7,6 +7,8 @@ import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
+import com.tespirit.panda3d.app.ColorSelect;
+import com.tespirit.panda3d.app.MatrixSelect;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.render.Renderer;
 import com.tespirit.panda3d.primitives.Box;
@@ -26,7 +28,13 @@ public class Pandamonium extends Activity {
         
     	Panda3dView view = new Panda3dView(this);
     	
-    	view.createTouchRotateCamera(-10);
+    	view.createTouchRotateCamera(-5);
+    	
+    	Material pick = new Material();
+    	pick.setDiffuse(0, 1, 1);
+    	
+    	view.setTouchDownController(new MatrixSelect(view, false));
+    	
     	
     	Renderer r = view.getRenderer();
     	
@@ -42,7 +50,7 @@ public class Pandamonium extends Activity {
     public Node createTestSG(){
     	Group g = new Group();
     	
-    	/*Texture t1 = new Texture();
+    	Texture t1 = new Texture();
     	t1.setDiffuseTextureName("test.bmp");
     	
     	Model m1 = new Model("plane");
@@ -53,25 +61,20 @@ public class Pandamonium extends Activity {
     	m1.getTransform().rotateY(45.0f);
     	
     	g.appendChild(m1);
-*/
+
     	Model m2 = new Model("box");
     	m2.setPrimative(new Box());
-    //	Material mat1 = new Material();
-    //	mat1.setDiffuse(1, 1, 0);
-    //	m2.setSurface(mat1);
-    	
-    	return m2;
     	
     	//adjust matrix
- //   	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
- //   	m2.getTransform().scale(0.5f);
+    	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
+    	m2.getTransform().scale(0.5f);
     	
-//    	g.appendChild(m2);
+    	g.appendChild(m2);
     	
-//    	g.getTransform().translate(1.0f, 0.0f, 0.0f);
-//    	g.getTransform().rotateX(20.0f);
-//    	g.getTransform().rotateY(-20.0f);
+    	g.getTransform().translate(1.0f, 0.0f, 0.0f);
+    	g.getTransform().rotateX(20.0f);
+    	g.getTransform().rotateY(-20.0f);
     	
- //   	return g;
+    	return g;
     }
 }

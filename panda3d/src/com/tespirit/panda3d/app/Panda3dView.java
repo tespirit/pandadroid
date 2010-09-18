@@ -7,7 +7,6 @@ import com.tespirit.panda3d.controllers.RotateController2d;
 import com.tespirit.panda3d.controllers.TranslateController2d;
 import com.tespirit.panda3d.core.Assets;
 import com.tespirit.panda3d.render.Camera;
-import com.tespirit.panda3d.scenegraph.Model;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -19,20 +18,29 @@ public class Panda3dView extends GLSurfaceView {
 	private Controller2d touchMoveController;
 	private Controller2d touchDownController;
 
-	public Panda3dView(Context context) {
+	public Panda3dView(Context context){
+		this(context, false);
+	}
+	
+	public Panda3dView(Context context, boolean debugMode) {
 		super(context);
 		Assets.init(context);
 		
 		//TODO:smartly create a renderer based on the availible graphics api.
-		this.initOpenGl1x();
+		this.initOpenGl1x(debugMode);
 		
 		this.touchUpController = ControllerDummy.getInstance();
 		this.touchMoveController = ControllerDummy.getInstance();
 		this.touchDownController = ControllerDummy.getInstance();
 	}
 	
-	public void initOpenGl1x(){
-		com.tespirit.panda3d.opengl1x.Renderer gl1x = new com.tespirit.panda3d.opengl1x.Renderer();
+	private void initOpenGl1x(boolean debugMode){
+		com.tespirit.panda3d.opengl1x.Renderer gl1x;
+		if(debugMode){
+			gl1x = new com.tespirit.panda3d.opengl1x.Renderer.Debug();
+		} else {
+			gl1x = new com.tespirit.panda3d.opengl1x.Renderer();
+		}
 		this.renderer = gl1x;
 		this.setRenderer(gl1x);
 	}
@@ -101,10 +109,6 @@ public class Panda3dView extends GLSurfaceView {
 			this.startX = x;
 			this.startY = y;
 			this.startTime = time;
-			Model m = this.getRenderer().selectModel(x, y);
-			if(m != null){
-				m.getTransform().rotateX(10);
-			}
 			this.touchDownController.update(x, y);
 			break;
 		case MotionEvent.ACTION_MOVE:

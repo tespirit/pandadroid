@@ -52,6 +52,11 @@ public abstract class MatrixController2d implements Controller2d{
 		}
 	}
 	
+	public void setAxis(Vector3d x, Vector3d y){
+		this.xMapAxis.copy(x);
+		this.yMapAxis.copy(y);
+	}
+	
 	public void setScale(float scale){
 		this.scale = scale;
 	}
