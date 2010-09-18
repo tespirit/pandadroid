@@ -33,7 +33,7 @@ public class Pandamonium extends Activity {
     	Material pick = new Material();
     	pick.setDiffuse(0, 1, 1);
     	
-    	view.setTouchDownController(new MatrixSelect(view, false));
+    	view.setTouchDownController(new MatrixSelect(view, true));
     	
     	
     	Renderer r = view.getRenderer();

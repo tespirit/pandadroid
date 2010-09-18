@@ -27,6 +27,7 @@ public class MatrixSelect extends SelectController2d{
 	public void deselect() {
 		if(this.previousController != null){
 			this.view.setTouchMoveController(this.previousController);
+			this.previousController = null;
 		}
 	}
 
@@ -35,9 +36,11 @@ public class MatrixSelect extends SelectController2d{
 		if(model == null){
 			this.deselect();
 		} else {
-			this.previousController = this.view.getTouchMoveController();
 			this.selectController.setControlled(model);
-			this.view.setTouchMoveController(this.selectController);
+			if(this.previousController == null){
+				this.previousController = this.view.getTouchMoveController();
+				this.view.setTouchMoveController(this.selectController);
+			}
 		}
 	}
 
