@@ -3,7 +3,7 @@ package com.tespirit.panda3d.vectors;
 import java.lang.Math;
 
 public class Util {
-	private static float TOLERANCE = 0.0000001f;
+	private static float TOLERANCE = 0.00001f;
 	
 	public static void setTolerance(float t){
 		Util.TOLERANCE = t;

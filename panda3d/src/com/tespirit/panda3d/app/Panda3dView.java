@@ -37,7 +37,7 @@ public class Panda3dView extends GLSurfaceView {
 	private void initOpenGl1x(boolean debugMode){
 		com.tespirit.panda3d.opengl1x.Renderer gl1x;
 		if(debugMode){
-			gl1x = new com.tespirit.panda3d.opengl1x.Renderer.Debug();
+			gl1x = new com.tespirit.panda3d.opengl1x.RendererDebug();
 		} else {
 			gl1x = new com.tespirit.panda3d.opengl1x.Renderer();
 		}

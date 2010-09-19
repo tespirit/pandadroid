@@ -22,20 +22,20 @@ public class Box extends TriangleIndices {
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
 		
-		this.vertexBuffer.addNormal(0, 0, 1);
-		this.vertexBuffer.addNormal(0, 0, 1);
-		this.vertexBuffer.addNormal(0, 0, 1);
-		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 1, 0);
+		this.vertexBuffer.addNormal(0, 1, 0);
+		this.vertexBuffer.addNormal(0, 1, 0);
+		this.vertexBuffer.addNormal(0, 1, 0);
 		
 		this.vertexBuffer.addTexcoord(0.0f, 0.0f);
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 1.0f);
 		this.vertexBuffer.addTexcoord(1.0f, 0.0f);
 		
-		this.vertexBuffer.addNormal(0, 1, 0);
-		this.vertexBuffer.addNormal(0, 1, 0);
-		this.vertexBuffer.addNormal(0, 1, 0);
-		this.vertexBuffer.addNormal(0, 1, 0);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
+		this.vertexBuffer.addNormal(0, 0, 1);
 		
 		this.vertexBuffer.addTexcoord(0.0f, 0.0f);
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);

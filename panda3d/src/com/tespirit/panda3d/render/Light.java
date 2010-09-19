@@ -3,14 +3,15 @@ package com.tespirit.panda3d.render;
 import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.scenegraph.RenderableNode;
 import com.tespirit.panda3d.vectors.AxisAlignedBox;
+import com.tespirit.panda3d.vectors.Color4;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
 
 
 public class Light extends Node implements RenderableNode{
-	private Vector3d ambient;
-	private Vector3d diffuse;
-	private Vector3d specular;
+	private Color4 ambient;
+	private Color4 diffuse;
+	private Color4 specular;
 	private Vector3d position;
 	
 	private Vector3d worldPosition;
@@ -19,18 +20,17 @@ public class Light extends Node implements RenderableNode{
 	private int lightId;
 	
 	public Light(){
-		float[] buffer = Vector3d.createBuffer(5);
-		this.ambient = new Vector3d(buffer);
-		this.diffuse = new Vector3d(buffer, Vector3d.SIZE);
-		this.specular = new Vector3d(buffer, Vector3d.SIZE*2);
-		this.position = new Vector3d(buffer, Vector3d.SIZE*3);
-		
+		float[] buffer = Color4.createBuffer(5);
+		this.ambient = new Color4(buffer);
+		this.diffuse = new Color4(buffer, Color4.SIZE);
+		this.specular = new Color4(buffer, Color4.SIZE*2);
+		this.position = new Vector3d(buffer, Color4.SIZE*3);
 		this.worldPosition = new Vector3d(buffer, Vector3d.SIZE*4);
 		
 		this.setAmbient(0.5f, 0.5f, 0.5f);
 		this.setDiffuse(1.0f, 1.0f, 1.0f);
 		this.setSpecular(1.0f, 1.0f, 1.0f);
-		this.setPosition(3.0f, 1.0f, 2.0f);
+		this.setPosition(0.0f, 0.0f, 0.0f);
 	}
 	
 	@Override
@@ -80,7 +80,7 @@ public class Light extends Node implements RenderableNode{
 		this.diffuse.set(r, g, b);
 	}
 	
-	public Vector3d getDiffuse(){
+	public Color4 getDiffuse(){
 		return this.diffuse;
 	}
 	
@@ -88,7 +88,7 @@ public class Light extends Node implements RenderableNode{
 		this.specular.set(r, g, b);
 	}
 	
-	public Vector3d getSpecular(){
+	public Color4 getSpecular(){
 		return this.specular;
 	}
 	
@@ -96,7 +96,7 @@ public class Light extends Node implements RenderableNode{
 		this.ambient.set(r, g, b);
 	}
 	
-	public Vector3d getAmbient(){
+	public Color4 getAmbient(){
 		return this.ambient;
 	}
 	

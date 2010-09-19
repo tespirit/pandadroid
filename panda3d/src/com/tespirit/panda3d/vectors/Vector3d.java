@@ -76,14 +76,6 @@ public class Vector3d {
 		return this.v[this.offset+2];
 	}
 	
-	public float getExtra(){
-		return this.v[this.offset+3];
-	}
-	
-	public void setExtra(float extra){
-		this.v[this.offset+3] = extra;
-	}
-	
 	public void setX(float x){
 		this.v[this.offset] = x;
 	}
@@ -102,15 +94,24 @@ public class Vector3d {
 		this.v[this.offset+2] = z;
 	}
 	
-	public void set(float x, float y, float z, float extra){
-		this.v[this.offset] = x;
-		this.v[this.offset+1] = y;
-		this.v[this.offset+2] = z;
-		this.v[this.offset+3] = extra;
-	}
-	
 	public void setAt(int i, float f){
 		this.v[this.offset+i] = f;
+	}
+	
+	/**
+	 * this converts the the vector to only a directional vector
+	 * that will only get rotational and scalar information applied to it
+	 */
+	public void makeDirectional(){
+		this.v[this.offset+3] = 0.0f;
+	}
+	
+	/**
+	 * when using a float buffer, this should be called to make this a normal
+	 * vector.
+	 */
+	public void makePositional(){
+		this.v[this.offset+3] = 1.0f;
 	}
 	
 	public void copy(Vector3d v){
@@ -124,6 +125,7 @@ public class Vector3d {
 		Vector3d v = new Vector3d(this.v[this.offset], 
 								  this.v[this.offset+1], 
 								  this.v[this.offset+2]);
+		v.v[v.offset+3] = this.v[this.offset+3];
 		return v;
 	}
 		
@@ -199,6 +201,18 @@ public class Vector3d {
 	
 	public Vector3d project(Vector3d v){
 		this.scale(this.dot(v)/this.magnitude2());
+		return this;
+	}
+	
+	/**
+	 * v2 is the vector being projected to
+	 * @param v1
+	 * @param v2
+	 * @return
+	 */
+	public Vector3d project(Vector3d v1, Vector3d v2){
+		this.copy(v2);
+		this.project(v1);
 		return this;
 	}
 	

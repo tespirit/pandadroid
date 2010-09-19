@@ -10,10 +10,10 @@ public class Plane extends TriangleIndices{
 		this.vertexBuffer.addPosition(0.5f, -0.5f, 0.0f);
 		this.vertexBuffer.addPosition(0.5f,  0.5f, 0.0f);
 		
-		this.vertexBuffer.addNormal(0.0f, 0.0f, -1.0f);
-		this.vertexBuffer.addNormal(0.0f, 0.0f, -1.0f);
-		this.vertexBuffer.addNormal(0.0f, 0.0f, -1.0f);
-		this.vertexBuffer.addNormal(0.0f, 0.0f, -1.0f);
+		this.vertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+		this.vertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+		this.vertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+		this.vertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
 		
 		this.vertexBuffer.addTexcoord(0.0f, 0.0f);
 		this.vertexBuffer.addTexcoord(0.0f, 1.0f);

@@ -18,6 +18,7 @@ import com.tespirit.panda3d.render.Light;
 import com.tespirit.panda3d.surfaces.Color;
 import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
+import com.tespirit.panda3d.vectors.Color4;
 import com.tespirit.panda3d.vectors.Matrix3d;
 
 import android.graphics.Bitmap;
@@ -41,21 +42,6 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 							   GL10.GL_LINE_STRIP,
 							   GL10.GL_POINTS);
 	}
-	
-	public static class Debug extends Renderer{
-		@Override
-		public void onDrawFrame(GL10 gl) {
-			gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-			gl.glLoadIdentity();
-			
-			gl.glPointSize(3);
-			gl.glLineWidthx(3);
-			
-			this.gl = gl;
-
-			this.renderSceneDebug();
-		}
-	}
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
@@ -63,6 +49,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		gl.glLoadIdentity();
 		
 		this.gl = gl;
+		this.updateScene();
 		this.renderScene();
 	}
 
@@ -108,9 +95,21 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.gl.glEnable(GL10.GL_COLOR_MATERIAL);
 		this.gl.glEnable(GL10.GL_NORMALIZE);
 	}
+	
+	@Override
+	public void disableLights(){
+		this.gl.glDisable(GL10.GL_LIGHTING);
+		this.gl.glDisable(GL10.GL_COLOR_MATERIAL);
+		this.gl.glDisable(GL10.GL_NORMALIZE);
+	}
 
 	@Override
 	public void enableTextures() {
+		//VOID
+	}
+	
+	@Override
+	public void disableTextures(){
 		//VOID
 	}
 
@@ -125,7 +124,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.gl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
 	
-	class LightRenderer extends Light.Renderer{
+	protected class LightRenderer extends Light.Renderer{
 		@Override
 		public void render(Light light) {
 			int id = light.getLightId();
@@ -145,7 +144,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	class CameraRenderer extends Camera.Renderer{
+	protected class CameraRenderer extends Camera.Renderer{
 		@Override
 		public void render(Camera camera) {
 			gl.glMultMatrixf(camera.getTransform().getBuffer(),camera.getTransform().getBufferOffset());
@@ -171,11 +170,13 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	class ColorRenderer extends Color.Renderer{
+	protected class ColorRenderer extends Color.Renderer{
 		@Override
 		public void render(Color color) {
 			gl.glDisable(GL10.GL_TEXTURE_2D);
-			gl.glColor4f(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+			gl.glEnable(GL10.GL_COLOR_MATERIAL);
+			Color4 c = color.getColor();
+			gl.glColor4f(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
 		}
 
 		@Override
@@ -184,9 +185,11 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 
-	class MaterialRenderer extends Material.Renderer{
+	protected class MaterialRenderer extends Material.Renderer{
 		@Override
 		public void render(Material material) {
+			gl.glDisable(GL10.GL_COLOR_MATERIAL);
+			gl.glDisable(GL10.GL_TEXTURE);
 			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
 			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
 			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());
@@ -199,10 +202,11 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 
-	class TextureRenderer extends Texture.Renderer{
+	protected class TextureRenderer extends Texture.Renderer{
 		@Override
 		public void render(Texture texture) {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
+			gl.glEnable(GL10.GL_COLOR_MATERIAL);
 			gl.glColor4f(1,1,1,1);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, texture.getDiffuseTextureId());
 		}
@@ -270,7 +274,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	private void renderVertexBuffer(VertexBuffer vertexBuffer){
+	protected void renderVertexBuffer(VertexBuffer vertexBuffer){
 		
 		this.gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		this.gl.glVertexPointer(vertexBuffer.getStride(VertexBuffer.POSITION), 
@@ -302,7 +306,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	class TriangleIndicesRenderer extends TriangleIndices.Renderer {
+	protected class TriangleIndicesRenderer extends TriangleIndices.Renderer {
 
 		@Override
 		public void render(TriangleIndices triangles) {
@@ -326,7 +330,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 
-	class TriangleListRenderer extends TriangleList.Renderer{
+	protected class TriangleListRenderer extends TriangleList.Renderer{
 		@Override
 		public void render(TriangleList triangles) {
 			gl.glFrontFace(GL10.GL_CCW);
@@ -343,7 +347,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	class LineIndicesRenderer extends LineIndices.Renderer{
+	protected class LineIndicesRenderer extends LineIndices.Renderer{
 		@Override
 		public void render(LineIndices lines) {
 			
@@ -363,7 +367,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	class LineListRenderer extends LineList.Renderer{
+	protected class LineListRenderer extends LineList.Renderer{
 		@Override
 		public void render(LineList lines) {
 			renderVertexBuffer(lines.getVertexBuffer());
@@ -377,7 +381,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		}
 	}
 	
-	class PointsRenderer extends Points.Renderer{
+	protected class PointsRenderer extends Points.Renderer{
 		@Override
 		public void render(Points points) {
 			renderVertexBuffer(points.getVertexBuffer());

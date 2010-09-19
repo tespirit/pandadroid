@@ -9,7 +9,7 @@ public class Ray {
 		this.position = new Vector3d(buffer);
 		this.direction = new Vector3d(buffer, Vector3d.SIZE);
 		//this will make sure that this vector only rotates when transformed.
-		this.direction.setExtra(0);
+		this.direction.makeDirectional();
 	}
 	
 	public void copy(Ray ray){
@@ -35,9 +35,19 @@ public class Ray {
 		this.position.set(x, y, z);
 	}
 	
+	public void setPosition(Vector3d v){
+		this.position.copy(v);
+	}
+	
 	public void setDirection(float x, float y, float z){
 		this.direction.set(x, y, z);
 		this.direction.normalize();
+	}
+	
+	public void setDirection(Vector3d v){
+		this.direction.copy(v);
+		this.direction.normalize();
+		this.direction.makeDirectional();
 	}
 	
 	public Ray transformBy(Ray in, Matrix3d m){

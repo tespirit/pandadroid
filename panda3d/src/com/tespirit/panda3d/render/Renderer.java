@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import com.tespirit.panda3d.primitives.Box;
-import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
@@ -73,21 +71,25 @@ public abstract class Renderer {
 		return this.lights;
 	}
 	
-	public void renderScene(){
-		if(this.camera != null){
-			this.camera.update(Matrix3d.IDENTITY);
-		}
-		
+	public void updateScene(){
+		this.camera.update(Matrix3d.IDENTITY);
+		Matrix3d view = this.camera.getWorldTransform();
 		if(this.lights != null){
-			this.lights.update(this.camera.getWorldTransform());
+			this.lights.update(view);
+		}
+		if(this.root != null){
+			this.root.update(view);
+			Collections.sort(this.renderableNodes, Renderer.renderableSort);
+		}
+	}
+	
+	public void renderScene(){
+		if(this.lights != null){
 			for(int i = 0; i < this.lights.getChildCount(); i++){
 				((Light)this.lights.getChild(i)).render();
 			}
 		}
-		
 		if(this.root != null){
-			root.update(this.camera.getWorldTransform());
-			Collections.sort(this.renderableNodes, Renderer.renderableSort);
 			for(RenderableNode node : this.renderableNodes){
 				this.pushMatrix(node.getWorldTransform());
 				node.render();
@@ -96,51 +98,8 @@ public abstract class Renderer {
 		}
 	}
 	
-	//debug settings:
-	public boolean drawBB = true;
-	public boolean drawRenderables = true;
-	
-	public void renderSceneDebug(){
-		if(this.camera != null){
-			this.camera.update(Matrix3d.IDENTITY);
-		}
-		
-		if(this.lights != null){
-			this.lights.update(this.camera.getWorldTransform());
-			for(int i = 0; i < this.lights.getChildCount(); i++){
-				Light light = (Light)this.lights.getChild(i);
-				this.pushMatrix(light.getWorldTransform());
-				light.render();
-				this.popMatrix();
-			}
-		}
-		
-		//bounding box debug
-		Box box = null;
-		Material mat = null;
-		if(this.drawBB){
-			box = new Box();
-			box.renderWireFrame();
-			mat = new Material();
-			mat.setDiffuse(1, 1, 0);
-		}
-		
-		if(this.root != null){
-			root.update(this.camera.getWorldTransform());
-			Collections.sort(this.renderableNodes, Renderer.renderableSort);
-			for(RenderableNode node : this.renderableNodes){
-				this.pushMatrix(node.getWorldTransform());
-				if(box != null && mat != null){
-					box.setBox(node.getBoundingBox());
-					mat.render();
-					box.render();
-				}
-				if(this.drawRenderables){
-					node.render();
-				}
-				this.popMatrix();
-			}
-		}
+	public boolean lightsEnabled(){
+		return this.lights != null;
 	}
 	
 	public void traverseSetup(Node node){
@@ -211,6 +170,8 @@ public abstract class Renderer {
 	/* render settings */
 	public abstract void enableTextures();
 	public abstract void enableLights();
+	public abstract void disableLights();
+	public abstract void disableTextures();
 	
 	public void addComponentRenderer(ComponentRenderer r){
 		this.renderers.add(r);

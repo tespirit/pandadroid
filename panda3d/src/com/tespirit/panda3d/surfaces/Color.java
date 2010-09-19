@@ -1,6 +1,7 @@
 package com.tespirit.panda3d.surfaces;
 
 import com.tespirit.panda3d.render.ComponentRenderer;
+import com.tespirit.panda3d.vectors.Color4;
 
 /**
  * This is a super basic color surface renderer.
@@ -9,58 +10,23 @@ import com.tespirit.panda3d.render.ComponentRenderer;
  */
 public class Color extends Surface{
 	
-	private float r;
-	private float g;
-	private float b;
-	private float a;
+	Color4 color;
 	
 	public Color(){
+		this.color = new Color4();
 		this.setColor(0.5f, 0.5f, 0.5f, 1);
 	}
 	
 	public void setColor(float r, float g, float b, float a){
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
+		this.color = new Color4(r,g,b,a);
 	}
 	
 	public void setColor(float r, float g, float b){
-		this.r = r;
-		this.g = g;
-		this.b = b;
+		this.color = new Color4(r,g,b);
 	}
 	
-	public void setAlpha(float a){
-		this.a = a;
-	}
-	
-	public void setRed(float r){
-		this.r = r;
-	}
-	
-	public void setGreen(float g){
-		this.g = g;
-	}
-	
-	public void setBlue(float b){
-		this.b = b;
-	}
-	
-	public float getRed(){
-		return this.r;
-	}
-	
-	public float getBlue(){
-		return this.b;
-	}
-	
-	public float getGreen(){
-		return this.g;
-	}
-	
-	public float getAlpha(){
-		return this.a;
+	public Color4 getColor(){
+		return this.color;
 	}
 
 	@Override

@@ -7,9 +7,10 @@ import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
-import com.tespirit.panda3d.app.ColorSelect;
+
 import com.tespirit.panda3d.app.MatrixSelect;
 import com.tespirit.panda3d.app.Panda3dView;
+import com.tespirit.panda3d.app.TranslateAbsolute;
 import com.tespirit.panda3d.render.Renderer;
 import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.Plane;
@@ -26,11 +27,13 @@ public class Pandamonium extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
-    	Panda3dView view = new Panda3dView(this);
+    	Panda3dView view = new Panda3dView(this, true);
     	
     	view.createTouchRotateCamera(-5);
     	
-    	view.setTouchDownController(new MatrixSelect(view, true));
+    	//TranslateAbsolute trans = new TranslateAbsolute(view);
+    	
+    	view.setTouchDownController(new MatrixSelect(view, true));//trans.createSelectController());
     	
     	
     	Renderer r = view.getRenderer();
@@ -50,6 +53,10 @@ public class Pandamonium extends Activity {
     	Texture t1 = new Texture();
     	t1.setDiffuseTextureName("test.bmp");
     	
+    	Material mat1 = new Material();
+    	mat1.setAmbient(0.8f, 0.3f, 0.5f);
+    	mat1.setDiffuse(0.8f, 0.3f, 0.5f);
+    	
     	Model m1 = new Model("plane");
     	m1.setPrimative(new Plane());
     	m1.setSurface(t1);
@@ -67,6 +74,14 @@ public class Pandamonium extends Activity {
     	m2.getTransform().scale(0.5f);
     	
     	g.appendChild(m2);
+    	
+    	Model m3 = new Model("box_material");
+    	m3.setPrimative(new Box());
+    	m3.setSurface(mat1);
+    	
+    	m3.getTransform().translate(-1.5f, 1.0f, 0.0f);
+    	
+    	g.appendChild(m3);
     	
     	g.getTransform().translate(1.0f, 0.0f, 0.0f);
     	g.getTransform().rotateX(20.0f);

@@ -55,7 +55,9 @@ public class LightGroup extends Node{
 	 * This is a quick light initialization to some preset settings.
 	 */
 	public void createBasic(){
-		this.addLight(new Light());
+		Light light1 = new Light();
+		light1.setPosition(10.0f, 10.0f, 10.0f);
+		this.addLight(light1);
 	}
 	
 	/**
