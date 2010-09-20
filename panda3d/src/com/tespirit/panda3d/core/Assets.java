@@ -3,6 +3,11 @@ package com.tespirit.panda3d.core;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +22,7 @@ import android.graphics.BitmapFactory;
  */
 public class Assets {
 	private android.content.res.AssetManager assets;
-	
+	private DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	private static Assets manager;
 	
 	/**
@@ -36,8 +41,36 @@ public class Assets {
 		this.assets = contex.getAssets();
 	}
 	
-	public Bitmap openBitmap(String textureName){
+	public InputStream openStream(String name){
 		InputStream stream;
+		
+		try{
+			stream = this.assets.open(name);
+		} catch (IOException e){
+			return null;
+		}
+		return stream;
+	}
+	
+	public Document openXmlDom(String xmlName){
+        try{
+        	DocumentBuilder builder = this.factory.newDocumentBuilder();
+        	InputStream stream = this.openStream(xmlName);
+        	Document doc = builder.parse(stream);
+        	stream.close();
+        	return doc;
+        	
+        } catch(Exception e){
+        	return null;
+        }
+	}
+	
+	public Bitmap openBitmap(String textureName){
+		InputStream stream = this.openStream(textureName);
+		if(stream == null){
+			return null;
+		}
+		
 		Bitmap bitmap;
 		
 		try{

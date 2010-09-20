@@ -24,7 +24,9 @@ public class Group extends Transform {
 	}
 	
 	public void appendChild(Node node){
-		this.children.add(node);
+		if(node != null){
+			this.children.add(node);
+		}
 	}
 	
 	@Override

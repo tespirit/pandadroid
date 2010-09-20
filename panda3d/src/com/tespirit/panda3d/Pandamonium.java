@@ -11,6 +11,7 @@ import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.app.MatrixSelect;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
+import com.tespirit.panda3d.convert.Collada;
 import com.tespirit.panda3d.render.Renderer;
 import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.Plane;
@@ -28,8 +29,8 @@ public class Pandamonium extends Activity {
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
     	Panda3dView view = new Panda3dView(this, true);
-    	
-    	view.createTouchRotateCamera(-5);
+
+    	view.createTouchRotateCamera(-100);
     	
     	//TranslateAbsolute trans = new TranslateAbsolute(view);
     	
@@ -42,9 +43,32 @@ public class Pandamonium extends Activity {
     	lights.createBasic();
     	r.setLightGroup(lights);
     	
-    	r.setSceneGraph(createTestSG());
+    	try{
+    		
+    		r.setSceneGraph(this.loadCollada());
+    		
+    	} catch(Exception e){
+    		r.setSceneGraph(this.createTestSG());
+    	}
+    	
+    	
     	
    		setContentView(view);
+    }
+    
+    public Node loadCollada() throws Exception{
+		Collada jC = new Collada("jocelyn.dae");
+		Collada dC = new Collada("doug.dae");
+		Group g = new Group();
+		Node j = jC.getSceneGraph();
+		j.getTransform().translate(-20, 0, 0);
+		g.appendChild(j);
+		
+		Node d = dC.getSceneGraph();
+		d.getTransform().translate(20, 0, 0);
+		g.appendChild(d);
+		
+		return g;
     }
     
     public Node createTestSG(){

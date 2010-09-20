@@ -23,11 +23,11 @@ public class Camera extends Node implements RenderableNode{
 	private float aspectRatio;
 	
 	public Camera(){
-		this(45.0f,0.1f,100.0f);
+		this(45.0f);
 	}
 	
 	public Camera(float fov){
-		this(fov,0.1f,100.0f);
+		this(fov,0.1f,1000.0f);
 	}
 	
 	public Camera(float fov, float near, float far){

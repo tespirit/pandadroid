@@ -12,6 +12,12 @@ public class TriangleIndices extends Primitive {
 	protected VertexBuffer vertexBuffer;
 	protected IndexBuffer indexBuffer;
 	
+	public TriangleIndices(VertexBuffer vb, IndexBuffer ib){
+		this.vertexBuffer = vb;
+		this.renderAsTriangles();
+		this.indexBuffer = ib;
+	}
+	
 	public TriangleIndices(int indexCount, int vertexCount, int[] vertexTypes){
 		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
 		this.renderAsTriangles(); //default setting.

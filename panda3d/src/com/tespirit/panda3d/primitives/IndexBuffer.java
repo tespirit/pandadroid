@@ -26,9 +26,9 @@ public class IndexBuffer {
 		this.count = count;
 		ByteBuffer temp = ByteBuffer.allocateDirect(count * 4);
 		temp.order(ByteOrder.nativeOrder());
-		this.buffer32 = temp.asIntBuffer();
-		this.buffer = this.buffer32;
-		this.type = 0;
+		this.buffer16 = temp.asShortBuffer();
+		this.buffer = this.buffer16;
+		this.type = 1;
 	}
 	
 	public IndexBuffer(int count, int maxValue){

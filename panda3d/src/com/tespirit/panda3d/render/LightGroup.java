@@ -56,7 +56,7 @@ public class LightGroup extends Node{
 	 */
 	public void createBasic(){
 		Light light1 = new Light();
-		light1.setPosition(10.0f, 10.0f, 10.0f);
+		light1.setPosition(100.0f, 100.0f, 100.0f);
 		this.addLight(light1);
 	}
 	

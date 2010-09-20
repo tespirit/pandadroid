@@ -57,7 +57,10 @@ public class Model extends Transform implements RenderableNode{
 	}
 	
 	public void setSurface(Surface surface){
-		this.surface = surface;
+		if(surface != null)
+			this.surface = surface;
+		else
+			this.surface = Surface.getDefaultSurface();
 	}
 
 	@Override
