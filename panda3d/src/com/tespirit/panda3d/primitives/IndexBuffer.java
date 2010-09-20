@@ -73,6 +73,19 @@ public class IndexBuffer {
 		}
 	}
 	
+	public void addLine(int v1, int v2){
+		if(this.buffer8 != null){
+			this.buffer8.put((byte)v1);
+			this.buffer8.put((byte)v2);
+		} else if(this.buffer16 != null){
+			this.buffer16.put((short)v1);
+			this.buffer16.put((short)v2);
+		} else {
+			this.buffer32.put(v1);
+			this.buffer32.put(v2);
+		}
+	}
+	
 	public int getTypeEnum(){
 		return IndexBuffer.types[this.type];
 	}

@@ -3,6 +3,7 @@ package com.tespirit.panda3d.opengl1x;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Hashtable;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -11,6 +12,7 @@ import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.TriangleIndices;
 import com.tespirit.panda3d.primitives.TriangleList;
 import com.tespirit.panda3d.primitives.VertexBuffer;
+import com.tespirit.panda3d.primitives.WireBox;
 import com.tespirit.panda3d.render.Light;
 import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.surfaces.Color;
@@ -24,8 +26,10 @@ public class RendererDebug extends Renderer{
 	public boolean renderLightPoint;
 	public boolean lightsOn;
 	
+	
+	public Hashtable<Integer, FloatBuffer> normalBuffers;
 
-	private Box boundingBox;
+	private WireBox boundingBox;
 	private Color boundingBoxColor;
 	private Axis axis;
 	private FloatBuffer point;
@@ -39,10 +43,11 @@ public class RendererDebug extends Renderer{
 		this.renderLightPoint = false;
 		this.lightsOn = true;
 		
-		this.boundingBox = new Box();
-		this.boundingBox.renderWireFrame();
+		this.boundingBox = new WireBox();
 		this.boundingBoxColor = new Color();
 		this.boundingBoxColor.setColor(1, 1, 0);
+		
+		this.normalBuffers = new Hashtable<Integer, FloatBuffer>();
 		
 		this.axis = new Axis();
 		
@@ -140,12 +145,18 @@ public class RendererDebug extends Renderer{
 			gl.glDisable(GL10.GL_LIGHTING);
 			gl.glDisable(GL10.GL_TEXTURE_2D);
 			
+			int count = vb.getCount()*3*4*2;
+			
 			//generate normal list!
 			FloatBuffer normals;
-			//3 values per point, 4bytes per float, 2 points, start and end pos
-			ByteBuffer temp = ByteBuffer.allocateDirect(vb.getCount()*3*4*2);
-			temp.order(ByteOrder.nativeOrder());
-			normals = temp.asFloatBuffer();
+			
+			normals = this.normalBuffers.get(count);
+			if(normals == null){
+				ByteBuffer temp = ByteBuffer.allocateDirect(vb.getCount()*3*4*2);
+				temp.order(ByteOrder.nativeOrder());
+				normals = temp.asFloatBuffer();
+				this.normalBuffers.put(count, normals);
+			}
 			
 			Vector3d position = new Vector3d();
 			Vector3d normalOffset = new Vector3d();
@@ -164,13 +175,17 @@ public class RendererDebug extends Renderer{
 			vb.resetBufferPosition();
 			normals.position(0);
 			
-			//draw normals!
+			//draw position!
 			gl.glColor4f(0, 1, 1, 1);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vb.getBuffer(VertexBuffer.POSITION));
+			gl.glDrawArrays(GL10.GL_POINTS, 0, vb.getCount());
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			
+			//draw normals!
+			gl.glColor4f(0, 0.5f, 0.5f, 1);
 			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, normals);
-			gl.glDrawArrays(GL10.GL_POINTS, 0, vb.getCount()*2);
-			gl.glColor4f(0, 0.5f, 0.5f, 1);
 			gl.glDrawArrays(GL10.GL_LINES, 0, vb.getCount()*2);
 			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			if(lightsEnabled() && this.lightsOn){

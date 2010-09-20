@@ -37,22 +37,22 @@ public class Debug {
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
 			if(event.getAction() == KeyEvent.ACTION_UP){
 				switch(keyCode){
-				case KeyEvent.KEYCODE_0:
+				case KeyEvent.KEYCODE_1:
 					this.renderer.renderAxis = !this.renderer.renderAxis;
 					break;
-				case KeyEvent.KEYCODE_1:
+				case KeyEvent.KEYCODE_2:
 					this.renderer.renderBB = !this.renderer.renderBB;
 					break;
-				case KeyEvent.KEYCODE_2:
+				case KeyEvent.KEYCODE_3:
 					this.renderer.renderNormals = !this.renderer.renderNormals;
 					break;
-				case KeyEvent.KEYCODE_3:
+				case KeyEvent.KEYCODE_4:
 					this.renderer.renderRenderables = !this.renderer.renderRenderables;
 					break;
-				case KeyEvent.KEYCODE_4:
+				case KeyEvent.KEYCODE_5:
 					this.renderer.renderLightPoint = !this.renderer.renderLightPoint;
 					break;
-				case KeyEvent.KEYCODE_5:
+				case KeyEvent.KEYCODE_6:
 					this.renderer.lightsOn = !this.renderer.lightsOn;
 				}
 			}

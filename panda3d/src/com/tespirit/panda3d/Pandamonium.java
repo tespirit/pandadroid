@@ -8,7 +8,6 @@ import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
 
-import com.tespirit.panda3d.app.Debug;
 import com.tespirit.panda3d.app.MatrixSelect;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;

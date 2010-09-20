@@ -8,19 +8,19 @@ public class Axis extends LineList{
 		this.vertexBuffer.addPosition(0, 0, 0);
 		this.vertexBuffer.addPosition(1, 0, 0);
 		
-		this.vertexBuffer.addColor(1, 0, 0);
+		this.vertexBuffer.addColor(0.5f, 0.5f, 0.5f);
 		this.vertexBuffer.addColor(1, 0, 0);
 		
 		this.vertexBuffer.addPosition(0, 0, 0);
 		this.vertexBuffer.addPosition(0, 1, 0);
 		
-		this.vertexBuffer.addColor(0, 1, 0);
+		this.vertexBuffer.addColor(0.5f, 0.5f, 0.5f);
 		this.vertexBuffer.addColor(0, 1, 0);
 		
 		this.vertexBuffer.addPosition(0, 0, 0);
 		this.vertexBuffer.addPosition(0, 0, 1);
 		
-		this.vertexBuffer.addColor(0, 0, 1);
+		this.vertexBuffer.addColor(0.5f, 0.5f, 0.5f);
 		this.vertexBuffer.addColor(0, 0, 1);
 		
 		this.vertexBuffer.resetBufferPosition();
