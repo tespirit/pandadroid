@@ -32,10 +32,15 @@ import org.w3c.dom.NodeList;
 /**
  * This is for loading collada files.
  * Right now there are a few things that the collada file must have:
- * 1. triangulated geometry in the form of a collada polygons node.
+ * 1. triangulated geometry (polygon and triangles are supported, 
+ * though the polygon has to be a triangle).
  * 2. the up direction needs to be y.
+ * 3. only 1 shader group is supported.
+ * 4. node transformations must be represented as a matrix in order to import.
  * 
- * all data is scaled to be in meters (makes physics and all that easier).
+ * all data is scaled to be in meters (makes physics and all that easier) 
+ * so as long as you model with correct units and the exporter exports unit 
+ * information, your models should all be scaled correctly.
  * 
  * futute plans will get better support for different input types.
  * @author Todd Espiritu Santo
@@ -55,12 +60,40 @@ public class Collada {
 	
 	private float scale;
 	
+	private boolean normals;
 	
-	public Collada(String fileName)throws Exception{
+	
+	/**
+	 * use this to disable normals from importing since normals are only
+	 * needed if there is lighting.
+	 * @param fileName
+	 * @param normals
+	 * @throws Exception
+	 */
+	public Collada(String fileName, boolean normals)throws Exception{
+		this.normals = normals;
 		this.init(Assets.getManager().openXmlDom(fileName));
 	}
-
+	
+	public Collada(String fileName)throws Exception{
+		this.normals = true;
+		this.init(Assets.getManager().openXmlDom(fileName));
+	}
+	
 	public Collada(Document document) throws Exception{
+		this.normals = true;
+		this.init(document);
+	}
+	
+	/**
+	 * use this to disable normals from importing since normals are only
+	 * needed if there is lighting.
+	 * @param document
+	 * @param normals
+	 * @throws Exception
+	 */
+	public Collada(Document document, boolean normals) throws Exception{
+		this.normals = normals;
 		this.init(document);
 	}
 	
@@ -76,8 +109,9 @@ public class Collada {
 		String unit = this.getAttribute("meter", node);
 		if(unit != null){
 			this.scale = Float.parseFloat(unit);
+		} else {
+			this.scale = 1;
 		}
-		
 		
 		node = document.getElementsByTagName("scene").item(0);
 		node = this.getChildNodeByType("instance_visual_scene", node);
@@ -434,10 +468,12 @@ public class Collada {
 		}
 		
 		void setNormal(float[] values, int offset){
-			this.normals2 = new Vector<Float>();
-			this.normals = values;
-			this.normalOffset = offset;
-			this.count++;
+			if(Collada.this.normals){
+				this.normals2 = new Vector<Float>();
+				this.normals = values;
+				this.normalOffset = offset;
+				this.count++;
+			}
 		}
 		
 		void setTexcoord(float[] values, int offset){

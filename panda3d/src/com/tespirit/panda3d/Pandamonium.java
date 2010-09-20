@@ -8,6 +8,7 @@ import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
 
+import com.tespirit.panda3d.app.Debug;
 import com.tespirit.panda3d.app.MatrixSelect;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
@@ -19,6 +20,9 @@ import com.tespirit.panda3d.primitives.Plane;
 import android.view.*;
 
 public class Pandamonium extends Activity {
+	
+	boolean debug = true;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,7 +32,7 @@ public class Pandamonium extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
-    	Panda3dView view = new Panda3dView(this, true);
+    	Panda3dView view = new Panda3dView(this, this.debug);
 
     	view.createTouchRotateCamera(-2);
     	
@@ -50,10 +54,9 @@ public class Pandamonium extends Activity {
     	} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
     	}
-    	
-    	
-    	
+
    		setContentView(view);
+   		view.setFocusableInTouchMode(true);
     }
     
     public Node loadCollada() throws Exception{

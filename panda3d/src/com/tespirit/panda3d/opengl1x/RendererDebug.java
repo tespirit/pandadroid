@@ -21,6 +21,8 @@ public class RendererDebug extends Renderer{
 	public boolean renderBB;
 	public boolean renderRenderables;
 	public boolean renderAxis;
+	public boolean renderLightPoint;
+	public boolean lightsOn;
 	
 
 	private Box boundingBox;
@@ -34,6 +36,8 @@ public class RendererDebug extends Renderer{
 		this.renderRenderables = true;
 		this.renderNormals = false;
 		this.renderAxis = false;
+		this.renderLightPoint = false;
+		this.lightsOn = true;
 		
 		this.boundingBox = new Box();
 		this.boundingBox.renderWireFrame();
@@ -54,8 +58,7 @@ public class RendererDebug extends Renderer{
 		gl.glLoadIdentity();
 		
 		gl.glEnable(GL10.GL_POINT_SIZE);
-		gl.glPointSize(5);
-		gl.glLineWidthx(3);
+		gl.glPointSize(3);
 		
 		this.gl = gl;
 
@@ -65,7 +68,7 @@ public class RendererDebug extends Renderer{
 		this.gl.glDisable(GL10.GL_LIGHTING);
 		this.gl.glDisable(GL10.GL_TEXTURE_2D);
 		this.drawNodeInfo(this.getSceneGraph());
-		if(this.lightsEnabled()){
+		if(this.lightsEnabled() && this.lightsOn){
 			this.gl.glEnable(GL10.GL_LIGHTING);
 		}
 		
@@ -107,13 +110,15 @@ public class RendererDebug extends Renderer{
 		@Override
 		public void render(Light light) {
 			super.render(light);
-			renderPoint(light.getWorldPosition());
+			if(renderLightPoint){
+				renderPoint(light.getWorldPosition());
+			}
 		}
 	}
 	
 	private void renderPoint(Vector3d point){
 		gl.glDisable(GL10.GL_LIGHTING);
-		gl.glDisable(GL10.GL_TEXTURE);
+		gl.glDisable(GL10.GL_TEXTURE_2D);
 		this.point.put(point.getX());
 		this.point.put(point.getY());
 		this.point.put(point.getZ());
@@ -125,7 +130,7 @@ public class RendererDebug extends Renderer{
 		this.gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
 		this.gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		
-		if(this.lightsEnabled()){
+		if(this.lightsEnabled() && this.lightsOn){
 			this.gl.glEnable(GL10.GL_LIGHTING);
 		}
 	}
@@ -133,7 +138,7 @@ public class RendererDebug extends Renderer{
 	private void renderNormals(VertexBuffer vb){
 		if(renderNormals && vb.hasType(VertexBuffer.NORMAL)){
 			gl.glDisable(GL10.GL_LIGHTING);
-			gl.glDisable(GL10.GL_TEXTURE);
+			gl.glDisable(GL10.GL_TEXTURE_2D);
 			
 			//generate normal list!
 			FloatBuffer normals;
@@ -161,8 +166,6 @@ public class RendererDebug extends Renderer{
 			
 			//draw normals!
 			gl.glColor4f(0, 1, 1, 1);
-			gl.glDisable(GL10.GL_LIGHTING);
-			gl.glDisable(GL10.GL_TEXTURE);
 			
 			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, normals);
@@ -170,7 +173,7 @@ public class RendererDebug extends Renderer{
 			gl.glColor4f(0, 0.5f, 0.5f, 1);
 			gl.glDrawArrays(GL10.GL_LINES, 0, vb.getCount()*2);
 			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			if(lightsEnabled()){
+			if(lightsEnabled() && this.lightsOn){
 				gl.glEnable(GL10.GL_LIGHTING);
 			}
 		}
