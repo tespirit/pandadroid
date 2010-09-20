@@ -30,7 +30,7 @@ public class Pandamonium extends Activity {
         
     	Panda3dView view = new Panda3dView(this, true);
 
-    	view.createTouchRotateCamera(-100);
+    	view.createTouchRotateCamera(-2);
     	
     	//TranslateAbsolute trans = new TranslateAbsolute(view);
     	
@@ -61,11 +61,11 @@ public class Pandamonium extends Activity {
 		Collada dC = new Collada("doug.dae");
 		Group g = new Group();
 		Node j = jC.getSceneGraph();
-		j.getTransform().translate(-20, 0, 0);
+		j.getTransform().translate(-0.4f, 0, 0);
 		g.appendChild(j);
 		
 		Node d = dC.getSceneGraph();
-		d.getTransform().translate(20, 0, 0);
+		d.getTransform().translate(0.4f, 0, 0);
 		g.appendChild(d);
 		
 		return g;

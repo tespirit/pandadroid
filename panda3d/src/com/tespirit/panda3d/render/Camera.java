@@ -27,7 +27,7 @@ public class Camera extends Node implements RenderableNode{
 	}
 	
 	public Camera(float fov){
-		this(fov,0.1f,1000.0f);
+		this(fov,0.1f,100.0f);
 	}
 	
 	public Camera(float fov, float near, float far){

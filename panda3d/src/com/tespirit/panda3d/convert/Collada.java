@@ -32,9 +32,10 @@ import org.w3c.dom.NodeList;
 /**
  * This is for loading collada files.
  * Right now there are a few things that the collada file must have:
- * triangulated geometry in the form of a collada polygons node.
- * each vertex maps 1 to 1 to a position,normal,texcoord,color ..... in other
- * words, a triangle uses the same index for all those values (just duplicated).
+ * 1. triangulated geometry in the form of a collada polygons node.
+ * 2. the up direction needs to be y.
+ * 
+ * all data is scaled to be in meters (makes physics and all that easier).
  * 
  * futute plans will get better support for different input types.
  * @author Todd Espiritu Santo
@@ -52,6 +53,9 @@ public class Collada {
 	
 	private Document document;
 	
+	private float scale;
+	
+	
 	public Collada(String fileName)throws Exception{
 		this.init(Assets.getManager().openXmlDom(fileName));
 	}
@@ -62,11 +66,23 @@ public class Collada {
 	
 	private void init(Document document) throws Exception{
 		XPathFactory factory = XPathFactory.newInstance();
-	    xpath = factory.newXPath();
+	    this.xpath = factory.newXPath();
 		this.document = document;
 		this.primitives = new TreeMap<String, Primitive>();
 		this.surfaces = new TreeMap<String, Surface>();
-		this.root = this.convertSceneNode(document.getElementsByTagName("visual_scene").item(0));		
+		
+		org.w3c.dom.Node node = document.getElementsByTagName("asset").item(0);
+		node = this.getChildNodeByType("unit", node);
+		String unit = this.getAttribute("meter", node);
+		if(unit != null){
+			this.scale = Float.parseFloat(unit);
+		}
+		
+		
+		node = document.getElementsByTagName("scene").item(0);
+		node = this.getChildNodeByType("instance_visual_scene", node);
+		node = this.getNodeByUrl(this.getAttribute("url", node));
+		this.root = this.convertSceneNode(node);		
 	}
 	
 	private String getAttribute(String name, org.w3c.dom.Node node){
@@ -127,6 +143,7 @@ public class Collada {
 				m.setValue(vals[col+Matrix3d.SIZEROW*row], row, col);
 			}
 		}
+		m.getTranslation().scale(this.scale);
 		return m;
 	}
 	
@@ -228,7 +245,12 @@ public class Collada {
 			if(node != null){
 				org.w3c.dom.Node indices = this.getChildNodeByType("polygons", node);
 				if(indices != null){
-					p = convertPolygon(indices);
+					p = this.convertPolygon(indices);
+				} else {
+					indices = this.getChildNodeByType("triangles", node);
+					if(indices != null){
+						p = convertTriangles(indices);
+					}
 				}
 			}
 			
@@ -239,28 +261,43 @@ public class Collada {
 		return null;
 	}
 	
+	private Primitive convertTriangles(org.w3c.dom.Node triangles){
+		ColladaVb vb = this.convertVertexBuffer(triangles);
+		int count = Integer.parseInt(this.getAttribute("count", triangles));
+		IndexBuffer ib = new IndexBuffer(count * 3);
+		org.w3c.dom.Node p = this.getChildNodeByType("p", triangles);
+		int[] values = this.convertToIntArray(p);
+		int stride = values.length/count;
+		for(int i = 0; i < count; i++){
+			ib.addTriangle(vb.registerVertex(values, i*3),
+					   	   vb.registerVertex(values, i*3+stride),
+					       vb.registerVertex(values, i*3+stride*2));
+		}
+		ib.resetBufferPosition();
+		
+		TriangleIndices t = new TriangleIndices(vb.createVb(), ib);
+		return t;
+	}
+	
 	private Primitive convertPolygon(org.w3c.dom.Node polygon){
 		ColladaVb vb = this.convertVertexBuffer(polygon);
-		if(vb != null){
-			int count = Integer.parseInt(this.getAttribute("count", polygon));
-			IndexBuffer ib = new IndexBuffer(count * 3); //assume triangles!
-			NodeList polygons = polygon.getChildNodes();
-			for(int i = 0; i < polygons.getLength(); i++){
-				org.w3c.dom.Node p = polygons.item(i);
-				if(p.getNodeName().equalsIgnoreCase("p")){
-					int[] values = this.convertToIntArray(p);
-					int stride = values.length/3;
-					ib.addTriangle(vb.registerVertex(values, 0),
-								   vb.registerVertex(values, stride),
-								   vb.registerVertex(values, stride*2));
-				}
+		int count = Integer.parseInt(this.getAttribute("count", polygon));
+		IndexBuffer ib = new IndexBuffer(count * 3); //assume triangles!
+		NodeList polygons = polygon.getChildNodes();
+		for(int i = 0; i < polygons.getLength(); i++){
+			org.w3c.dom.Node p = polygons.item(i);
+			if(p.getNodeName().equalsIgnoreCase("p")){
+				int[] values = this.convertToIntArray(p);
+				int stride = values.length/3;
+				ib.addTriangle(vb.registerVertex(values, 0),
+							   vb.registerVertex(values, stride),
+							   vb.registerVertex(values, stride*2));
 			}
-			ib.resetBufferPosition();
-			
-			TriangleIndices triangles = new TriangleIndices(vb.createVb(), ib);
-			return triangles;
 		}
-		return null;
+		ib.resetBufferPosition();
+			
+		TriangleIndices t = new TriangleIndices(vb.createVb(), ib);
+		return t;
 	}
 	
 	class ColladaVb{
@@ -333,9 +370,9 @@ public class Collada {
 			
 			for(int i = 0; i < this.nextIndex; i++){
 				if(this.positions2 != null){
-					vb.addPosition(this.positions2.get(i*3),
-								   this.positions2.get(i*3+1), 
-								   this.positions2.get(i*3+2));
+					vb.addPosition(scale*this.positions2.get(i*3),
+								   scale*this.positions2.get(i*3+1), 
+								   scale*this.positions2.get(i*3+2));
 				}
 				if(this.normals2 != null){
 					vb.addNormal(this.normals2.get(i*3),
@@ -366,21 +403,20 @@ public class Collada {
 		
 		int[] types;
 		
+		final static int MAX = 4;
+		
 		void generateTypes(){
 			int i = 0;
 			this.types = new int[this.count];
 			if(this.positions != null){
-				this.positions2 = new Vector<Float>();
 				this.types[i] = VertexBuffer.POSITION;
 				i++;
 			}
 			if(this.normals != null){
-				this.normals2 = new Vector<Float>();
 				this.types[i] = VertexBuffer.NORMAL;
 				i++;
 			}
 			if(this.texcoords != null){
-				this.texcoords2 = new Vector<Float>();
 				this.types[i] = VertexBuffer.TEXCOORD;
 				i++;
 			}
@@ -389,46 +425,81 @@ public class Collada {
 				this.types[i] = VertexBuffer.COLOR;
 			}
 		}
+		
+		void setPosition(float[] values, int offset){
+			this.positions2 = new Vector<Float>();
+			this.positions = values;
+			this.positionOffset = offset;
+			this.count++;
+		}
+		
+		void setNormal(float[] values, int offset){
+			this.normals2 = new Vector<Float>();
+			this.normals = values;
+			this.normalOffset = offset;
+			this.count++;
+		}
+		
+		void setTexcoord(float[] values, int offset){
+			this.texcoords2 = new Vector<Float>();
+			this.texcoords = values;
+			this.texcoordOffset = offset;
+			this.count++;
+		}
+		
+		void setColor(float[] values, int offset){
+			this.colors2 = new Vector<Float>();
+			this.colors = values;
+			this.colorOffset = offset;
+			this.count++;
+		}
+	}
+	
+	private void convertInput(org.w3c.dom.Node input, ColladaVb vb, int currentOffset){
+		String type = input.getNodeName().toLowerCase();
+		
+		if(!type.equals("input")){
+			return;
+		}
+		
+		String semantic = this.getAttribute("semantic", input);
+		String offsetStr = this.getAttribute("offset", input);
+		int offset;
+		
+		if(offsetStr == null){
+			offset = currentOffset;
+		} else {
+			offset = Integer.parseInt(this.getAttribute("offset", input));
+		}
+		
+		input = this.getNodeByUrl(this.getAttribute("source", input));
+		
+		if(semantic.equals("VERTEX")){
+			for(int i = 0; i < input.getChildNodes().getLength(); i++){
+				this.convertInput(input.getChildNodes().item(i), vb, offset);
+			}
+		} else if(semantic.equals("POSITION")){
+			input = this.getChildNodeByType("float_array", input);
+			vb.setPosition(this.convertToFloatArray(input), offset);
+		} else if(semantic.equals("NORMAL")){
+			input = this.getChildNodeByType("float_array", input);
+			vb.setNormal(this.convertToFloatArray(input), offset);
+		} else if(semantic.equals("TEXCOORD")){
+			input = this.getChildNodeByType("float_array", input);
+			vb.setTexcoord(this.convertToFloatArray(input), offset);
+		} else if(semantic.equals("COLOR")){
+			input = this.getChildNodeByType("float_array", input);
+			vb.setColor(this.convertToFloatArray(input), offset);
+		}
 	}
 	
 	private ColladaVb convertVertexBuffer(org.w3c.dom.Node source){
 		ColladaVb vb = new ColladaVb();
 		
 		NodeList inputs = source.getChildNodes();
-		for(int i = 0; i < inputs.getLength(); i++){
+		for(int i = 0; i < inputs.getLength() && vb.count < ColladaVb.MAX; i++){
 			org.w3c.dom.Node input = inputs.item(i);
-			String type = input.getNodeName().toLowerCase();
-			if(type.equals("input")){
-				String semantic = this.getAttribute("semantic", input);
-				int offset = Integer.parseInt(this.getAttribute("offset", input));
-				if(semantic != null){
-					org.w3c.dom.Node inputSource = this.getNodeByUrl(this.getAttribute("source", input));
-					if(inputSource != null){
-						if(semantic.equals("VERTEX")){
-							inputSource = this.getNodeByUrl(this.getAttribute("source", this.getChildNodeByType("input", inputSource)));
-							inputSource = this.getChildNodeByType("float_array", inputSource);
-							vb.positions = this.convertToFloatArray(inputSource);
-							vb.positionOffset = offset;
-							vb.count++;
-						} else if(semantic.equals("NORMAL")){
-							inputSource = this.getChildNodeByType("float_array", inputSource);
-							vb.normals = this.convertToFloatArray(inputSource);
-							vb.normalOffset = offset;
-							vb.count++;
-						} else if(semantic.equals("TEXCOORD")){
-							inputSource = this.getChildNodeByType("float_array", inputSource);
-							vb.texcoords = this.convertToFloatArray(inputSource);
-							vb.texcoordOffset = offset;
-							vb.count++;
-						} else if(semantic.equals("COLOR")){
-							inputSource = this.getChildNodeByType("float_array", inputSource);
-							vb.colors = this.convertToFloatArray(inputSource);;
-							vb.colorOffset = offset;
-							vb.count++;
-						}
-					}
-				}
-			}
+			this.convertInput(input, vb, 0);
 		}
 		
 		vb.generateTypes();
