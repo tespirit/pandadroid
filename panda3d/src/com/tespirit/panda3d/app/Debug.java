@@ -1,5 +1,8 @@
 package com.tespirit.panda3d.app;
 
+import java.util.ArrayList;
+
+import com.tespirit.panda3d.animation.Animation;
 import com.tespirit.panda3d.opengl1x.RendererDebug;
 import com.tespirit.panda3d.opengl1x.Renderer;
 import com.tespirit.panda3d.vectors.Matrix3d;
@@ -11,6 +14,8 @@ import android.view.View.OnKeyListener;
 
 public class Debug {
 	private static RendererDebug renderer;
+	private static ArrayList<Animation> animations = new ArrayList<Animation>();
+	private static int currentAnimation = -1;
 	
 	public static Renderer init(Panda3dView pv){
 		Debug.renderer = new RendererDebug();
@@ -28,6 +33,11 @@ public class Debug {
 		if(Debug.renderer != null){
 			Debug.renderer.renderPoint(new RendererDebug.Point(p, m));
 		}
+	}
+	
+	public static void addTestAnimation(Animation a){
+		Debug.currentAnimation = 0;
+		Debug.animations.add(a);
 	}
 	
 	static class DebugKeys implements OnKeyListener{
@@ -56,6 +66,27 @@ public class Debug {
 					break;
 				case KeyEvent.KEYCODE_6:
 					Debug.renderer.lightsOn = !Debug.renderer.lightsOn;
+					break;
+				case KeyEvent.KEYCODE_N:
+					if(currentAnimation != -1){
+						animations.get(currentAnimation).play();
+					}
+					break;
+				case KeyEvent.KEYCODE_M:
+					if(currentAnimation != -1){
+						animations.get(currentAnimation).stop();
+					}
+					break;
+				case KeyEvent.KEYCODE_COMMA:
+					if(currentAnimation > 0){
+						currentAnimation--;
+					}
+					break;
+				case KeyEvent.KEYCODE_PERIOD:
+					if(currentAnimation < animations.size() - 1){
+						currentAnimation++;
+					}
+					break;
 				}
 			}
 

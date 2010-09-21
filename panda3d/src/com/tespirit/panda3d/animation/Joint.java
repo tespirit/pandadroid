@@ -1,7 +1,8 @@
 package com.tespirit.panda3d.animation;
 
+import java.util.ArrayList;
+
 import com.tespirit.panda3d.scenegraph.Node;
-import com.tespirit.panda3d.scenegraph.Transform;
 import com.tespirit.panda3d.vectors.*;
 
 /**
@@ -16,40 +17,119 @@ import com.tespirit.panda3d.vectors.*;
  * @author Dennis McAutoKnight
  *
  */
-public class Joint extends Transform{
+public abstract class Joint extends Node{
 	
-	private Node[] children;
+	protected Matrix3d localTransform;
+	protected Matrix3d worldTransform;
+	
+	private AxisAlignedBox bone;
+	
+	protected ArrayList<Joint> children;
+	
+	private DofStream dofs;
 	
 	public Joint(){
-		this.children = null;
+		this(null);
 	}
 	
 	public Joint(String name){
-		this.children = null;
+		super(name);
+		this.children = new ArrayList<Joint>();
+		float[] buffer = Matrix3d.createBuffer(2);
+		this.localTransform = new Matrix3d(buffer);
+		this.worldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
+	}
+	
+	/**
+	 * A convenience function to set up bones for this node and all
+	 * child nodes.
+	 * @param radius
+	 */
+	public void createAllBones(float radius){
+		this.createBone(radius);
+		for(Joint j : this.children){
+			j.createAllBones(radius);
+		}
+	}
+
+	/**
+	 * call this to set up a bone which can be used for selection and collision
+	 * detection. It will create a bounding box which is the bone.
+	 * since this is based on the children, make sure all child nodes have been
+	 * added before calling this.
+	 * @param radius
+	 */
+	public void createBone(float radius){
+		this.bone = new AxisAlignedBox();
+		
+		Vector3d sizeOffset = new Vector3d(radius, radius, radius);
+		this.bone.grow(sizeOffset);
+		sizeOffset.set(-radius, -radius, -radius);
+		this.bone.grow(sizeOffset);
+		
+		//now add children!
+		for(Joint j : this.children){
+			Vector3d top = j.localTransform.getTranslation();
+			sizeOffset.set(radius, radius, radius);
+			sizeOffset.add(top);
+			this.bone.grow(sizeOffset);
+			sizeOffset.set(-radius, -radius, -radius);
+			sizeOffset.add(top);
+			this.bone.grow(sizeOffset);
+		}
+	}
+	
+	public void setDofs(DofStream dofs){
+		this.dofs = dofs;
+		for(Joint j : this.children){
+			j.setDofs(dofs);
+		}
+		
 	}
 	
 	@Override
 	public AxisAlignedBox getBoundingBox() {
-		return null;
+		return this.bone;
+	}
+	
+	public void appendChild(Joint joint){
+		this.children.add(joint);
+		if(this.dofs!= null){
+			joint.setDofs(this.dofs);
+		}
 	}
 
 	@Override
 	public Node getChild(int i) {
-		return this.children[i];
+		return this.children.get(i);
 	}
 
 	@Override
 	public int getChildCount() {
-		return this.children.length;
-	}
-	
-	public void setChildren(Node[] c){
-		this.children = c;
+		return this.children.size();
 	}
 
 	@Override
 	public Matrix3d getTransform() {
-		return null;
+		return this.localTransform;
 	}
+
+	@Override
+	public Matrix3d getWorldTransform() {
+		return this.worldTransform;
+	}
+
+	@Override
+	public void update(Matrix3d transform){
+		if(this.dofs != null){
+			this.updateLocalMatrix(this.dofs);
+		}
+		this.worldTransform.multiply(transform,this.localTransform);
+		for(Joint joint : this.children){
+			joint.update(this.worldTransform);
+		}
+	}
+	
+	protected abstract void updateLocalMatrix(DofStream dofs);
 
 }

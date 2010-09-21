@@ -13,7 +13,7 @@ public class Matrix3d {
 	private Vector3d translation;
 	
 	public static float[] createBuffer(int matrixCount){
-		float[] buffer = new float[Vector3d.SIZE*matrixCount];
+		float[] buffer = new float[Matrix3d.SIZE*matrixCount];
 		for(int i = 0; i < matrixCount; i++){
 			int index = Matrix3d.SIZE*i;
 			buffer[index] = 1.0f;
@@ -349,6 +349,22 @@ public class Matrix3d {
 	
 	public Matrix3d identity(){
 		Matrix.setIdentityM(this.m, this.offset);
+		return this;
+	}
+	
+	public Matrix3d identity3x3(){
+		this.m[0] = 1;
+		this.m[1] = 0;
+		this.m[2] = 0;
+		
+		this.m[4] = 0;
+		this.m[5] = 1;
+		this.m[6] = 0;
+		
+		this.m[8] = 0;
+		this.m[9] = 0;
+		this.m[10] = 1;
+		
 		return this;
 	}
 	

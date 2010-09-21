@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import android.os.SystemClock;
+
 import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
 import com.tespirit.panda3d.vectors.Matrix3d;
@@ -21,7 +23,11 @@ public abstract class Renderer {
 	private TextureManager textures;
 	private ArrayList<ComponentRenderer> renderers;
 	
+	protected long currentTime;
+	
 	private ArrayList<RenderableNode> renderableNodes;
+	
+	private ArrayList<TimeUpdate> timeUpdates;
 	
 	private static final RenderableSort renderableSort = new RenderableSort();
 	
@@ -45,6 +51,7 @@ public abstract class Renderer {
 		this.textures = TextureManager.getInstance();
 		this.renderers = new ArrayList<ComponentRenderer>();
 		this.renderableNodes = new ArrayList<RenderableNode>();
+		this.timeUpdates = new ArrayList<TimeUpdate>();
 	}
 	
 	public void setSceneGraph(Node root){
@@ -53,6 +60,18 @@ public abstract class Renderer {
 	
 	public Node getSceneGraph(){
 		return this.root;
+	}
+	
+	public void addTimeUpdate(TimeUpdate a){
+		this.timeUpdates.add(a);
+	}
+	
+	public int getTimeUpdateCount(){
+		return this.timeUpdates.size();
+	}
+	
+	public TimeUpdate getTimeUpdate(int i){
+		return this.timeUpdates.get(i);
 	}
 	
 	public void setCamera(Camera camera){
@@ -72,6 +91,12 @@ public abstract class Renderer {
 	}
 	
 	public void updateScene(){
+		//update all animations!
+		this.currentTime = SystemClock.elapsedRealtime();
+		for(TimeUpdate timeUpdate : this.timeUpdates){
+			timeUpdate.update(this.currentTime);
+		}
+		
 		this.camera.update(Matrix3d.IDENTITY);
 		Matrix3d view = this.camera.getWorldTransform();
 		if(this.lights != null){

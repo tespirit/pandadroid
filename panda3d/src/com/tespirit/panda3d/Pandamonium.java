@@ -4,12 +4,17 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.tespirit.panda3d.surfaces.Color;
-import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.scenegraph.*;
 
-import com.tespirit.panda3d.app.MatrixSelect;
+import com.tespirit.panda3d.animation.Animation;
+import com.tespirit.panda3d.animation.Channel;
+import com.tespirit.panda3d.animation.Joint;
+import com.tespirit.panda3d.animation.JointOrient;
+import com.tespirit.panda3d.animation.JointRotateY;
+import com.tespirit.panda3d.animation.JointRotateZ;
+import com.tespirit.panda3d.app.Debug;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
 import com.tespirit.panda3d.convert.Collada;
@@ -38,19 +43,21 @@ public class Pandamonium extends Activity {
     	
     	view.setTouchDownController(new TranslateAbsolute(view));
     	
-    	//view.setTouchDownController(new MatrixSelect(view, true));
-    	
     	Renderer r = view.getRenderer();
     	
     	LightGroup lights = new LightGroup();
     	lights.createBasic();
     	r.setLightGroup(lights);
     	
-//    	try{
-//    		r.setSceneGraph(this.loadCollada());	
-//    	} catch(Exception e){
+    	/*try{
+    		r.setSceneGraph(this.loadCollada());	
+    	} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
-//    	}
+    	}*/
+    	
+    	AnimationStuff a = this.createTestAnimation();
+    	r.addTimeUpdate(a.a);
+    	r.setSceneGraph(a.j);
 
    		setContentView(view);
    		view.setFocusableInTouchMode(true);
@@ -69,6 +76,63 @@ public class Pandamonium extends Activity {
 		g.appendChild(d);
 		
 		return g;
+    }
+    
+    class AnimationStuff{
+    	Animation a;
+    	Joint j;
+    }
+    
+    public AnimationStuff createTestAnimation(){
+    	JointRotateY j1 = new JointRotateY();
+    	JointRotateZ j2 = new JointRotateZ();
+    	JointRotateZ j3 = new JointRotateZ();
+    	JointOrient j4 = new JointOrient();
+    	
+    	j1.appendChild(j2);
+    	j2.appendChild(j3);
+    	j3.appendChild(j4);
+    	
+    	
+    	j2.getTransform().translate(0, 1, 0);
+    	j3.getTransform().translate(0, 2, 0);
+    	j4.getTransform().translate(0, 0.5f, 0);
+    	
+    	Channel c1 = new Channel();
+    	for(int i = 0; i < 11; i++){
+    		c1.addKeyFrame(new Channel.KeyFrame(30*i, 1000*i));
+    	}
+    	c1.setRange(0, 1000*12);
+    	
+    	Channel c2 = new Channel();
+    	c2.addKeyFrame(new Channel.KeyFrame(45, 1000));
+    	c2.addKeyFrame(new Channel.KeyFrame(60, 1500));
+    	c2.addKeyFrame(new Channel.KeyFrame(80, 1800));
+    	c2.setRange(0, 2000);
+    	
+    	Channel c3 = new Channel();
+    	c3.addKeyFrame(new Channel.KeyFrame(10, 2000));
+    	c3.addKeyFrame(new Channel.KeyFrame(20, 2600));
+    	c3.addKeyFrame(new Channel.KeyFrame(40, 3200));
+    	c3.addKeyFrame(new Channel.KeyFrame(80, 3800));
+    	c3.setRange(1400, 4400);
+    	
+    	Animation a = new Animation(3);
+    	
+    	a.addChannel(c1);
+    	a.addChannel(c2);
+    	a.addChannel(c3);
+    	
+    	a.attachSkeleton(j1);
+    	
+    	Debug.addTestAnimation(a);
+    	
+    	j1.createAllBones(0.25f);
+    	
+    	AnimationStuff ani = new AnimationStuff();
+    	ani.j = j1;
+    	ani.a = a;
+    	return ani;
     }
     
     public Node createTestSG(){
