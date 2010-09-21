@@ -53,12 +53,14 @@ public class Ray {
 	public Ray transformBy(Ray in, Matrix3d m){
 		m.transform(in.position, this.position);
 		m.transform(in.direction, this.direction);
+		this.direction.normalize();
 		return this;
 	}
 	
 	public Ray transformBy(Matrix3d m){
 		m.transform(this.position);
 		m.transform(this.direction);
+		this.direction.normalize();
 		return this;
 	}
 }

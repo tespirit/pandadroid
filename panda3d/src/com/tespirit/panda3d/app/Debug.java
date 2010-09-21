@@ -2,35 +2,37 @@ package com.tespirit.panda3d.app;
 
 import com.tespirit.panda3d.opengl1x.RendererDebug;
 import com.tespirit.panda3d.opengl1x.Renderer;
+import com.tespirit.panda3d.vectors.Matrix3d;
+import com.tespirit.panda3d.vectors.Vector3d;
 
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 
 public class Debug {
-	private static DebugKeys dk;
-	private static Panda3dView pv;
+	private static RendererDebug renderer;
 	
 	public static Renderer init(Panda3dView pv){
-		RendererDebug renderer = new RendererDebug();
-		pv.setOnKeyListener(new DebugKeys(renderer));
-		return renderer;
+		Debug.renderer = new RendererDebug();
+		pv.setOnKeyListener(new DebugKeys());
+		return Debug.renderer;
 	}
 	
-	public static boolean handleKeyInput(int keyCode, KeyEvent event){
-		if(dk != null){
-			return Debug.dk.onKey(pv, keyCode, event);
-		} else {
-			return true;
+	public static void drawPoint(Vector3d p){
+		if(Debug.renderer != null){
+			Debug.renderer.renderPoint(new RendererDebug.Point(p));
+		}
+	}
+	
+	public static void drawPoint(Vector3d p, Matrix3d m){
+		if(Debug.renderer != null){
+			Debug.renderer.renderPoint(new RendererDebug.Point(p, m));
 		}
 	}
 	
 	static class DebugKeys implements OnKeyListener{
 		
-		private RendererDebug renderer;
-		
-		public DebugKeys(RendererDebug renderer){
-			this.renderer = renderer;
+		public DebugKeys(){
 		}
 
 		@Override
@@ -38,22 +40,22 @@ public class Debug {
 			if(event.getAction() == KeyEvent.ACTION_UP){
 				switch(keyCode){
 				case KeyEvent.KEYCODE_1:
-					this.renderer.renderAxis = !this.renderer.renderAxis;
+					Debug.renderer.renderAxis = !Debug.renderer.renderAxis;
 					break;
 				case KeyEvent.KEYCODE_2:
-					this.renderer.renderBB = !this.renderer.renderBB;
+					Debug.renderer.renderBB = !Debug.renderer.renderBB;
 					break;
 				case KeyEvent.KEYCODE_3:
-					this.renderer.renderNormals = !this.renderer.renderNormals;
+					Debug.renderer.renderNormals = !Debug.renderer.renderNormals;
 					break;
 				case KeyEvent.KEYCODE_4:
-					this.renderer.renderRenderables = !this.renderer.renderRenderables;
+					Debug.renderer.renderRenderables = !Debug.renderer.renderRenderables;
 					break;
 				case KeyEvent.KEYCODE_5:
-					this.renderer.renderLightPoint = !this.renderer.renderLightPoint;
+					Debug.renderer.renderLightPoint = !Debug.renderer.renderLightPoint;
 					break;
 				case KeyEvent.KEYCODE_6:
-					this.renderer.lightsOn = !this.renderer.lightsOn;
+					Debug.renderer.lightsOn = !Debug.renderer.lightsOn;
 				}
 			}
 

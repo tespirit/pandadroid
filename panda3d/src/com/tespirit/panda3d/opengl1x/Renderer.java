@@ -189,7 +189,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		@Override
 		public void render(Material material) {
 			gl.glDisable(GL10.GL_COLOR_MATERIAL);
-			gl.glDisable(GL10.GL_TEXTURE);
+			gl.glDisable(GL10.GL_TEXTURE_2D);
 			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
 			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
 			gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());

@@ -8,72 +8,73 @@ import com.tespirit.panda3d.vectors.Plane;
 import com.tespirit.panda3d.vectors.Ray;
 import com.tespirit.panda3d.vectors.Vector3d;
 
-public class TranslateAbsolute implements Controller2d{
+public class TranslateAbsolute extends SelectController2d{
+	Controller2d previousController;
+	MoveController moveController;
+	
 	private Panda3dView view;
 	private Node node;
 	private Plane plane;
 	private Matrix3d inverter;
+	private Matrix3d local;
 	
-	private class Select extends SelectController2d{
-		Controller2d previousController;
-
-		public Select() {
-			super(TranslateAbsolute.this.view);
-		}
-
-		@Override
-		public void deselect() {
-			if(this.previousController != null){
-				view.setTouchMoveController(this.previousController);
-				this.previousController = null;
-			}
-		}
-
-		@Override
-		public void select(Model model) {
-			if(model == null){
-				this.deselect();
-			} else {
-				node = model;
-				if(this.previousController == null){
-					this.previousController = this.view.getTouchMoveController();
-					this.view.setTouchMoveController(TranslateAbsolute.this);
-				}
-			}
-		}
-		
-	}
+	float totalX;
+	float totalY;
 	
 	public TranslateAbsolute(Panda3dView view){
-		super();
+		super(view);
 		this.view = view;
 		this.plane = new Plane();
 		this.inverter = new Matrix3d();
+		this.moveController = new MoveController();
+		this.local = new Matrix3d();
 	}
 
 	@Override
-	public void update(float x, float y) {
-		Ray ray = this.view.getRenderer().getCamera().createRay(x, y);
-		this.inverter.invert(this.node.getWorldTransform());
-		ray.transformBy(this.inverter);
-		Vector3d intersect = this.plane.rayIntersectsAt(ray);
-		if(intersect != null){
-			node.getTransform().translate(intersect);
+	public void deselect() {
+		if(this.previousController != null){
+			view.setTouchMoveController(this.previousController);
+			this.previousController = null;
 		}
 	}
-
 	@Override
-	public void update(float x, float y, long time) {
-		this.update(x, y);
-		
+	public void select(Model model) {
+		if(model == null){
+			this.deselect();
+		} else {
+			this.node = model;
+			this.inverter.invert(model.getWorldTransform());
+			this.local.copy(model.getTransform());
+			this.totalX = this.x;
+			this.totalY = this.y;
+			if(this.previousController == null){
+				this.previousController = this.view.getTouchMoveController();
+				this.view.setTouchMoveController(this.moveController);
+			}
+		}
 	}
 	
-	public void setController(Node node){
-		this.node = node;
-	}
 	
-	public Select createSelectController(){
-		return new Select();
-	}
+	private class MoveController implements Controller2d{
+		@Override
+		public void update(float x, float y) {
+			totalX += x;
+			totalY += y;
+			Ray ray = view.getRenderer().getCamera().createRay(totalX, totalY);
+			ray.transformBy(inverter);
+			plane.setNormal(ray.getPosition());
+			Vector3d intersect = plane.rayIntersectsAt(ray);
+			if(intersect != null){
+				//push the position as a translation onto the node.
+				node.getTransform().identity().translate(intersect).multiply(local);
+			}
+		}
 
+		@Override
+		public void update(float x, float y, long time) {
+			this.update(x, y);
+			
+		}
+	}
+	
 }

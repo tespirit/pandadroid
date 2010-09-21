@@ -25,7 +25,6 @@ public class Joint extends Transform{
 	}
 	
 	public Joint(String name){
-		super(name);
 		this.children = null;
 	}
 	

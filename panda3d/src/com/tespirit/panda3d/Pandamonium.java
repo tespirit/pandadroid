@@ -3,6 +3,7 @@ package com.tespirit.panda3d;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.tespirit.panda3d.surfaces.Color;
 import com.tespirit.panda3d.surfaces.Material;
 import com.tespirit.panda3d.surfaces.Texture;
 import com.tespirit.panda3d.render.LightGroup;
@@ -33,12 +34,11 @@ public class Pandamonium extends Activity {
         
     	Panda3dView view = new Panda3dView(this, this.debug);
 
-    	view.createTouchRotateCamera(-2);
+    	view.createTouchRotateCamera(-4);
     	
-    	//TranslateAbsolute trans = new TranslateAbsolute(view);
+    	view.setTouchDownController(new TranslateAbsolute(view));
     	
-    	view.setTouchDownController(new MatrixSelect(view, true));//trans.createSelectController());
-    	
+    	//view.setTouchDownController(new MatrixSelect(view, true));
     	
     	Renderer r = view.getRenderer();
     	
@@ -46,13 +46,11 @@ public class Pandamonium extends Activity {
     	lights.createBasic();
     	r.setLightGroup(lights);
     	
-    	try{
-    		
-    		r.setSceneGraph(this.loadCollada());
-    		
-    	} catch(Exception e){
+//    	try{
+//    		r.setSceneGraph(this.loadCollada());	
+//    	} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
-    	}
+//    	}
 
    		setContentView(view);
    		view.setFocusableInTouchMode(true);
@@ -79,9 +77,8 @@ public class Pandamonium extends Activity {
     	Texture t1 = new Texture();
     	t1.setDiffuseTextureName("test.bmp");
     	
-    	Material mat1 = new Material();
-    	mat1.setAmbient(0.8f, 0.3f, 0.5f);
-    	mat1.setDiffuse(0.8f, 0.3f, 0.5f);
+    	Color mat1 = new Color();
+    	mat1.setColor(0.8f, 0.3f, 0.5f);
     	
     	Model m1 = new Model("plane");
     	m1.setPrimative(new Plane());

@@ -8,7 +8,6 @@ import java.util.Hashtable;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.tespirit.panda3d.primitives.Axis;
-import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.TriangleIndices;
 import com.tespirit.panda3d.primitives.TriangleList;
 import com.tespirit.panda3d.primitives.VertexBuffer;
@@ -16,6 +15,7 @@ import com.tespirit.panda3d.primitives.WireBox;
 import com.tespirit.panda3d.render.Light;
 import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.surfaces.Color;
+import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
 
 public class RendererDebug extends Renderer{
@@ -26,6 +26,23 @@ public class RendererDebug extends Renderer{
 	public boolean renderLightPoint;
 	public boolean lightsOn;
 	
+	private Point pointBuffer;
+	
+	public static class Point{
+		Vector3d v;
+		Matrix3d m;
+		
+		public Point(Vector3d v){
+			this.v = v;
+			this.m = Matrix3d.IDENTITY;
+		}
+		
+		public Point(Vector3d v, Matrix3d m){
+			this.v = v;
+			this.m = m;
+		}
+		
+	}
 	
 	public Hashtable<Integer, FloatBuffer> normalBuffers;
 
@@ -50,11 +67,14 @@ public class RendererDebug extends Renderer{
 		this.normalBuffers = new Hashtable<Integer, FloatBuffer>();
 		
 		this.axis = new Axis();
-		
+				
 		ByteBuffer temp = ByteBuffer.allocateDirect(4*3);
 		temp.order(ByteOrder.nativeOrder());
 		point = temp.asFloatBuffer();
-		
+	}
+	
+	public void renderPoint(Point p){
+		this.pointBuffer = p;
 	}
 	
 	@Override
@@ -69,9 +89,18 @@ public class RendererDebug extends Renderer{
 
 		this.updateScene();
 		
+		
+		if(this.pointBuffer != null){
+			this.pushMatrix(this.pointBuffer.m);
+			this.gl.glColor4f(1, 1, 1, 1);
+			this.renderPoint(this.pointBuffer.v);
+			this.popMatrix();
+		}
+		
 		//render node info!
 		this.gl.glDisable(GL10.GL_LIGHTING);
 		this.gl.glDisable(GL10.GL_TEXTURE_2D);
+		
 		this.drawNodeInfo(this.getSceneGraph());
 		if(this.lightsEnabled() && this.lightsOn){
 			this.gl.glEnable(GL10.GL_LIGHTING);
