@@ -49,23 +49,35 @@ public class Pandamonium extends Activity {
     	lights.createBasic();
     	r.setLightGroup(lights);
     	
-    	/*try{
-    		r.setSceneGraph(this.loadCollada());	
+    	try{
+    		AnimationStuff a = this.loadCandy();
+    		r.setSceneGraph(a.j);
+    		r.addTimeUpdate(a.a);
+    		//r.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
-    	}*/
-    	
+    	}
+    	/*
     	AnimationStuff a = this.createTestAnimation();
     	r.addTimeUpdate(a.a);
     	r.setSceneGraph(a.j);
-
+*/
    		setContentView(view);
    		view.setFocusableInTouchMode(true);
+    }
+    
+    public AnimationStuff loadCandy() throws Exception{
+    	Collada candyC = new Collada("test_anim.dae");
+    	AnimationStuff a = new AnimationStuff();
+    	a.a = candyC.getAnimation();
+    	a.j = candyC.getSceneGraph();
+    	return a;
     }
     
     public Node loadCollada() throws Exception{
 		Collada jC = new Collada("jocelyn.dae");
 		Collada dC = new Collada("doug.dae");
+		Collada tC = new Collada("test_cube.dae");
 		Group g = new Group();
 		Node j = jC.getSceneGraph();
 		j.getTransform().translate(-0.4f, 0, 0);
@@ -75,12 +87,15 @@ public class Pandamonium extends Activity {
 		d.getTransform().translate(0.4f, 0, 0);
 		g.appendChild(d);
 		
+		Node t = tC.getSceneGraph();
+		g.appendChild(t);
+		
 		return g;
     }
     
     class AnimationStuff{
     	Animation a;
-    	Joint j;
+    	Node j;
     }
     
     public AnimationStuff createTestAnimation(){

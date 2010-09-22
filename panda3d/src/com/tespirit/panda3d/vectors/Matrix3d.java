@@ -368,6 +368,16 @@ public class Matrix3d {
 		return this;
 	}
 	
+	public boolean isIdentity(){
+		return this.equals(Matrix3d.IDENTITY);
+	}
+	
+	public boolean isIdentity3x3(){
+		return this.xAxis.equals(Matrix3d.IDENTITY.xAxis) &&
+			   this.yAxis.equals(Matrix3d.IDENTITY.yAxis) &&
+			   this.zAxis.equals(Matrix3d.IDENTITY.zAxis);
+	}
+	
 	public Matrix3d aim(Matrix3d m){
 		//TODO: implement
 		return this;

@@ -1,0 +1,1254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+  <asset>
+    <contributor>
+      <author></author>
+      <authoring_tool>FBX COLLADA exporter</authoring_tool>
+      <comments></comments>
+    </contributor>
+    <created>2010-09-22T04:03:52Z</created>
+    <modified>2010-09-22T04:03:52Z</modified>
+    <revision></revision>
+    <title></title>
+    <subject></subject>
+    <keywords></keywords>
+    <unit meter="0.010000"/>
+    <up_axis>Y_UP</up_axis>
+  </asset>
+  <library_animations>
+    <animation id="joint1-anim" name="joint1">
+      <animation>
+        <source id="joint1-rotateX-animation-inputANGLE">
+          <float_array id="joint1-rotateX-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateX-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateX-animation-outputANGLE">
+          <float_array id="joint1-rotateX-animation-outputANGLE-array" count="24">
+
+0.000000 1.808068 3.616136 5.424204 7.232272 9.040340 10.848408 12.656477 14.464544 16.272612 18.080681 19.888748 21.696817 23.504885 25.312954 27.121021
+28.929089 30.737158 32.545227 34.353294 36.161362 37.969429 39.777496 41.585567</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateX-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateX-animation-intanANGLE">
+          <float_array id="joint1-rotateX-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateX-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateX-animation-outtanANGLE">
+          <float_array id="joint1-rotateX-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateX-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateX-animation-interpolationANGLE">
+          <Name_array id="joint1-rotateX-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint1-rotateX-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint1-rotateX-animationANGLE">
+          <input semantic="INPUT" source="#joint1-rotateX-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint1-rotateX-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint1-rotateX-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint1-rotateX-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint1-rotateX-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint1-rotateX-animationANGLE" target="joint1/rotateX.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint1-rotateY-animation-inputANGLE">
+          <float_array id="joint1-rotateY-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateY-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateY-animation-outputANGLE">
+          <float_array id="joint1-rotateY-animation-outputANGLE-array" count="24">
+
+0.000000 0.767774 1.535549 2.303323 3.071097 3.838872 4.606646 5.374421 6.142195 6.909969 7.677744 8.445518 9.213293 9.981067 10.748841 11.516616
+12.284389 13.052165 13.819940 14.587713 15.355488 16.123262 16.891037 17.658812</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateY-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateY-animation-intanANGLE">
+          <float_array id="joint1-rotateY-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateY-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateY-animation-outtanANGLE">
+          <float_array id="joint1-rotateY-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateY-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateY-animation-interpolationANGLE">
+          <Name_array id="joint1-rotateY-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint1-rotateY-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint1-rotateY-animationANGLE">
+          <input semantic="INPUT" source="#joint1-rotateY-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint1-rotateY-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint1-rotateY-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint1-rotateY-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint1-rotateY-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint1-rotateY-animationANGLE" target="joint1/rotateY.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint1-rotateZ-animation-inputANGLE">
+          <float_array id="joint1-rotateZ-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateZ-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateZ-animation-outputANGLE">
+          <float_array id="joint1-rotateZ-animation-outputANGLE-array" count="24">
+
+0.000000 1.083814 2.167627 3.251441 4.335255 5.419068 6.502882 7.586696 8.670509 9.754323 10.838137 11.921950 13.005765 14.089578 15.173391 16.257206
+17.341019 18.424833 19.508646 20.592459 21.676273 22.760088 23.843901 24.927715</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateZ-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateZ-animation-intanANGLE">
+          <float_array id="joint1-rotateZ-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateZ-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateZ-animation-outtanANGLE">
+          <float_array id="joint1-rotateZ-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint1-rotateZ-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint1-rotateZ-animation-interpolationANGLE">
+          <Name_array id="joint1-rotateZ-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint1-rotateZ-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint1-rotateZ-animationANGLE">
+          <input semantic="INPUT" source="#joint1-rotateZ-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint1-rotateZ-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint1-rotateZ-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint1-rotateZ-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint1-rotateZ-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint1-rotateZ-animationANGLE" target="joint1/rotateZ.ANGLE"/>
+      </animation>
+    </animation>
+    <animation id="joint2-anim" name="joint2">
+      <animation>
+        <source id="joint2-rotateX-animation-inputANGLE">
+          <float_array id="joint2-rotateX-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateX-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateX-animation-outputANGLE">
+          <float_array id="joint2-rotateX-animation-outputANGLE-array" count="24">
+
+0.000000 -2.098278 -4.196555 -6.294833 -8.393109 -10.491387 -12.589664 -14.687943 -16.786221 -18.884497 -20.982775 -23.081053 -25.179331 -27.277607 -29.375885 -31.474163
+-33.572437 -35.670719 -37.768997 -39.867271 -41.965549 -44.063828 -46.162106 -48.260384</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateX-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateX-animation-intanANGLE">
+          <float_array id="joint2-rotateX-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateX-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateX-animation-outtanANGLE">
+          <float_array id="joint2-rotateX-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateX-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateX-animation-interpolationANGLE">
+          <Name_array id="joint2-rotateX-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint2-rotateX-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint2-rotateX-animationANGLE">
+          <input semantic="INPUT" source="#joint2-rotateX-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint2-rotateX-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint2-rotateX-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint2-rotateX-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint2-rotateX-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint2-rotateX-animationANGLE" target="joint2/rotateX.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint2-rotateY-animation-inputANGLE">
+          <float_array id="joint2-rotateY-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateY-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateY-animation-outputANGLE">
+          <float_array id="joint2-rotateY-animation-outputANGLE-array" count="24">
+
+0.000000 2.174797 4.349595 6.524392 8.699188 10.873986 13.048782 15.223581 17.398378 19.573174 21.747972 23.922770 26.097567 28.272362 30.447161 32.621960
+34.796753 36.971554 39.146351 41.321144 43.495945 45.670742 47.845539 50.020336</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateY-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateY-animation-intanANGLE">
+          <float_array id="joint2-rotateY-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateY-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateY-animation-outtanANGLE">
+          <float_array id="joint2-rotateY-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateY-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateY-animation-interpolationANGLE">
+          <Name_array id="joint2-rotateY-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint2-rotateY-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint2-rotateY-animationANGLE">
+          <input semantic="INPUT" source="#joint2-rotateY-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint2-rotateY-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint2-rotateY-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint2-rotateY-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint2-rotateY-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint2-rotateY-animationANGLE" target="joint2/rotateY.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint2-rotateZ-animation-inputANGLE">
+          <float_array id="joint2-rotateZ-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateZ-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateZ-animation-outputANGLE">
+          <float_array id="joint2-rotateZ-animation-outputANGLE-array" count="24">
+
+0.000000 -0.665698 -1.331396 -1.997095 -2.662792 -3.328491 -3.994189 -4.659887 -5.325585 -5.991283 -6.656981 -7.322680 -7.988378 -8.654076 -9.319775 -9.985473
+-10.651170 -11.316869 -11.982567 -12.648265 -13.313963 -13.979662 -14.645359 -15.311057</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateZ-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateZ-animation-intanANGLE">
+          <float_array id="joint2-rotateZ-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateZ-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateZ-animation-outtanANGLE">
+          <float_array id="joint2-rotateZ-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint2-rotateZ-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint2-rotateZ-animation-interpolationANGLE">
+          <Name_array id="joint2-rotateZ-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint2-rotateZ-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint2-rotateZ-animationANGLE">
+          <input semantic="INPUT" source="#joint2-rotateZ-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint2-rotateZ-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint2-rotateZ-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint2-rotateZ-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint2-rotateZ-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint2-rotateZ-animationANGLE" target="joint2/rotateZ.ANGLE"/>
+      </animation>
+    </animation>
+    <animation id="joint3-anim" name="joint3">
+      <animation>
+        <source id="joint3-rotateX-animation-inputANGLE">
+          <float_array id="joint3-rotateX-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateX-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateX-animation-outputANGLE">
+          <float_array id="joint3-rotateX-animation-outputANGLE-array" count="24">
+
+0.000000 -1.676916 -3.353832 -5.030748 -6.707664 -8.384580 -10.061496 -11.738413 -13.415328 -15.092243 -16.769161 -18.446075 -20.122993 -21.799908 -23.476824 -25.153740
+-26.830654 -28.507572 -30.184488 -31.861403 -33.538319 -35.215237 -36.892151 -38.569069</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateX-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateX-animation-intanANGLE">
+          <float_array id="joint3-rotateX-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateX-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateX-animation-outtanANGLE">
+          <float_array id="joint3-rotateX-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateX-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateX-animation-interpolationANGLE">
+          <Name_array id="joint3-rotateX-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint3-rotateX-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint3-rotateX-animationANGLE">
+          <input semantic="INPUT" source="#joint3-rotateX-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint3-rotateX-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint3-rotateX-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint3-rotateX-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint3-rotateX-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint3-rotateX-animationANGLE" target="joint3/rotateX.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint3-rotateY-animation-inputANGLE">
+          <float_array id="joint3-rotateY-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateY-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateY-animation-outputANGLE">
+          <float_array id="joint3-rotateY-animation-outputANGLE-array" count="24">
+
+0.000000 1.663872 3.327745 4.991617 6.655489 8.319362 9.983234 11.647107 13.310979 14.974852 16.638723 18.302597 19.966469 21.630341 23.294214 24.958086
+26.621958 28.285831 29.949703 31.613575 33.277447 34.941322 36.605190 38.269066</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateY-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateY-animation-intanANGLE">
+          <float_array id="joint3-rotateY-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateY-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateY-animation-outtanANGLE">
+          <float_array id="joint3-rotateY-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateY-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateY-animation-interpolationANGLE">
+          <Name_array id="joint3-rotateY-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint3-rotateY-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint3-rotateY-animationANGLE">
+          <input semantic="INPUT" source="#joint3-rotateY-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint3-rotateY-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint3-rotateY-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint3-rotateY-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint3-rotateY-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint3-rotateY-animationANGLE" target="joint3/rotateY.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint3-rotateZ-animation-inputANGLE">
+          <float_array id="joint3-rotateZ-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateZ-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateZ-animation-outputANGLE">
+          <float_array id="joint3-rotateZ-animation-outputANGLE-array" count="24">
+
+0.000000 -1.693363 -3.386726 -5.080089 -6.773451 -8.466814 -10.160176 -11.853540 -13.546903 -15.240265 -16.933628 -18.626991 -20.320354 -22.013716 -23.707079 -25.400444
+-27.093805 -28.787169 -30.480532 -32.173893 -33.867256 -35.560619 -37.253983 -38.947346</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateZ-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateZ-animation-intanANGLE">
+          <float_array id="joint3-rotateZ-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateZ-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateZ-animation-outtanANGLE">
+          <float_array id="joint3-rotateZ-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint3-rotateZ-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint3-rotateZ-animation-interpolationANGLE">
+          <Name_array id="joint3-rotateZ-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint3-rotateZ-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint3-rotateZ-animationANGLE">
+          <input semantic="INPUT" source="#joint3-rotateZ-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint3-rotateZ-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint3-rotateZ-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint3-rotateZ-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint3-rotateZ-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint3-rotateZ-animationANGLE" target="joint3/rotateZ.ANGLE"/>
+      </animation>
+    </animation>
+    <animation id="joint4-anim" name="joint4">
+      <animation>
+        <source id="joint4-rotateX-animation-inputANGLE">
+          <float_array id="joint4-rotateX-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateX-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateX-animation-outputANGLE">
+          <float_array id="joint4-rotateX-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateX-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateX-animation-intanANGLE">
+          <float_array id="joint4-rotateX-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateX-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateX-animation-outtanANGLE">
+          <float_array id="joint4-rotateX-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateX-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateX-animation-interpolationANGLE">
+          <Name_array id="joint4-rotateX-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint4-rotateX-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint4-rotateX-animationANGLE">
+          <input semantic="INPUT" source="#joint4-rotateX-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint4-rotateX-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint4-rotateX-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint4-rotateX-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint4-rotateX-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint4-rotateX-animationANGLE" target="joint4/rotateX.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint4-rotateY-animation-inputANGLE">
+          <float_array id="joint4-rotateY-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateY-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateY-animation-outputANGLE">
+          <float_array id="joint4-rotateY-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateY-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateY-animation-intanANGLE">
+          <float_array id="joint4-rotateY-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateY-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateY-animation-outtanANGLE">
+          <float_array id="joint4-rotateY-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateY-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateY-animation-interpolationANGLE">
+          <Name_array id="joint4-rotateY-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint4-rotateY-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint4-rotateY-animationANGLE">
+          <input semantic="INPUT" source="#joint4-rotateY-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint4-rotateY-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint4-rotateY-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint4-rotateY-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint4-rotateY-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint4-rotateY-animationANGLE" target="joint4/rotateY.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint4-rotateZ-animation-inputANGLE">
+          <float_array id="joint4-rotateZ-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateZ-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateZ-animation-outputANGLE">
+          <float_array id="joint4-rotateZ-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateZ-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateZ-animation-intanANGLE">
+          <float_array id="joint4-rotateZ-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateZ-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateZ-animation-outtanANGLE">
+          <float_array id="joint4-rotateZ-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint4-rotateZ-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint4-rotateZ-animation-interpolationANGLE">
+          <Name_array id="joint4-rotateZ-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint4-rotateZ-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint4-rotateZ-animationANGLE">
+          <input semantic="INPUT" source="#joint4-rotateZ-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint4-rotateZ-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint4-rotateZ-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint4-rotateZ-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint4-rotateZ-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint4-rotateZ-animationANGLE" target="joint4/rotateZ.ANGLE"/>
+      </animation>
+    </animation>
+    <animation id="joint5-anim" name="joint5">
+      <animation>
+        <source id="joint5-rotateX-animation-inputANGLE">
+          <float_array id="joint5-rotateX-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateX-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateX-animation-outputANGLE">
+          <float_array id="joint5-rotateX-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateX-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateX-animation-intanANGLE">
+          <float_array id="joint5-rotateX-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateX-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateX-animation-outtanANGLE">
+          <float_array id="joint5-rotateX-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateX-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateX-animation-interpolationANGLE">
+          <Name_array id="joint5-rotateX-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint5-rotateX-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint5-rotateX-animationANGLE">
+          <input semantic="INPUT" source="#joint5-rotateX-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint5-rotateX-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint5-rotateX-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint5-rotateX-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint5-rotateX-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint5-rotateX-animationANGLE" target="joint5/rotateX.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint5-rotateY-animation-inputANGLE">
+          <float_array id="joint5-rotateY-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateY-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateY-animation-outputANGLE">
+          <float_array id="joint5-rotateY-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateY-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateY-animation-intanANGLE">
+          <float_array id="joint5-rotateY-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateY-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateY-animation-outtanANGLE">
+          <float_array id="joint5-rotateY-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateY-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateY-animation-interpolationANGLE">
+          <Name_array id="joint5-rotateY-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint5-rotateY-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint5-rotateY-animationANGLE">
+          <input semantic="INPUT" source="#joint5-rotateY-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint5-rotateY-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint5-rotateY-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint5-rotateY-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint5-rotateY-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint5-rotateY-animationANGLE" target="joint5/rotateY.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint5-rotateZ-animation-inputANGLE">
+          <float_array id="joint5-rotateZ-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateZ-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateZ-animation-outputANGLE">
+          <float_array id="joint5-rotateZ-animation-outputANGLE-array" count="24">
+
+0.000000 4.090698 8.181396 12.272094 16.362789 20.453487 24.544184 28.634884 32.725578 36.816277 40.906975 44.997669 49.088371 53.179062 57.269760 61.360462
+65.451157 69.541855 73.632553 77.723244 81.813942 85.904648 89.995338 94.086037</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateZ-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateZ-animation-intanANGLE">
+          <float_array id="joint5-rotateZ-animation-intanANGLE-array" count="24">
+
+0.000000 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566
+1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateZ-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateZ-animation-outtanANGLE">
+          <float_array id="joint5-rotateZ-animation-outtanANGLE-array" count="24">
+
+1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566
+1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 1.363566 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint5-rotateZ-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint5-rotateZ-animation-interpolationANGLE">
+          <Name_array id="joint5-rotateZ-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint5-rotateZ-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint5-rotateZ-animationANGLE">
+          <input semantic="INPUT" source="#joint5-rotateZ-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint5-rotateZ-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint5-rotateZ-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint5-rotateZ-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint5-rotateZ-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint5-rotateZ-animationANGLE" target="joint5/rotateZ.ANGLE"/>
+      </animation>
+    </animation>
+    <animation id="joint6-anim" name="joint6">
+      <animation>
+        <source id="joint6-rotateX-animation-inputANGLE">
+          <float_array id="joint6-rotateX-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateX-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateX-animation-outputANGLE">
+          <float_array id="joint6-rotateX-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateX-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateX-animation-intanANGLE">
+          <float_array id="joint6-rotateX-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateX-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateX-animation-outtanANGLE">
+          <float_array id="joint6-rotateX-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateX-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateX-animation-interpolationANGLE">
+          <Name_array id="joint6-rotateX-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint6-rotateX-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint6-rotateX-animationANGLE">
+          <input semantic="INPUT" source="#joint6-rotateX-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint6-rotateX-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint6-rotateX-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint6-rotateX-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint6-rotateX-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint6-rotateX-animationANGLE" target="joint6/rotateX.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint6-rotateY-animation-inputANGLE">
+          <float_array id="joint6-rotateY-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateY-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateY-animation-outputANGLE">
+          <float_array id="joint6-rotateY-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateY-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateY-animation-intanANGLE">
+          <float_array id="joint6-rotateY-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateY-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateY-animation-outtanANGLE">
+          <float_array id="joint6-rotateY-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateY-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateY-animation-interpolationANGLE">
+          <Name_array id="joint6-rotateY-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint6-rotateY-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint6-rotateY-animationANGLE">
+          <input semantic="INPUT" source="#joint6-rotateY-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint6-rotateY-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint6-rotateY-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint6-rotateY-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint6-rotateY-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint6-rotateY-animationANGLE" target="joint6/rotateY.ANGLE"/>
+      </animation>
+      <animation>
+        <source id="joint6-rotateZ-animation-inputANGLE">
+          <float_array id="joint6-rotateZ-animation-inputANGLE-array" count="24">
+
+0.041667 0.083333 0.125000 0.166667 0.208333 0.250000 0.291667 0.333333 0.375000 0.416667 0.458333 0.500000 0.541667 0.583333 0.625000 0.666667
+0.708333 0.750000 0.791667 0.833333 0.875000 0.916667 0.958333 1.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateZ-animation-inputANGLE-array" count="24">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateZ-animation-outputANGLE">
+          <float_array id="joint6-rotateZ-animation-outputANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateZ-animation-outputANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateZ-animation-intanANGLE">
+          <float_array id="joint6-rotateZ-animation-intanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateZ-animation-intanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateZ-animation-outtanANGLE">
+          <float_array id="joint6-rotateZ-animation-outtanANGLE-array" count="24">
+
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000</float_array>
+          <technique_common>
+            <accessor source="#joint6-rotateZ-animation-outtanANGLE-array" count="24">
+              <param name="ANGLE" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="joint6-rotateZ-animation-interpolationANGLE">
+          <Name_array id="joint6-rotateZ-animation-interpolationANGLE-array" count="24">
+ BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER
+BEZIER</Name_array>
+          <technique_common>
+            <accessor source="#joint6-rotateZ-animation-interpolationANGLE-array" count="24">
+              <param type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="joint6-rotateZ-animationANGLE">
+          <input semantic="INPUT" source="#joint6-rotateZ-animation-inputANGLE"/>
+          <input semantic="OUTPUT" source="#joint6-rotateZ-animation-outputANGLE"/>
+          <input semantic="IN_TANGENT" source="#joint6-rotateZ-animation-intanANGLE"/>
+          <input semantic="OUT_TANGENT" source="#joint6-rotateZ-animation-outtanANGLE"/>
+          <input semantic="INTERPOLATION" source="#joint6-rotateZ-animation-interpolationANGLE"/>
+        </sampler>
+        <channel source="#joint6-rotateZ-animationANGLE" target="joint6/rotateZ.ANGLE"/>
+      </animation>
+    </animation>
+  </library_animations>
+  <library_visual_scenes>
+    <visual_scene id="RootNode" name="RootNode">
+      <node id="joint1" name="joint1" type="JOINT">
+        <translate sid="translate">0.000000 0.014231 0.000000</translate>
+        <rotate sid="jointOrientZ">0 0 1 90.325541</rotate>
+        <rotate sid="jointOrientX">1 0 0 180.000000</rotate>
+        <rotate sid="rotateZ">0 0 1 0.000000</rotate>
+        <rotate sid="rotateY">0 1 0 0.000000</rotate>
+        <rotate sid="rotateX">1 0 0 0.000000</rotate>
+        <node id="joint2" name="joint2" type="JOINT">
+          <translate sid="translate">5.009569 0.000000 0.000000</translate>
+          <rotate sid="jointOrientZ">0 0 1 -0.209918</rotate>
+          <rotate sid="rotateZ">0 0 1 0.000000</rotate>
+          <rotate sid="rotateY">0 1 0 0.000000</rotate>
+          <rotate sid="rotateX">1 0 0 0.000000</rotate>
+          <node id="joint3" name="joint3" type="JOINT">
+            <translate sid="translate">3.045674 -0.000000 -0.000000</translate>
+            <rotate sid="jointOrientZ">0 0 1 1.550499</rotate>
+            <rotate sid="jointOrientX">1 0 0 -180.000000</rotate>
+            <rotate sid="rotateZ">0 0 1 0.000000</rotate>
+            <rotate sid="rotateY">0 1 0 0.000000</rotate>
+            <rotate sid="rotateX">1 0 0 0.000000</rotate>
+            <node id="joint4" name="joint4" type="JOINT">
+              <translate sid="translate">3.213461 -0.000000 -0.000000</translate>
+              <rotate sid="jointOrientZ">0 0 1 -88.984960</rotate>
+              <rotate sid="rotateZ">0 0 1 0.000000</rotate>
+              <rotate sid="rotateY">0 1 0 0.000000</rotate>
+              <rotate sid="rotateX">1 0 0 0.000000</rotate>
+            </node>
+          </node>
+          <node id="joint5" name="joint5" type="JOINT">
+            <translate sid="translate">0.914573 -2.020523 -0.000000</translate>
+            <rotate sid="jointOrientZ">0 0 1 -117.643131</rotate>
+            <rotate sid="rotateZ">0 0 1 0.000000</rotate>
+            <rotate sid="rotateY">0 1 0 0.000000</rotate>
+            <rotate sid="rotateX">1 0 0 0.000000</rotate>
+            <node id="joint6" name="joint6" type="JOINT">
+              <translate sid="translate">2.142762 0.000000 -0.000000</translate>
+              <rotate sid="jointOrientZ">0 0 1 117.643131</rotate>
+              <rotate sid="rotateZ">0 0 1 0.000000</rotate>
+              <rotate sid="rotateY">0 1 0 0.000000</rotate>
+              <rotate sid="rotateX">1 0 0 0.000000</rotate>
+            </node>
+          </node>
+        </node>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#RootNode"/>
+  </scene>
+</COLLADA>
+
