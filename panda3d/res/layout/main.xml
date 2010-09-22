@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:panda3d="http://www.tespirit.com/panda3d"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
+<TextView
+	android:id="@+id/title"
     android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+    android:layout_height="wrap_content"
+    android:textSize="12px"
+    android:text="@string/output"
+    android:textColor="@color/titleTextColor"
+    android:background="@color/titleColor"
+/>
+<TextView
+	android:id="@+id/consol"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:textSize="10px"
+    android:textColor="@color/consolTextColor"
+    android:background="@color/consolColor"
+    android:typeface="monospace" 
+    android:scrollbarStyle="outsideOverlay"
+    android:scrollbars="vertical"
+    android:maxLines="10"
+    android:minLines="10"
+/>
+<com.tespirit.panda3d.app.Panda3dView 
+	android:id="@+id/panda3d"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	panda3d:debug="true"
+	/>
 </LinearLayout>

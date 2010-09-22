@@ -10,6 +10,7 @@ import com.tespirit.panda3d.render.Camera;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 public class Panda3dView extends GLSurfaceView {
@@ -17,26 +18,40 @@ public class Panda3dView extends GLSurfaceView {
 	private Controller2d touchUpController;
 	private Controller2d touchMoveController;
 	private Controller2d touchDownController;
+	private boolean debug;
 
 	public Panda3dView(Context context){
-		this(context, false);
+		super(context);
+		this.debug = false;
+		this.init(context);
 	}
 	
-	public Panda3dView(Context context, boolean debugMode) {
+	public Panda3dView(Context context, boolean debug){
 		super(context);
+		this.debug = debug;
+		this.init(context);
+	}
+	
+	public Panda3dView(Context context, AttributeSet attrs){
+		super(context, attrs);
+		this.debug = true;//attrs.getAttributeBooleanValue("panda3d", "debug", false);
+		this.init(context);
+	}
+	
+	private void init(Context context){
 		Assets.init(context);
 		
 		//TODO:smartly create a renderer based on the availible graphics api.
-		this.initOpenGl1x(debugMode);
+		this.initOpenGl1x();
 		
 		this.touchUpController = ControllerDummy.getInstance();
 		this.touchMoveController = ControllerDummy.getInstance();
 		this.touchDownController = ControllerDummy.getInstance();
 	}
 	
-	private void initOpenGl1x(boolean debugMode){
+	private void initOpenGl1x(){
 		com.tespirit.panda3d.opengl1x.Renderer gl1x;
-		if(debugMode){
+		if(this.debug){
 			gl1x = Debug.init(this);
 		} else {
 			gl1x = new com.tespirit.panda3d.opengl1x.Renderer();

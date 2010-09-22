@@ -23,21 +23,23 @@ import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.Plane;
 
 import android.view.*;
+import android.widget.TextView;
 
 public class Pandamonium extends Activity {
-	
-	boolean debug = true;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-    	
+
     	this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	setContentView(R.layout.main);
         
-    	Panda3dView view = new Panda3dView(this, this.debug);
+        Panda3dView view = (Panda3dView)findViewById(R.id.panda3d);
+        view.setFocusableInTouchMode(true);
+        Debug.setConsol((TextView)findViewById(R.id.consol));
 
     	view.createTouchRotateCamera(-4);
     	
@@ -52,18 +54,18 @@ public class Pandamonium extends Activity {
     	try{
     		AnimationStuff a = this.loadCandy();
     		r.setSceneGraph(a.j);
-    		r.addTimeUpdate(a.a);
+    		//r.addTimeUpdate(a.a);
     		//r.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
     	}
-    	/*
-    	AnimationStuff a = this.createTestAnimation();
-    	r.addTimeUpdate(a.a);
-    	r.setSceneGraph(a.j);
-*/
-   		setContentView(view);
-   		view.setFocusableInTouchMode(true);
+    	
+    	//AnimationStuff a = this.createTestAnimation();
+    	//r.addTimeUpdate(a.a);
+    	//r.setSceneGraph(a.j);
+
+   		
+   		//view.setFocusableInTouchMode(true);
     }
     
     public AnimationStuff loadCandy() throws Exception{

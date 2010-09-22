@@ -329,7 +329,7 @@ public class Collada {
 				}
 			}
 		}
-		joint.createAllBones(0.5f);
+		joint.createAllBones(0.1f);
 		return joint;
 	}
 	
