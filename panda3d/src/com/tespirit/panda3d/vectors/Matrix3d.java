@@ -213,16 +213,16 @@ public class Matrix3d {
 		float temp;
 		
 		temp = this.m[1];
-		this.m[1] = this.m[4];
-		this.m[4] = temp;
+		this.m[this.offset+1] = this.m[this.offset+4];
+		this.m[this.offset+4] = temp;
 		
 		temp = this.m[2];
-		this.m[2] = this.m[12];
-		this.m[12] = temp;
+		this.m[this.offset+2] = this.m[this.offset+12];
+		this.m[this.offset+12] = temp;
 		
 		temp = this.m[6];
-		this.m[6] = this.m[13];
-		this.m[13] = temp;
+		this.m[this.offset+6] = this.m[this.offset+13];
+		this.m[this.offset+13] = temp;
 		
 		return this;
 	}
@@ -353,17 +353,17 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d identity3x3(){
-		this.m[0] = 1;
-		this.m[1] = 0;
-		this.m[2] = 0;
+		this.m[this.offset+0] = 1;
+		this.m[this.offset+1] = 0;
+		this.m[this.offset+2] = 0;
 		
-		this.m[4] = 0;
-		this.m[5] = 1;
-		this.m[6] = 0;
+		this.m[this.offset+4] = 0;
+		this.m[this.offset+5] = 1;
+		this.m[this.offset+6] = 0;
 		
-		this.m[8] = 0;
-		this.m[9] = 0;
-		this.m[10] = 1;
+		this.m[this.offset+8] = 0;
+		this.m[this.offset+9] = 0;
+		this.m[this.offset+10] = 1;
 		
 		return this;
 	}

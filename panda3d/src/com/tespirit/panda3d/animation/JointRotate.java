@@ -12,7 +12,10 @@ public class JointRotate extends Joint{
 
 	@Override
 	protected void updateLocalMatrix(DofStream dofs) {
-		this.localTransform.identity3x3().rotateEuler(dofs.getNext(), dofs.getNext(), dofs.getNext());
+		this.localTransform.identity3x3();
+		this.localTransform.rotateX(dofs.getNext());
+		this.localTransform.rotateY(dofs.getNext());
+		this.localTransform.rotateZ(dofs.getNext());
 	}
 
 }

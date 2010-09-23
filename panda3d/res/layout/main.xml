@@ -29,6 +29,6 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	panda3d:debug="true"
-	panda3d:background_color="#888888"
+	panda3d:background_color="#444444"
 />
 </LinearLayout>

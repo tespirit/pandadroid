@@ -18,6 +18,7 @@ import com.tespirit.panda3d.animation.JointOrient;
 import com.tespirit.panda3d.animation.JointRotate;
 import com.tespirit.panda3d.animation.JointTranslate;
 import com.tespirit.panda3d.core.Assets;
+import com.tespirit.panda3d.debug.Debug;
 import com.tespirit.panda3d.primitives.IndexBuffer;
 import com.tespirit.panda3d.primitives.Primitive;
 import com.tespirit.panda3d.primitives.TriangleIndices;
@@ -145,20 +146,21 @@ public class Collada {
 	
 	private Animation convertAnimations(org.w3c.dom.Node animations){
 		NodeList children = animations.getChildNodes();
-		boolean success = false;
+		this.minAnimationTime = Long.MAX_VALUE;
+		this.maxAnimationTime = Long.MIN_VALUE;
+		
 		for(int i = 0; i < children.getLength(); i++){
 			org.w3c.dom.Node child = children.item(i);
 			if(child.getNodeName().equalsIgnoreCase("animation")){
-				if(this.convertChannel(child)){
-					success = true;
-				}
+				this.convertAnimation(child);
 			}
 		}
 		
-		if(success){
+		if(this.minAnimationTime < this.maxAnimationTime){
 			Animation a = new Animation(this.jointChannels.size());
 			for(Channel c : this.jointChannels){
 				a.addChannel(c);
+				c.setRange(this.minAnimationTime, this.maxAnimationTime);
 			}
 			return a;
 		}
@@ -166,23 +168,30 @@ public class Collada {
 		return null;
 	}
 	
-	private boolean convertChannel(org.w3c.dom.Node animation){
-		org.w3c.dom.Node channel = this.getChildNodeByType("animation", animation);
-		if(channel != null){
-			this.convertChannel(channel);
+	private long minAnimationTime;
+	private long maxAnimationTime;
+	
+	private void convertAnimation(org.w3c.dom.Node animation){
+		NodeList children = animation.getChildNodes();
+		for(int i=0; i < children.getLength(); i++){
+			org.w3c.dom.Node child = children.item(i);
+			String type = child.getNodeName();
+			if(type.equals("animation")){
+				this.convertAnimation(child);
+			} else if(type.equals("channel")){
+				this.convertChannel(child);
+			}
 		}
-		channel = this.getChildNodeByType("channel", animation);
-		if(channel == null){
-			return false;
-		}
+	}
+	
+	private void convertChannel(org.w3c.dom.Node channel){
 		String url = this.getAttribute("source", channel);
 		String target = this.getAttribute("target", channel);
-		
 		int offset;
 		if(this.channelOffset.containsKey(target)){
 			offset = this.channelOffset.get(target);
 		} else {
-			return false;
+			return;
 		}
 		
 		float[] time = null;
@@ -204,16 +213,24 @@ public class Collada {
 			}
 		}
 		
-		int channelCount = values.length / time.length;
-		
-		for(int i = 0; i < channelCount; i++){
-			Channel c = this.jointChannels.get(offset+i);
-			for(int j = 0; j < time.length; j++){
-				c.addKeyFrame(new Channel.KeyFrame(values[j*channelCount+i], (long)(time[j]*1000)));
+		if(time.length > 0){
+			int channelCount = values.length / time.length;
+			
+			for(int i = 0; i < channelCount; i++){
+				Channel c = this.jointChannels.get(offset+i);
+				for(int j = 0; j < time.length; j++){
+					c.addKeyFrame(new Channel.KeyFrame(values[j*channelCount+i], (long)(time[j]*1000)));
+				}
+			}
+			long startTime = (long)(time[0]*1000);
+			long endTime = (long)(time[time.length-1]*1000);
+			if(startTime < this.minAnimationTime){
+				this.minAnimationTime = startTime;
+			}
+			if(endTime > this.maxAnimationTime){
+				this.maxAnimationTime = endTime;
 			}
 		}
-		
-		return true;
 	}
 	
 	private String getAttribute(String name, org.w3c.dom.Node node){
@@ -228,26 +245,26 @@ public class Collada {
 		String prefix;
 		String postfix;
 		if(rotate){
-			name = name +"/Rotate";
+			name = name +"/rotate";
 			prefix = "";
-			postfix = ".Angle";
+			postfix = ".ANGLE";
 		} else {
-			name = name + "/Translate";
+			name = name + "/translate";
 			prefix = ".";
 			postfix = "";
 		}
 		
 		if(x){
+			this.channelOffset.put(name+prefix+"X"+postfix, this.jointChannels.size());
 			this.jointChannels.add(new Channel());
-			this.channelOffset.put(name+prefix+"X"+postfix, this.jointChannels.size()-1);
 		}
 		if(y){
+			this.channelOffset.put(name+prefix+"Y"+postfix, this.jointChannels.size());
 			this.jointChannels.add(new Channel());
-			this.channelOffset.put(name+prefix+"Y"+postfix, this.jointChannels.size()-1);
 		}
 		if(z){
+			this.channelOffset.put(name+prefix+"Z"+postfix, this.jointChannels.size());
 			this.jointChannels.add(new Channel());
-			this.channelOffset.put(name+prefix+"Z"+postfix, this.jointChannels.size()-1);
 		}
 		
 		if(x && y && z){
@@ -257,8 +274,8 @@ public class Collada {
 	
 	private Joint convertJoint(org.w3c.dom.Node node){
 		String name = getAttribute("id", node);
-		Joint joint = new JointRotate();
-		JointOrient jointO = null;
+		Joint joint = new JointRotate(name);
+		JointOrient jointO = new JointOrient(name+"<orient>");
 		this.generateChannels(name, true, true, true, true);
 		for(int i = 0; i < node.getChildNodes().getLength(); i++){
 			org.w3c.dom.Node child = node.getChildNodes().item(i);
@@ -267,15 +284,10 @@ public class Collada {
 			if(type.equals("matrix")){
 				this.pushMatrix(joint.getTransform(), child);
 			} else if(type.equals("translate")){ 
-				this.pushTranslate(joint.getTransform(), child);
+				this.pushTranslate(jointO.getTransform(), child);
 			} else if(type.equals("rotate")){
 				type = this.getAttribute("sid", child);
 				if(type != null && type.startsWith("jointOrient")){
-					if(jointO == null){
-						jointO = new JointOrient();
-						jointO.getTransform().copy(joint.getTransform());
-						joint.getTransform().identity();
-					}
 					this.pushRotate(jointO.getTransform(), child);
 				} else {
 					this.pushRotate(joint.getTransform(), child);
@@ -287,14 +299,12 @@ public class Collada {
 				}
 			}
 		}
-		if(jointO != null){
-			if(jointO.getTransform().isIdentity3x3()){
-				jointO.getTransform().multiply(joint.getTransform());
-				joint.getTransform().copy(jointO.getTransform());
-			} else {
-				jointO.appendChild(joint);
-				joint = jointO;
-			}
+		if(jointO.getTransform().isIdentity3x3()){
+			joint.getTransform().multiply(jointO.getTransform());
+			//joint.getTransform().copy(jointO.getTransform());
+		} else {
+			jointO.appendChild(joint);
+			joint = jointO;
 		}
 		return joint;
 	}
@@ -398,11 +408,9 @@ public class Collada {
 		float[] vals = this.convertToFloatArray(node);
 		for(int row = 0; row < Matrix3d.SIZEROW; row++){
 			for(int col = 0; col < Matrix3d.SIZEROW; col++){
-				temp.setValue(vals[col+Matrix3d.SIZEROW*row], row, col);
+				current.setValue(vals[col+Matrix3d.SIZEROW*row], row, col);
 			}
 		}
-		temp.getTranslation().scale(this.scale);
-		current.multiply(temp);
 	}
 	
 	private void pushTranslate(Matrix3d current, org.w3c.dom.Node node){

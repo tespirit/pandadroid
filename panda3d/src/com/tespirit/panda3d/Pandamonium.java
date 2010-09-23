@@ -53,14 +53,14 @@ public class Pandamonium extends Activity {
     	lights.createBasic();
     	r.setLightGroup(lights);
     	
-    	//try{
-    		//AnimationStuff a = this.loadCandy();
-    		//r.setSceneGraph(a.j);
-    		//r.addTimeUpdate(a.a);
-    		//r.setSceneGraph(this.loadCollada());	
-    	//} catch(Exception e){
+    	try{
+    		AnimationStuff a = this.loadCandy();
+    		r.setSceneGraph(a.j);
+    		r.addTimeUpdate(a.a);
+    	//	r.setSceneGraph(this.loadCollada());	
+    	} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
-    	//}
+    	}
     	
     	//AnimationStuff a = this.createTestAnimation();
     	//r.addTimeUpdate(a.a);
@@ -75,6 +75,8 @@ public class Pandamonium extends Activity {
     	AnimationStuff a = new AnimationStuff();
     	a.a = candyC.getAnimation();
     	a.j = candyC.getSceneGraph();
+    	a.a.attachSkeleton((Joint)a.j);
+    	Debug.addTestAnimation(a.a);
     	return a;
     }
     

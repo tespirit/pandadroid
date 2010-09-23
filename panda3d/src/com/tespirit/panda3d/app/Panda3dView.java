@@ -1,9 +1,11 @@
 package com.tespirit.panda3d.app;
 
 import com.tespirit.panda3d.R;
+import com.tespirit.panda3d.controllers.AccelerationController3d;
 import com.tespirit.panda3d.controllers.Controller2d;
 import com.tespirit.panda3d.controllers.ControllerDummy;
 import com.tespirit.panda3d.controllers.Dof3;
+import com.tespirit.panda3d.controllers.EulerController3d;
 import com.tespirit.panda3d.controllers.RotateController2d;
 import com.tespirit.panda3d.controllers.TranslateController2d;
 import com.tespirit.panda3d.core.Assets;
@@ -14,6 +16,8 @@ import com.tespirit.panda3d.vectors.Color4;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -24,6 +28,7 @@ public class Panda3dView extends GLSurfaceView {
 	private Controller2d touchMoveController;
 	private Controller2d touchDownController;
 	private boolean debug;
+	private Context context;
 
 	public Panda3dView(Context context){
 		super(context);
@@ -58,6 +63,7 @@ public class Panda3dView extends GLSurfaceView {
 	
 	private void init(Context context){
 		Assets.init(context);
+		this.context = context;
 		
 		//TODO:smartly create a renderer based on the availible graphics api.
 		this.initOpenGl1x();
@@ -191,6 +197,48 @@ public class Panda3dView extends GLSurfaceView {
 		m.setScale(0.01f);
 		this.setTouchMoveController(m);
 		
+		return camera;
+	}
+	
+	/**
+	 * 
+	 * @return null if the device does not support motion sensors.
+	 */
+	public Camera createMotionSensorCamera(){
+		return this.createMotionSensorCamera(0.0f);
+	}
+	
+	/**
+	 * 
+	 * @param zoomDistance
+	 * @return null if the device does not support motion sensors.
+	 */
+	public Camera createMotionSensorCamera(float zoomDistance){
+		SensorManager s = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+		Sensor accelerometer = s.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER);
+		Sensor geoMagnetic = s.getDefaultSensor(SensorManager.SENSOR_MAGNETIC_FIELD);
+		if(accelerometer == null || geoMagnetic == null){
+			return null;
+		}
+		
+		Camera camera = new Camera();
+		camera.zoom(zoomDistance);
+		
+		EulerController3d e = new EulerController3d(EulerController3d.Euler.ZXY);
+		e.setControlled(camera);
+		
+		AccelerationController3d a = new AccelerationController3d();
+		a.setControlled(camera);
+		
+		MotionSensor3d motionSensor = new MotionSensor3d(e, a);
+		
+		//register the motion sensor!		
+		if(!s.registerListener(motionSensor, accelerometer, SensorManager.SENSOR_DELAY_GAME)){
+			return null;
+		}
+		if(!s.registerListener(motionSensor, geoMagnetic, SensorManager.SENSOR_DELAY_GAME)){
+			return null;
+		}
 		return camera;
 	}
 }

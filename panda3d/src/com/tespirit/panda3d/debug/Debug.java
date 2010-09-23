@@ -29,7 +29,7 @@ public class Debug {
 	private static ArrayList<Animation> animations = new ArrayList<Animation>();
 	private static int currentAnimation = -1;
 	private static TextView console;
-	private static ArrayBlockingQueue<String> printBuffer = new ArrayBlockingQueue<String>(100);
+	private static ArrayBlockingQueue<String> printBuffer = new ArrayBlockingQueue<String>(1000);
 	private static DebugKeys dk = new DebugKeys();
 	
 	public static Renderer init(Panda3dView pv){
@@ -57,43 +57,43 @@ public class Debug {
 	}
 	
 	public static void print(Node node){
-		Debug.printNode(node, "");
+		Debug.printNode(node, "", 0);
 	}
 	
-	private static void printNode(Node node, String spacing){
+	private static void printNode(Node node, String spacing, int depth){
 		String type;
 		if(node instanceof Group){
-			type = "-+ Group: ";
+			type = "- Group: ";
 		} else if (node instanceof Model){
-			type = "-+ Model: ";
+			type = "- Model: ";
 		} else if (node instanceof JointOrient){
-			type = "-+ JointOrient: ";
+			type = "- JointOrient: ";
 		} else if (node instanceof JointRotate){
-			type = "-+ JointRotate: ";
+			type = "- JointRotate: ";
 		} else if (node instanceof JointTranslate){
-			type = "-+ JointTranslate: ";
+			type = "- JointTranslate: ";
 		} else if (node instanceof Joint){
-			type = "-+ Joint: ";
+			type = "- Joint: ";
 		} else if (node instanceof LightGroup){
-			type = "-+ LightGroup: ";
+			type = "- LightGroup: ";
 		} else if (node instanceof Light){
-			type = "-+ Light: ";
+			type = "- Light: ";
 		} else if (node instanceof Camera){
-			type = "-+ Camera: ";
+			type = "- Camera: ";
 		} else {
-			type = "-+ Node: ";
+			type = "- Node: ";
 		}
 		String name = node.getName();
 		if(name == null){
 			name = "<no name>";
 		}
+
+		Debug.print(spacing+depth+type + name);
 		
-		Debug.print(spacing+type + name);
-		
-		spacing = spacing+" |";
+		spacing = spacing+"  ";
 		
 		for(int i = 0; i < node.getChildCount(); i++){
-			Debug.printNode(node.getChild(i), spacing);
+			Debug.printNode(node.getChild(i), spacing, depth+1);
 		}
 	}
 	

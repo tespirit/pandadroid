@@ -73,7 +73,9 @@ public abstract class Renderer {
 	}
 	
 	public void addTimeUpdate(TimeUpdate a){
-		this.timeUpdates.add(a);
+		if(a != null){
+			this.timeUpdates.add(a);
+		}
 	}
 	
 	public int getTimeUpdateCount(){
