@@ -292,6 +292,7 @@ public class Collada {
 				jointO.getTransform().multiply(joint.getTransform());
 				joint.getTransform().copy(jointO.getTransform());
 			} else {
+				jointO.appendChild(joint);
 				joint = jointO;
 			}
 		}

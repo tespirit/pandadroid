@@ -2,6 +2,6 @@
 <resources>
 <color name="titleColor">#666666</color>
 <color name="titleTextColor">#FF9955</color>
-<color name="consolColor">#FFFFFF</color>
-<color name="consolTextColor">#0000FF</color>
+<color name="consoleColor">#FFFFFF</color>
+<color name="consoleTextColor">#0000FF</color>
 </resources>

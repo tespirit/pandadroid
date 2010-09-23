@@ -1,14 +1,19 @@
 package com.tespirit.panda3d.app;
 
+import com.tespirit.panda3d.R;
 import com.tespirit.panda3d.controllers.Controller2d;
 import com.tespirit.panda3d.controllers.ControllerDummy;
 import com.tespirit.panda3d.controllers.Dof3;
 import com.tespirit.panda3d.controllers.RotateController2d;
 import com.tespirit.panda3d.controllers.TranslateController2d;
 import com.tespirit.panda3d.core.Assets;
+import com.tespirit.panda3d.debug.Debug;
 import com.tespirit.panda3d.render.Camera;
+import com.tespirit.panda3d.vectors.Color4;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -34,8 +39,21 @@ public class Panda3dView extends GLSurfaceView {
 	
 	public Panda3dView(Context context, AttributeSet attrs){
 		super(context, attrs);
-		this.debug = true;//attrs.getAttributeBooleanValue("panda3d", "debug", false);
+		
+		//setup custom attributes
+		TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.Panda3dView);
+		this.debug = a.getBoolean(R.styleable.Panda3dView_debug, false);
+		int color = a.getColor(R.styleable.Panda3dView_background_color, 0x000000FF);
+		
+		Color4 bgColor = new Color4();
+		bgColor.set(Color.red(color), 
+					Color.green(color), 
+					Color.blue(color),
+					Color.alpha(color));
+		a.recycle();
+		
 		this.init(context);
+		this.renderer.setBackgroundColor(bgColor);
 	}
 	
 	private void init(Context context){
@@ -112,6 +130,7 @@ public class Panda3dView extends GLSurfaceView {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		this.requestFocus();
 		float x = event.getX();
 		float y = event.getY();
 		long time = event.getEventTime();

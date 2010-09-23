@@ -8,6 +8,7 @@ import android.os.SystemClock;
 
 import com.tespirit.panda3d.surfaces.TextureManager;
 import com.tespirit.panda3d.scenegraph.*;
+import com.tespirit.panda3d.vectors.Color4;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Ray;
 
@@ -17,6 +18,10 @@ import com.tespirit.panda3d.vectors.Ray;
  *
  */
 public abstract class Renderer {
+	/* basic attributes */
+	protected Color4 backgroundColor;
+	
+	
 	private Node root;
 	private Camera camera;
 	private LightGroup lights;
@@ -52,6 +57,11 @@ public abstract class Renderer {
 		this.renderers = new ArrayList<ComponentRenderer>();
 		this.renderableNodes = new ArrayList<RenderableNode>();
 		this.timeUpdates = new ArrayList<TimeUpdate>();
+		this.backgroundColor = new Color4();
+	}
+	
+	public void setBackgroundColor(Color4 color){
+		this.backgroundColor.copy(color);
 	}
 	
 	public void setSceneGraph(Node root){

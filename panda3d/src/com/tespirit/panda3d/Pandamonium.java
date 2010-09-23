@@ -14,10 +14,10 @@ import com.tespirit.panda3d.animation.Joint;
 import com.tespirit.panda3d.animation.JointOrient;
 import com.tespirit.panda3d.animation.JointRotateY;
 import com.tespirit.panda3d.animation.JointRotateZ;
-import com.tespirit.panda3d.app.Debug;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
 import com.tespirit.panda3d.convert.Collada;
+import com.tespirit.panda3d.debug.Debug;
 import com.tespirit.panda3d.render.Renderer;
 import com.tespirit.panda3d.primitives.Box;
 import com.tespirit.panda3d.primitives.Plane;
@@ -38,8 +38,10 @@ public class Pandamonium extends Activity {
     	setContentView(R.layout.main);
         
         Panda3dView view = (Panda3dView)findViewById(R.id.panda3d);
+        view.setFocusable(true);
         view.setFocusableInTouchMode(true);
-        Debug.setConsol((TextView)findViewById(R.id.consol));
+        Debug.setConsole((TextView)findViewById(R.id.console));
+
 
     	view.createTouchRotateCamera(-4);
     	
@@ -51,14 +53,14 @@ public class Pandamonium extends Activity {
     	lights.createBasic();
     	r.setLightGroup(lights);
     	
-    	try{
-    		AnimationStuff a = this.loadCandy();
-    		r.setSceneGraph(a.j);
+    	//try{
+    		//AnimationStuff a = this.loadCandy();
+    		//r.setSceneGraph(a.j);
     		//r.addTimeUpdate(a.a);
     		//r.setSceneGraph(this.loadCollada());	
-    	} catch(Exception e){
+    	//} catch(Exception e){
     		r.setSceneGraph(this.createTestSG());
-    	}
+    	//}
     	
     	//AnimationStuff a = this.createTestAnimation();
     	//r.addTimeUpdate(a.a);

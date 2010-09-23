@@ -1,10 +1,9 @@
-package com.tespirit.panda3d.app;
+package com.tespirit.panda3d.debug;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.tespirit.panda3d.animation.Animation;
-import com.tespirit.panda3d.opengl1x.RendererDebug;
 import com.tespirit.panda3d.opengl1x.Renderer;
 import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.scenegraph.Group;
@@ -13,6 +12,7 @@ import com.tespirit.panda3d.render.LightGroup;
 import com.tespirit.panda3d.render.Light;
 import com.tespirit.panda3d.render.Camera;
 import com.tespirit.panda3d.animation.*;
+import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
 
@@ -28,7 +28,7 @@ public class Debug {
 	private static RendererDebug renderer;
 	private static ArrayList<Animation> animations = new ArrayList<Animation>();
 	private static int currentAnimation = -1;
-	private static TextView consol;
+	private static TextView console;
 	private static ArrayBlockingQueue<String> printBuffer = new ArrayBlockingQueue<String>(100);
 	private static DebugKeys dk = new DebugKeys();
 	
@@ -39,15 +39,19 @@ public class Debug {
 		return Debug.renderer;
 	}
 	
-	public static void setConsol(TextView consol){
-		Debug.consol = consol;
-		Debug.consol.setOnKeyListener(Debug.dk);
-		Debug.consol.setMovementMethod(new ScrollingMovementMethod()); 
+	public static void addDebugListeners(View view){
+		view.setOnKeyListener(Debug.dk);
+	}
+	
+	public static void setConsole(TextView console){
+		Debug.console = console;
+		Debug.console.setOnKeyListener(Debug.dk);
+		Debug.console.setMovementMethod(new ScrollingMovementMethod());
 		//print back logged output
 		if(!Debug.printBuffer.isEmpty()){
-			Debug.consol.append(Debug.printBuffer.poll());
+			Debug.console.append(Debug.printBuffer.poll());
 			while(!Debug.printBuffer.isEmpty()){
-				Debug.consol.append("\n"+Debug.printBuffer.poll());
+				Debug.console.append("\n"+Debug.printBuffer.poll());
 			}
 		}
 	}
@@ -122,9 +126,10 @@ public class Debug {
 	}
 	
 	public static void print(String text){
-		if(Debug.consol != null){
-			Debug.consol.append("\n"+text);
-			Spannable log = (Spannable) Debug.consol.getText();
+		if(Debug.console != null){
+			Debug.console.append("\n"+text);
+			Debug.console.requestFocus();
+			Spannable log = (Spannable) Debug.console.getText();
 			Selection.setSelection(log, log.length());
 
 		} else {
@@ -163,8 +168,8 @@ public class Debug {
 					Debug.print("Show axis: "+Debug.renderer.renderAxis);
 					break;
 				case KeyEvent.KEYCODE_2:
-					Debug.renderer.renderBB = !Debug.renderer.renderBB;
-					Debug.print("Show bounding box: "+Debug.renderer.renderBB);
+					Debug.renderer.renderBoundingBox = !Debug.renderer.renderBoundingBox;
+					Debug.print("Show bounding box: "+Debug.renderer.renderBoundingBox);
 					break;
 				case KeyEvent.KEYCODE_3:
 					Debug.renderer.renderNormals = !Debug.renderer.renderNormals;
@@ -209,12 +214,6 @@ public class Debug {
 						Debug.print("Next animation: "+currentAnimation);
 					}
 					break;
-				case KeyEvent.KEYCODE_0:
-					if(Debug.consol.getVisibility() == TextView.INVISIBLE){
-						Debug.consol.setVisibility(TextView.VISIBLE);
-					} else {
-						Debug.consol.setVisibility(TextView.INVISIBLE);
-					}
 				}
 			}
 
