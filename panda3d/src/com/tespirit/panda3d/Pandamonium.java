@@ -17,6 +17,7 @@ import com.tespirit.panda3d.animation.JointRotateZ;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
 import com.tespirit.panda3d.convert.Collada;
+import com.tespirit.panda3d.convert.ColladaAndroid;
 import com.tespirit.panda3d.debug.Debug;
 import com.tespirit.panda3d.render.Renderer;
 import com.tespirit.panda3d.primitives.Box;
@@ -72,7 +73,7 @@ public class Pandamonium extends Activity {
     }
     
     public AnimationStuff loadCandy() throws Exception{
-    	Collada candyC = new Collada("test_anim.dae");
+    	ColladaAndroid candyC = new ColladaAndroid("test_anim.dae");
     	AnimationStuff a = new AnimationStuff();
     	a.a = candyC.getAnimation();
     	a.j = candyC.getSceneGraph();
@@ -82,9 +83,9 @@ public class Pandamonium extends Activity {
     }
     
     public Node loadCollada() throws Exception{
-		Collada jC = new Collada("jocelyn.dae");
-		Collada dC = new Collada("doug.dae");
-		Collada tC = new Collada("test_cube.dae");
+    	ColladaAndroid jC = new ColladaAndroid("jocelyn.dae");
+    	ColladaAndroid dC = new ColladaAndroid("doug.dae");
+    	ColladaAndroid tC = new ColladaAndroid("test_cube.dae");
 		Group g = new Group();
 		Node j = jC.getSceneGraph();
 		j.getTransform().translate(-0.4f, 0, 0);

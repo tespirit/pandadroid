@@ -59,20 +59,14 @@ import org.xmlpull.v1.XmlPullParser;
  *
  */
 public class ColladaAndroid {
-	private Node root;
-	private LightGroup lights;
-	private Camera[] cameras;
-	private Animation animation;
+	private Node mRoot;
+	private LightGroup mLights;
+	private Camera[] mCameras;
+	private Animation mAnimation;
 	
-	private Map<String, Primitive> primitives;
-	private Map<String, Surface> surfaces;
-	private Map<String, Integer> channelOffset;
+	private float mScale;
 	
-	private ArrayList<Channel> jointChannels;
-	
-	private float scale;
-	
-	private boolean normals;
+	private boolean mImportNormals;
 	
 	private enum NameId{
 		assets,
@@ -123,9 +117,11 @@ public class ColladaAndroid {
 		instance_geometry,
 		geometry,
 		mesh,
+		vertices,
 		polygons,
 		triangles,
 		count,
+		p,
 		
 		bind_material,
 		technique_common,
@@ -143,31 +139,22 @@ public class ColladaAndroid {
 	
 	XmlPullParser mParser;
 	
-	private long minAnimationTime;
-	private long maxAnimationTime;
+	private long mMinAnimationTime;
+	private long mMaxAnimationTime;
 	
-	private class Linker<Element1,Element2>{
-		private Hashtable<String, Element1> element1Lookup;
-		private Hashtable<String, Element2> element2Lookup;
-		
-		public Linker(){
-			this.element1Lookup = new Hashtable<String, Element1>();
-			this.element2Lookup = new Hashtable<String, Element2>();
-		}
-		
-		public void registerElement1(String id, Element1 e1){
-			this.element1Lookup.put(id, e1);
-		}
-		
-		public void registerElement2(String id, Element2 e2){
-			this.element2Lookup.put(id, e2);
-		}
+	private Hashtable<String, Source> mSources;
+	private Hashtable<String, Sampler> mSamplers;
+	private Hashtable<String, Channel> mChannels;
+	private ArrayList<ModelLink> mModels;
+	private ArrayList<String> mChannelOrder;
+	private Hashtable<String, Primitive> mPrimitives;
+	private Hashtable<String, Surface> mSurfaces;
+	
+	private class ModelLink{
+		Model mModel;
+		String mSurfaceId;
+		String mPrimitiveId;
 	}
-	
-	private Linker<String, Source> samplerSource;
-	private Linker<Integer, Channel> intChannel;
-	private Linker<Channel, Sampler> channelSampler;
-	
 	
 	private class Source{
 		private String mId;
@@ -196,12 +183,12 @@ public class ColladaAndroid {
 	 * @throws Exception
 	 */
 	public ColladaAndroid(String fileName, boolean normals)throws Exception{
-		this.normals = normals;
+		this.mImportNormals = normals;
 		this.init(Assets.getManager().openStream(fileName));
 	}
 	
 	public ColladaAndroid(String fileName)throws Exception{
-		this.normals = true;
+		this.mImportNormals = true;
 		this.init(Assets.getManager().openStream(fileName));
 	}
 	
@@ -221,6 +208,14 @@ public class ColladaAndroid {
 		return this.mParser.getAttributeValue(null, id.name());
 	}
 	
+	private String getRefAttr(NameId id){
+		String attr = this.getAttr(id);
+		if(attr != null && attr.startsWith("#")){
+			attr = attr.substring(1);
+		}
+		return attr;
+	}
+	
 	private NameId getAttrId(NameId id){
 		try{
 			return NameId.valueOf(this.getAttr(id));
@@ -229,11 +224,31 @@ public class ColladaAndroid {
 		}
 	}
 	
+	/**
+	 * away to drill into the next node of this type.
+	 * @param id
+	 * @throws Exception
+	 */
+	private boolean moveToChildNode(NameId id, NameId parentId) throws Exception{
+		while(this.mParser.next() != XmlPullParser.END_DOCUMENT){
+			if(this.mParser.getEventType() == XmlPullParser.START_TAG && this.getTagId() == id){
+				return true;
+			} else if(this.mParser.getEventType() == XmlPullParser.END_TAG && this.getTagId() == parentId){
+				return false;
+			}
+		}
+		return false;
+	}
+	
 	private void init(InputStream stream) throws Exception{
 		
-		this.samplerSource = new Linker<String, Source>();
-		this.intChannel = new Linker<Integer, Channel>();
-		this.channelSampler = new Linker<Channel, Sampler>();
+		this.mSources = new Hashtable<String, Source>();
+		this.mSamplers = new Hashtable<String, Sampler>();
+		this.mChannels = new Hashtable<String, Channel>();
+		this.mModels = new ArrayList<ModelLink>();
+		this.mChannelOrder = new ArrayList<String>();
+		this.mPrimitives = new Hashtable<String, Primitive>();
+		this.mSurfaces = new Hashtable<String, Surface>();
 		
 		this.mParser = Xml.newPullParser();
 		this.mParser.setInput(stream, null);
@@ -244,6 +259,8 @@ public class ColladaAndroid {
         	switch(eventType){
         	case XmlPullParser.START_TAG:
         		switch(this.getTagId()){
+        		case assets:
+        			this.parseAssets();
         		case library_visual_scenes:
         			this.parseLibraryVisualScenes();
         			break;
@@ -263,32 +280,56 @@ public class ColladaAndroid {
         			this.parseLibraryControllers();
         			break;
         		}
+        		break;
         	}
         	eventType = this.mParser.next();
         }
+        
+        //assemble linked data!
+        for(int i = 0; i < this.mModels.size(); i++){
+        	ModelLink ml = this.mModels.get(i);
+        	Primitive p = this.mPrimitives.get(ml.mPrimitiveId);
+        	if(p == null){
+        		throw new Exception("Model primitive data not found: "+ml.mPrimitiveId);
+        	}
+        	ml.mModel.setPrimative(p);
+        	ml.mModel.setSurface(this.mSurfaces.get(ml.mSurfaceId));
+        }
+        
+        if(this.mChannelOrder.size() > 0 && this.mMaxAnimationTime >= this.mMinAnimationTime){
+        	this.mAnimation = new Animation(this.mChannelOrder.size());
+        	for(int i = 0; i < this.mChannelOrder.size(); i++){
+        		Channel c = this.mChannels.get(this.mChannelOrder.get(i));
+        		if(c == null){
+        			c = new Channel();
+        		}
+        		c.setRange(this.mMinAnimationTime, this.mMaxAnimationTime);
+        		this.mAnimation.addChannel(c);
+        	}
+        }
+	}
+	
+	private void parseAssets() throws Exception{
+		if(this.moveToChildNode(NameId.unit, NameId.assets)){
+			String meterScale = this.getAttr(NameId.meter);
+			if(meterScale != null && meterScale.length() > 0){
+				this.mScale = Float.parseFloat(meterScale);
+			}
+		}
 	}
 	
 	private void parseLibraryAnimations() throws Exception{
-		int eventType = this.mParser.next();
-		while (eventType != XmlPullParser.END_DOCUMENT){
-        	switch(eventType){
-        	case XmlPullParser.START_TAG:
-        		switch(this.getTagId()){
-        		case animation:
-        			this.parseAnimation();
-        			break;
-        		}
-        	case XmlPullParser.END_TAG:
-        		switch(this.getTagId()){
-        		case library_animations:
-        			return;
-        		}
-        	}
-        	eventType = this.mParser.next();
+		this.mMaxAnimationTime = Long.MIN_VALUE;
+		this.mMinAnimationTime = Long.MAX_VALUE;
+		while(this.moveToChildNode(NameId.animation, NameId.library_animations)){
+			this.parseAnimation();
 		}
 	}
 	
 	private void parseAnimation() throws Exception{
+		String samplerId = null;
+		String targetId = null;
+		
 		int eventType = this.mParser.next();
 		while (eventType != XmlPullParser.END_DOCUMENT){
         	switch(eventType){
@@ -298,128 +339,304 @@ public class ColladaAndroid {
         			this.parseAnimation();
         			break;
         		case channel:
-        			this.parseChannel();
+        			samplerId = this.getRefAttr(NameId.source);
+        			targetId = this.getAttr(NameId.target);
         			break;
         		case source:
         			this.parseSource();
         			break;
         		case sampler:
-        			this.parseSampler();
+        			Sampler sampler = new Sampler(this.getAttr(NameId.id));
+        			while(this.moveToChildNode(NameId.input, NameId.sampler)){
+        				switch(this.getAttrId(NameId.semantic)){
+            			case INPUT:
+            				sampler.mInputSource = this.getAttr(NameId.source);
+            				break;
+            			case OUTPUT:
+            				sampler.mOutputSource = this.getAttr(NameId.source);
+            				break;
+            			}
+        			}
+        			this.mSamplers.put(sampler.mId, sampler);
+        			break;
         		}
+        		break;
         	case XmlPullParser.END_TAG:
-        		switch(this.getTagId()){
-        		case animation:
+        		if(this.getTagId() == NameId.animation){
+        			this.createChannels(samplerId, targetId);
         			return;
         		}
+        		break;
         	}
         	eventType = this.mParser.next();
 		}
 	}
 	
-	private void parseChannel() throws Exception{
-		Channel c = new Channel();
-		String source = this.getAttr(NameId.source);
-		this.channelSampler.registerElement1(source, c);
+	private void createChannels(String samplerId, String targetId){
+		if(samplerId == null || targetId == null){
+			return;
+		}
+		String[] targetIds;
+		//parse target ids
+		if(targetId.endsWith("XYZ")){
+			targetId = targetId.substring(0, targetId.length()-4);
+			targetIds = new String[3];
+			targetIds[0] = targetId + "X";
+			targetIds[1] = targetId + "Y";
+			targetIds[2] = targetId + "Z";
+		} else {
+			targetIds = new String[1];
+			targetIds[0] = targetId;
+		}
+		
+		Sampler sampler = this.mSamplers.get(samplerId);
+		float[] input = this.mSources.get(sampler.mInputSource).mFloatSource;
+		float[] output = this.mSources.get(sampler.mOutputSource).mFloatSource;
+		
+		if(targetId.indexOf(NameId.translate.toString())!= -1){
+			//scale the output!
+			for(int i = 0; i < output.length; i++){
+				output[i] *= this.mScale;
+			}
+		}
+		
+		for(int i = 0; i < targetIds.length; i++){
+			Channel channel = new Channel();
+			for(int j  = 0; j < input.length; j++){
+				channel.addKeyFrame(new Channel.KeyFrame(output[j*targetIds.length+i], (long)(input[j]*1000)));
+			}
+			this.mChannels.put(targetIds[i], channel);
+		}
+		
+		long startTime = (long)(input[0]*1000);
+		long endTime = (long)(input[input.length-1]*1000);
+		if(startTime < this.mMinAnimationTime){
+			this.mMinAnimationTime = startTime;
+		}
+		if(endTime > this.mMaxAnimationTime){
+			this.mMaxAnimationTime = endTime;
+		}
+		
 	}
 	
 	private void parseSource() throws Exception{
-		String id = this.getAttr(NameId.id);
-		Source source = new Source(id);
-		this.samplerSource.registerElement2(id, source);
+		if(this.moveToChildNode(NameId.float_array, NameId.source)){
+			String id = this.getAttr(NameId.id);
+			Source source = new Source(id);
+			source.mFloatSource = this.parseFloatArray();
+			this.mSources.put(source.mId, source);
+		}
+	}
+	
+	private String[] parseStringArray(NameId id) throws Exception{
+		int eventType = this.mParser.next();
+		String[] values = null;
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			switch(eventType){
+			case XmlPullParser.TEXT:
+				values = this.mParser.getText().trim().split("[ \t\n\r]+");
+				break;
+			case XmlPullParser.END_TAG:
+				switch(this.getTagId()){
+        		case id:
+        			return values;
+        		}
+				break;
+			}
+		}
+		return null;
+	}
+	
+	private float[] parseFloatArray() throws Exception{
+		return parseFloatArray(NameId.float_array);
+	}
+	
+	private float[] parseFloatArray(NameId id) throws Exception{
+		String[] strings = this.parseStringArray(id);
+		if(strings != null){
+			float[] values = new float[strings.length];
+			for(int i = 0; i<strings.length; i++){
+				values[i] = Float.parseFloat(strings[i]);
+			}
+			return values;
+		}
+		return null;
+	}
+		
+	private void parseLibraryVisualScenes() throws Exception{
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		
+		while(this.moveToChildNode(NameId.visual_scene, NameId.library_visual_scenes)){
+			Node node = this.parseNode();
+			if(node != null){
+				nodes.add(node);
+			}
+		}
+		if(nodes.size() > 1){
+			Group group = new Group();
+			for(Node node : nodes){
+				group.appendChild(node);
+			}
+			this.mRoot = group;
+		} else if(nodes.size() == 1){
+			this.mRoot = nodes.get(0);
+		}
+	}
+	
+	private Node parseNode() throws Exception{
+		String name = this.getAttr(NameId.id);
+		Matrix3d transform = new Matrix3d();
+		Group group = null;
+		Model model = null;
+		Joint joint = null;
+		Node retVal = null;
 		
 		int eventType = this.mParser.next();
 		while (eventType != XmlPullParser.END_DOCUMENT){
 			switch(eventType){
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
-				case float_array:
-					source.mFloatSource = this.parseFloatArray();
+				case matrix:
+					this.parseMatrix(transform);
+					break;
+				case translate:
+					this.parseTranslate(transform);
+					break;
+				case rotate:
+					this.parseRotate(transform);
+					break;
+				case scale:
+					this.parseScale(transform);
+					break;
+				case instance_geometry:
+					model = new Model(name);
+					ModelLink modelLink = new ModelLink();
+					modelLink.mModel = model;
+					modelLink.mPrimitiveId = this.getRefAttr(NameId.url);
+					if(this.moveToChildNode(NameId.instance_material, NameId.instance_geometry)){
+						modelLink.mSurfaceId = this.getRefAttr(NameId.target);
+					}
+					this.mModels.add(modelLink);
+					break;
+				case node:
+					if(this.getAttrId(NameId.type) == NameId.JOINT){
+						joint = this.parseSkeleton();
+					} else {
+						Node child = parseNode();
+						if(child != null){
+							if(group == null){
+								group = new Group(name);
+								retVal = group;
+							}
+							group.appendChild(child);
+						}
+					}
+					break;
 				}
 				break;
 			case XmlPullParser.END_TAG:
 				switch(this.getTagId()){
-        		case source:
-        			return;
-        		}
+				case node:
+					if((model != null || joint != null) && group != null){
+						group.appendChild(joint);
+						group.appendChild(model);
+					} else if(model != null){
+						retVal = model;
+					} else if(joint != null){
+						retVal = joint;
+					}
+					
+					if(retVal != null){
+						retVal.getTransform().copy(transform);
+					}
+					return retVal;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	Matrix3d temp = new Matrix3d();
+	Vector3d tempVector = new Vector3d();
+	
+	private void parseMatrix(Matrix3d current) throws Exception{
+		float[] vals = this.parseFloatArray(NameId.matrix);
+		for(int row = 0; row < Matrix3d.SIZEROW; row++){
+			for(int col = 0; col < Matrix3d.SIZEROW; col++){
+				current.setValue(vals[col+Matrix3d.SIZEROW*row], row, col);
 			}
 		}
 	}
 	
-	private String[] textToStringArray(){
-		return this.mParser.getText().trim().split("[ \t\n\r]+");
+	private void parseTranslate(Matrix3d current) throws Exception{
+		float[] vals = this.parseFloatArray(NameId.translate);
+		temp.copy(current);
+		current.identity().translate(vals[0], vals[1], vals[2]);
+		current.getTranslation().scale(this.mScale);
+		current.multiply(temp);
 	}
 	
-	private float[] parseFloatArray() throws Exception{
+	private void parseRotate(Matrix3d current) throws Exception{
+		float[] vals = this.parseFloatArray(NameId.rotate);
+		temp.copy(current);
+		tempVector.set(vals[0], vals[1], vals[2]);
+		current.identity().rotateAxis(vals[3], tempVector);
+		current.multiply(temp);
+	}
+	
+	private void parseScale(Matrix3d current) throws Exception{
+		float[] vals = this.parseFloatArray(NameId.scale);
+		temp.copy(current);
+		current.identity().scale(vals[0], vals[1], vals[2]);
+		current.multiply(temp);
+	}
+	
+	private Joint parseSkeleton() throws Exception{
+		String name = this.getAttr(NameId.id);
+		this.generateChannels(name, false, true, true, true); //translate
+		this.generateChannels(name, true, true, true, true); //rotate
+		
+		JointTranslate joint = new JointTranslate(name);
+		JointRotate subJoint = new JointRotate();
+		joint.appendChild(subJoint);
+		
 		int eventType = this.mParser.next();
-		float[] values = null;
 		while (eventType != XmlPullParser.END_DOCUMENT){
 			switch(eventType){
-			case XmlPullParser.TEXT:
-				String[] strings = this.textToStringArray();
-				values = new float[strings.length];
-				for(int i = 0; i<strings.length; i++){
-					values[i] = Float.parseFloat(strings[i]);
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case matrix:
+					this.parseMatrix(joint.getTransform());
+					break;
+				case translate:
+					this.parseTranslate(joint.getTransform());
+					break;
+				case rotate:
+					String sid = this.getAttr(NameId.sid);
+					if(sid != null && sid.startsWith("jointOrient")){
+						this.parseRotate(joint.getTransform());
+					} else {
+						this.parseRotate(subJoint.getTransform());
+					}
+					break;
+				case node:
+					if(this.getAttrId(NameId.type) == NameId.JOINT){
+						Joint child = this.parseJoint();
+						subJoint.appendChild(child);
+					}
+					break;
 				}
 				break;
 			case XmlPullParser.END_TAG:
-				switch(this.getTagId()){
-        		case float_array:
-        			return values;
-        		}
+				if(this.getTagId() == NameId.node){
+					joint.createAllBones(0.05f);
+					return joint;
+				}
+				break;
 			}
 		}
 		return null;
-	}
-		
-	
-	
-	private void parseSampler() throws Exception{
-		String id = this.getAttr(NameId.id);
-		Sampler sampler = new Sampler(id);
-		this.channelSampler.registerElement2(id, sampler);
-
-		int eventType = this.mParser.next();
-		while (eventType != XmlPullParser.END_DOCUMENT){
-			switch(eventType){
-        	case XmlPullParser.START_TAG:
-        		switch(this.getTagId()){
-        		case input:
-        			switch(this.getAttrId(NameId.semantic)){
-        			case INPUT:
-        				sampler.mInputSource = this.getAttr(NameId.source);
-        				break;
-        			case OUTPUT:
-        				sampler.mOutputSource = this.getAttr(NameId.source);
-        			}
-        		}
-        		break;
-        	case XmlPullParser.END_TAG:
-        		switch(this.getTagId()){
-        		case sampler:
-        			return;
-        		}
-			}
-		}
-	}
-		
-	private void parseLibraryVisualScenes(){
-		
-	}
-	
-	private void parseLibraryMaterials(){
-		
-	}
-	
-	private void parseLibraryEffects(){
-		
-	}
-	
-	private void parseLibraryGeometries(){
-		
-	}
-	
-	private void parseLibraryControllers(){
-		
 	}
 	
 	private void generateChannels(String name, boolean rotate, boolean x, boolean y, boolean z){
@@ -436,203 +653,315 @@ public class ColladaAndroid {
 		}
 		
 		if(x){
-			this.channelOffset.put(name+prefix+"X"+postfix, this.jointChannels.size());
-			this.jointChannels.add(new Channel());
+			this.mChannelOrder.add(name+prefix+"X"+postfix);
 		}
 		if(y){
-			this.channelOffset.put(name+prefix+"Y"+postfix, this.jointChannels.size());
-			this.jointChannels.add(new Channel());
+			this.mChannelOrder.add(name+prefix+"Y"+postfix);
 		}
 		if(z){
-			this.channelOffset.put(name+prefix+"Z"+postfix, this.jointChannels.size());
-			this.jointChannels.add(new Channel());
-		}
-		
-		if(x && y && z){
-			this.channelOffset.put(name+"XYZ", this.jointChannels.size()-3);
+			this.mChannelOrder.add(name+prefix+"Z"+postfix);
 		}
 	}
 	
-/*	private Joint convertJoint(org.w3c.dom.Node node){
-		String name = getAttribute("id", node);
-		Joint joint = new JointRotate(name);
-		JointOrient jointO = new JointOrient(name+"<orient>");
-		this.generateChannels(name, true, true, true, true);
-		for(int i = 0; i < node.getChildNodes().getLength(); i++){
-			org.w3c.dom.Node child = node.getChildNodes().item(i);
-			String type = child.getNodeName();
-			
-			if(type.equals("matrix")){
-				this.pushMatrix(joint.getTransform(), child);
-			} else if(type.equals("translate")){ 
-				this.pushTranslate(jointO.getTransform(), child);
-			} else if(type.equals("rotate")){
-				type = this.getAttribute("sid", child);
-				if(type != null && type.startsWith("jointOrient")){
-					this.pushRotate(jointO.getTransform(), child);
-				} else {
-					this.pushRotate(joint.getTransform(), child);
-				}
-			} else if(child.getNodeName().equalsIgnoreCase("node")){
-				type = this.getAttribute("type", child);
-				if(type.equals("JOINT")){
-					joint.appendChild(this.convertJoint(child));
-				}
-			}
-		}
-		if(jointO.getTransform().isIdentity3x3()){
-			joint.getTransform().multiply(jointO.getTransform());
-		} else {
-			jointO.appendChild(joint);
-			joint = jointO;
-		}
-		return joint;
-	}
-	
-	private Joint convertSkeleton(org.w3c.dom.Node node){
-		//generate the node type!
-		String name = getAttribute("id", node);
-		this.generateChannels(name, false, true, true, true); //translate
+	private Joint parseJoint() throws Exception{
+		String name = this.getAttr(NameId.id);
 		this.generateChannels(name, true, true, true, true); //rotate
 		
-		JointTranslate joint = new JointTranslate(name);
-		JointRotate subJoint = new JointRotate();
-		joint.appendChild(subJoint);
-		for(int i = 0; i < node.getChildNodes().getLength(); i++){
-			org.w3c.dom.Node child = node.getChildNodes().item(i);
-			String type = child.getNodeName();
-			
-			if(type.equals("matrix")){
-				this.pushMatrix(joint.getTransform(), child);
-			} else if(type.equals("translate")){ 
-				this.pushTranslate(joint.getTransform(), child);
-			} else if(type.equals("rotate")){
-				type = this.getAttribute("sid", child);
-				if(type != null && type.startsWith("jointOrient")){
-					this.pushRotate(joint.getTransform(), child);
-				} else {
-					this.pushRotate(subJoint.getTransform(), child);
-				}
-			} else if(child.getNodeName().equalsIgnoreCase("node")){
-				type = this.getAttribute("type", child);
-				if(type.equals("JOINT")){
-					subJoint.appendChild(this.convertJoint(child));
-				}
-			}
-		}
-		joint.createAllBones(0.1f);
-		return joint;
-	}
-	
-	private Node convertSceneNode(org.w3c.dom.Node node){
-		Matrix3d localTransform = new Matrix3d();
-		NodeList children = node.getChildNodes();
-		Group g = null;
-		Model m = null;
-		Joint j = null;
-		Node retVal = null;
-		String name = getAttribute("id", node);
-		for(int i = 0; i < children.getLength(); i++){
-			org.w3c.dom.Node child = children.item(i);
-			String type = child.getNodeName().toLowerCase();
-			if(type.equals("matrix")){
-				this.pushMatrix(localTransform, child);
-			} else if(type.equals("translate")){ 
-				this.pushTranslate(localTransform, child);
-			} else if(type.equals("rotate")){
-				this.pushRotate(localTransform, child);
-			} else if(type.equals("scale")){
-				this.pushScale(localTransform, child);
-			} else if(type.equals("node")){
-				type = this.getAttribute("type", child);
-				if(type != null && type.equals("JOINT")){
-					j = this.convertSkeleton(child);
-				} else {
-					if(g == null){
-						g = new Group(name);
-						retVal = g;
+		Joint joint = new JointRotate(name);
+		JointOrient jointO = new JointOrient(name+"<orient>");
+		
+		int eventType = this.mParser.next();
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case matrix:
+					this.parseMatrix(jointO.getTransform());
+					break;
+				case translate:
+					this.parseTranslate(jointO.getTransform());
+					break;
+				case rotate:
+					String sid = this.getAttr(NameId.sid);
+					if(sid != null && sid.startsWith("jointOrient")){
+						this.parseRotate(jointO.getTransform());
+					} else {
+						this.parseRotate(joint.getTransform());
 					}
-					g.appendChild(this.convertSceneNode(child));
+					break;
+				case node:
+					if(this.getAttrId(NameId.type) == NameId.JOINT){
+						Joint child = this.parseJoint();
+						joint.appendChild(child);
+					}
+					break;
 				}
-			} else if(type.equals("instance_geometry")){
-				m = new Model(name);
-				m.setSurface(this.convertMaterial(child));
-				m.setPrimative(this.convertGeometry(child));
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == NameId.node){
+					if(jointO.getTransform().isIdentity3x3()){
+						joint.getTransform().multiply(jointO.getTransform());
+					} else {
+						jointO.appendChild(joint);
+						joint = jointO;
+					}
+					return joint;
+				}
+				break;
 			}
 		}
-		if((m != null || j != null) && g != null){
-			g.appendChild(j);
-			g.appendChild(m);
-		} else if(m != null){
-			retVal = m;
-		} else if(j != null){
-			retVal = j;
+		return null;
+	}
+	
+	private void parseLibraryGeometries() throws Exception{
+		while(this.moveToChildNode(NameId.geometry, NameId.library_geometries)){
+			String name = this.getAttr(NameId.id);
+			Inputs inputs = new Inputs();
+			Vector<Integer> indices = new Vector<Integer>();
+			
+			if(this.moveToChildNode(NameId.mesh, NameId.geometry)){
+				int eventType = this.mParser.getEventType();
+				while(eventType != XmlPullParser.END_DOCUMENT){
+					eventType = this.mParser.next();
+					switch(eventType){
+					case XmlPullParser.START_TAG:
+						switch(this.getTagId()){
+						case source:
+							this.parseSource();
+							break;
+						case vertices:
+							this.parseInputs(inputs, NameId.vertices);
+							break;
+						case polygons:
+							this.parseInputs(inputs, NameId.polygons);
+							this.parseP(indices, NameId.polygons);
+							break;
+						case triangles:
+							this.parseInputs(inputs, NameId.triangles);
+							this.parseP(indices, NameId.triangles);
+							break;
+						}
+						break;
+					case XmlPullParser.END_TAG:
+						if(this.getTagId() == NameId.geometry){
+							this.createPrimitive(name, inputs, indices);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	private void createPrimitive(String name, Inputs inputs, Vector<Integer> indices){
+		float[] position = null;
+		float[] normal = null;
+		float[] texcoord = null;
+		float[] color = null;
+		
+		Vector<Float> positionRemap = null;
+		Vector<Float> normalRemap = null;
+		Vector<Float> texcoordRemap = null;
+		Vector<Float> colorRemap = null;
+		
+		ArrayList<Integer> types = new ArrayList<Integer>();
+		
+		Hashtable<String, Integer> remap = new Hashtable<String, Integer>();
+		
+		int count = 0;
+		
+		if(inputs.mPosition != null){
+			position =  this.mSources.get(inputs.mPosition).mFloatSource;
+			types.add(VertexBuffer.POSITION);
+			positionRemap = new Vector<Float>();
+			if(inputs.mPositionOffset != -1) count++;
+		}
+		if(inputs.mNormal != null && this.mImportNormals){
+			normal = this.mSources.get(inputs.mNormal).mFloatSource;
+			types.add(VertexBuffer.NORMAL);
+			normalRemap = new Vector<Float>();
+			if(inputs.mNormalOffset != -1) count++;
+		}
+		if(inputs.mTexcoord != null){
+			texcoord = this.mSources.get(inputs.mTexcoord).mFloatSource;
+			types.add(VertexBuffer.TEXCOORD);
+			texcoordRemap = new Vector<Float>();
+			if(inputs.mTexcoordOffset != -1) count++;
+		}
+		if(inputs.mColor != null){
+			color = this.mSources.get(inputs.mColor).mFloatSource;
+			types.add(VertexBuffer.COLOR);
+			colorRemap = new Vector<Float>();
+			if(inputs.mColorOffset != -1) count++;
+		}
+		Vector<Integer> indicesRemap = new Vector<Integer>();
+		
+		int nextIndex = 0;
+		for(int i = 0; i < indices.size()/count; i++){
+			String id = "";
+			for(int j = 0; j < count; i++){
+				id += indices.get(i*count+j)+",";
+			}
+			if(remap.containsKey(id)){
+				indicesRemap.add(remap.get(id));
+				continue;
+			}
+			
+			remap.put(id, nextIndex);
+			nextIndex++;
+			
+			int index;
+			if(position != null){
+				index = indices.get(i*count+inputs.mPositionOffset)*3;
+				positionRemap.add(position[index]);
+				positionRemap.add(position[index+1]);
+				positionRemap.add(position[index+2]);
+			}
+			if(normal != null){
+				index = indices.get(i*count+inputs.mNormalOffset)*3;
+				normalRemap.add(normal[index]);
+				normalRemap.add(normal[index+1]);
+				normalRemap.add(normal[index+2]);
+			}
+			if(texcoord != null){
+				index = indices.get(i*count+inputs.mTexcoordOffset)*2;
+				texcoordRemap.add(texcoord[index]);
+				texcoordRemap.add(texcoord[index+1]);
+			}
+			if(color != null){
+				index = indices.get(i*count+inputs.mColorOffset)*4;
+				colorRemap.add(color[index]);
+				colorRemap.add(color[index+1]);
+				colorRemap.add(color[index+2]);
+				colorRemap.add(color[index+3]);
+			}
 		}
 		
-		if(localTransform != null && retVal != null){
-			retVal.getTransform().copy(localTransform);
+		//finally, assemble the primitive!
+		int[] typesArray = new int[types.size()];
+		for(int i = 0; i < types.size(); i++){
+			typesArray[i] = types.get(i);
 		}
+		TriangleIndices mesh = new TriangleIndices(indicesRemap.size(), nextIndex, typesArray);
+		VertexBuffer vb = mesh.getVertexBuffer();
+		for(int i = 0; i < nextIndex; i++){
+			if(positionRemap != null){
+				vb.addPosition(positionRemap.get(i*3),
+							   positionRemap.get(i*3+1),
+							   positionRemap.get(i*3+2));
+			}
+			if(normalRemap != null){
+				vb.addNormal(normalRemap.get(i*3),
+							 normalRemap.get(i*3+1),
+							 normalRemap.get(i*3+2));
+			}
+			if(texcoordRemap != null){
+				vb.addTexcoord(texcoordRemap.get(i*2),
+							   texcoordRemap.get(i*2+1));
+			}
+			if(colorRemap != null){
+				vb.addColor(colorRemap.get(i*4),
+							colorRemap.get(i*4+1),
+							colorRemap.get(i*4+2),
+							colorRemap.get(i*4+4));
+			}
+		}
+		vb.resetBufferPosition();
 		
-		if(node.getNodeName().equalsIgnoreCase("visual_scene") && g != null){
-			if(g.getChildCount() == 1){
-				retVal = g.getChild(0);
+		IndexBuffer ib = mesh.getIndexBuffer();
+		for(int i = 0; i < indicesRemap.size(); i++){
+			ib.addTriangle(indicesRemap.get(i++),
+						   indicesRemap.get(i++),
+						   indicesRemap.get(i++));
+		}
+		ib.resetBufferPosition();
+		
+		this.mPrimitives.put(name, mesh);
+		
+	}
+	
+	private void parseP(Vector<Integer> indices, NameId parentId) throws Exception{
+		while(this.moveToChildNode(NameId.p, parentId)){
+			String[] values = this.parseStringArray(NameId.p);
+			for(int i = 0; i < values.length; i++){
+				indices.add(Integer.parseInt(values[i]));
 			}
 		}
-		return retVal;
 	}
-
-	Matrix3d temp = new Matrix3d();
-	Vector3d tempVector = new Vector3d();
 	
-	private void pushMatrix(Matrix3d current, org.w3c.dom.Node node){
-		float[] vals = this.convertToFloatArray(node);
-		for(int row = 0; row < Matrix3d.SIZEROW; row++){
-			for(int col = 0; col < Matrix3d.SIZEROW; col++){
-				current.setValue(vals[col+Matrix3d.SIZEROW*row], row, col);
+	private class Inputs{
+		String mPosition;
+		int mPositionOffset = -1;
+		String mNormal;
+		int mNormalOffset = -1;
+		String mTexcoord;
+		int mTexcoordOffset = -1;
+		String mColor;
+		int mColorOffset = -1;
+	}
+	
+	private void parseInputs(Inputs inputs, NameId parentId)throws Exception{
+		while(this.moveToChildNode(NameId.input, parentId)){
+			String offsetString = this.getAttr(NameId.offset);
+			int offset = -1;
+			if(offsetString != null){
+				offset = Integer.parseInt(offsetString);
+			}
+			switch(this.getAttrId(NameId.semantic)){
+			case POSITION:
+				inputs.mPosition = this.getRefAttr(NameId.source);
+				if(offset != -1){
+					inputs.mPositionOffset = offset;
+				}
+				break;
+			case NORMAL:
+				inputs.mNormal = this.getRefAttr(NameId.source);
+				if(offset != -1){
+					inputs.mNormalOffset = offset;
+				}
+				break;
+			case TEXCOORD:
+				inputs.mTexcoord = this.getRefAttr(NameId.source);
+				if(offset != -1){
+					inputs.mTexcoordOffset = offset;
+				}
+				break;
+			case COLOR:
+				inputs.mColor = this.getRefAttr(NameId.source);
+				if(offset != -1){
+					inputs.mColorOffset = offset;
+				}
+				break;
+			case VERTEX:
+				if(inputs.mPositionOffset == -1){
+					inputs.mPositionOffset = offset;
+				}
+				if(inputs.mNormalOffset == -1){
+					inputs.mNormalOffset = offset;
+				}
+				if(inputs.mTexcoordOffset == -1){
+					inputs.mTexcoordOffset = offset;
+				}
+				if(inputs.mColorOffset == -1){
+					inputs.mColorOffset = offset;
+				}
+				break;
 			}
 		}
 	}
 	
-	private void pushTranslate(Matrix3d current, org.w3c.dom.Node node){
-		float[] vals = this.convertToFloatArray(node);
-		temp.copy(current);
-		current.identity().translate(vals[0], vals[1], vals[2]);
-		current.getTranslation().scale(this.scale);
-		current.multiply(temp);
+	private void parseLibraryMaterials(){
+		
 	}
 	
-	private void pushRotate(Matrix3d current, org.w3c.dom.Node node){
-		float[] vals = this.convertToFloatArray(node);
-		temp.copy(current);
-		tempVector.set(vals[0], vals[1], vals[2]);
-		current.identity().rotateAxis(vals[3], tempVector);
-		current.multiply(temp);
+	private void parseLibraryEffects(){
+		
 	}
 	
-	private void pushScale(Matrix3d current, org.w3c.dom.Node node){
-		float[] vals = this.convertToFloatArray(node);
-		temp.copy(current);
-		current.identity().scale(vals[0], vals[1], vals[2]);
-		current.multiply(temp);
+	private void parseLibraryControllers(){
+		
 	}
-	
-	private float[] convertToFloatArray(org.w3c.dom.Node node){
-		String[] values = node.getFirstChild().getNodeValue().trim().split("[ \t\n\r]+");
-		float[] retVals = new float[values.length];
-		for(int i = 0; i < values.length; i++){
-			retVals[i] = Float.parseFloat(values[i]);
-		}
-		return retVals;
-	}
-	
-	private int[] convertToIntArray(org.w3c.dom.Node node){
-		String[] values = node.getFirstChild().getNodeValue().trim().split("[ \t\n\r]+");
-		int[] retVals = new int[values.length];
-		for(int i = 0; i < values.length; i++){
-			retVals[i] = Integer.parseInt(values[i]);
-		}
-		return retVals;
-	}
+/*
 	
 	private Surface convertMaterial(org.w3c.dom.Node node){
 		node = this.getChildNodeByType("bind_material", node);
@@ -769,162 +1098,7 @@ public class ColladaAndroid {
 		return t;
 	}
 	
-	class ColladaVb{
-		float[] positions;
-		float[] normals;
-		float[] texcoords;
-		float[] colors;
-		
-		Vector<Float> positions2;
-		Vector<Float> normals2;
-		Vector<Float> texcoords2;
-		Vector<Float> colors2;
-		
-		float[][] buffer;
-		
-		int nextIndex;
-		
-		Hashtable<String, Integer> remap;
-		
-		ColladaVb(){
-			this.remap = new Hashtable<String, Integer>();
-			this.nextIndex = 0;
-		}
-		
-		int registerVertex(int[] buffer, int offset){
-			//generate id
-			String id = "";
-			for(int i = 0; i < this.count; i++){
-				id += buffer[i+offset]+",";
-			}
-			if(this.remap.containsKey(id)){
-				return this.remap.get(id);
-			}
-			
-			int retVal = this.nextIndex;
-			this.remap.put(id, retVal);
-			
-			int index;
-			if(this.positions != null){
-				index = buffer[offset+this.positionOffset]*3;
-				this.positions2.add(this.positions[index]);
-				this.positions2.add(this.positions[index+1]);
-				this.positions2.add(this.positions[index+2]);
-			}
-			if(this.normals != null){
-				index = buffer[offset+this.normalOffset]*3;
-				this.normals2.add(this.normals[index]);
-				this.normals2.add(this.normals[index+1]);
-				this.normals2.add(this.normals[index+2]);
-			}
-			if(this.texcoords != null){
-				index = buffer[offset+this.texcoordOffset]*2;
-				this.texcoords2.add(this.texcoords[index]);
-				this.texcoords2.add(this.texcoords[index+1]);
-			}
-			if(this.colors != null){
-				index = buffer[offset+this.colorOffset]*4;
-				this.colors2.add(this.colors[index]);
-				this.colors2.add(this.colors[index+1]);
-				this.colors2.add(this.colors[index+2]);
-				this.colors2.add(this.colors[index+4]);
-			}
-			
-			this.nextIndex++;
-			return retVal;
-		}
-		
-		VertexBuffer createVb(){
-			VertexBuffer vb = new VertexBuffer(this.nextIndex, this.types);
-			
-			for(int i = 0; i < this.nextIndex; i++){
-				if(this.positions2 != null){
-					vb.addPosition(scale*this.positions2.get(i*3),
-								   scale*this.positions2.get(i*3+1), 
-								   scale*this.positions2.get(i*3+2));
-				}
-				if(this.normals2 != null){
-					vb.addNormal(this.normals2.get(i*3),
-								 this.normals2.get(i*3+1), 
-								 this.normals2.get(i*3+2));
-				}
-				if(this.texcoords2 != null){
-					vb.addTexcoord(this.texcoords2.get(i*2),
-								   1-this.texcoords2.get(i*2+1));//flip y
-				}
-				if(this.colors2 != null){
-					vb.addColor(this.colors2.get(i*4),
-								this.colors2.get(i*4+1), 
-								this.colors2.get(i*4+2),
-								this.colors2.get(i*4+3));
-				}
-			}
-			vb.resetBufferPosition();
-			return vb;
-		}
-		
-		int positionOffset;
-		int normalOffset;
-		int texcoordOffset;
-		int colorOffset;
-		
-		int count;
-		
-		int[] types;
-		
-		final static int MAX = 4;
-		
-		void generateTypes(){
-			int i = 0;
-			this.types = new int[this.count];
-			if(this.positions != null){
-				this.types[i] = VertexBuffer.POSITION;
-				i++;
-			}
-			if(this.normals != null){
-				this.types[i] = VertexBuffer.NORMAL;
-				i++;
-			}
-			if(this.texcoords != null){
-				this.types[i] = VertexBuffer.TEXCOORD;
-				i++;
-			}
-			if(this.colors != null){
-				this.colors2 = new Vector<Float>();
-				this.types[i] = VertexBuffer.COLOR;
-			}
-		}
-		
-		void setPosition(float[] values, int offset){
-			this.positions2 = new Vector<Float>();
-			this.positions = values;
-			this.positionOffset = offset;
-			this.count++;
-		}
-		
-		void setNormal(float[] values, int offset){
-			if(ColladaAndroid.this.normals){
-				this.normals2 = new Vector<Float>();
-				this.normals = values;
-				this.normalOffset = offset;
-				this.count++;
-			}
-		}
-		
-		void setTexcoord(float[] values, int offset){
-			this.texcoords2 = new Vector<Float>();
-			this.texcoords = values;
-			this.texcoordOffset = offset;
-			this.count++;
-		}
-		
-		void setColor(float[] values, int offset){
-			this.colors2 = new Vector<Float>();
-			this.colors = values;
-			this.colorOffset = offset;
-			this.count++;
-		}
-	}
+	
 	
 	private void convertInput(org.w3c.dom.Node input, ColladaVb vb, int currentOffset){
 		String type = input.getNodeName().toLowerCase();
@@ -1002,18 +1176,18 @@ public class ColladaAndroid {
 	}*/
 	
 	public Node getSceneGraph(){
-		return this.root;
+		return this.mRoot;
 	}
 	
 	public LightGroup getLightGroup(){
-		return this.lights;
+		return this.mLights;
 	}
 	
 	public Camera[] getCameras(){
-		return this.cameras;
+		return this.mCameras;
 	}
 	
 	public Animation getAnimation(){
-		return this.animation;
+		return this.mAnimation;
 	}
 }

@@ -51,10 +51,10 @@ public class MotionSensor3d implements SensorEventListener{
 		switch(event.sensor.getType()){
 		case Sensor.TYPE_ACCELEROMETER:
 			this.acceleration = event.values.clone();
-			/*this.onAccelerateController.update(this.acceleration[0],
+			this.onAccelerateController.update(this.acceleration[0],
                     this.acceleration[1],
                 	   this.acceleration[2],
-                	   time);*/
+                	   time);
 			break;
 		case Sensor.TYPE_MAGNETIC_FIELD:
 			this.geoMagnetic = event.values.clone();

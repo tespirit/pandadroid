@@ -1,7 +1,5 @@
 package com.tespirit.panda3d.app;
 
-import java.util.List;
-
 import com.tespirit.panda3d.R;
 import com.tespirit.panda3d.controllers.AccelerationController3d;
 import com.tespirit.panda3d.controllers.Controller2d;
