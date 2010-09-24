@@ -1,5 +1,6 @@
 package com.tespirit.panda3d.convert;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
@@ -10,6 +11,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
+import android.util.Xml;
 
 import com.tespirit.panda3d.animation.Animation;
 import com.tespirit.panda3d.animation.Channel;
@@ -35,6 +38,7 @@ import com.tespirit.panda3d.vectors.Vector3d;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xmlpull.v1.XmlPullParser;
 
 
 /**
@@ -54,7 +58,7 @@ import org.w3c.dom.NodeList;
  * @author Todd Espiritu Santo
  *
  */
-public class Collada {
+public class ColladaAndroid {
 	private Node root;
 	private LightGroup lights;
 	private Camera[] cameras;
@@ -66,14 +70,123 @@ public class Collada {
 	
 	private ArrayList<Channel> jointChannels;
 	
-	private XPath xpath;
-	
-	private Document document;
-	
 	private float scale;
 	
 	private boolean normals;
 	
+	private enum NameId{
+		assets,
+		unit,
+		meter,
+		
+		scene,
+		instance_visual_scene,
+		
+		library_animations,
+		library_materials,
+		library_effects,
+		library_geometries,
+		library_controllers,
+		library_visual_scenes,
+		
+		animation,
+		sampler,
+		channel,
+		
+		input,
+		offset,
+		semantic,
+		VERTEX,
+		INPUT,
+		OUTPUT,
+		POSITION,
+		NORMAL,
+		COLOR,
+		TEXCOORD,
+		source,
+		float_array,
+		
+		id,
+		sid,
+		url,
+		target,
+		
+		visual_scene,
+		node,
+		type,
+		JOINT,
+		matrix,
+		translate,
+		rotate,
+		scale,
+		
+		instance_geometry,
+		geometry,
+		mesh,
+		polygons,
+		triangles,
+		count,
+		
+		bind_material,
+		technique_common,
+		instance_material,
+		instance_effect,
+		profile_COMMON,
+		technique,
+		diffuse,
+		texture,
+		init_from,
+		color,	
+		
+		error
+	};
+	
+	XmlPullParser mParser;
+	
+	private long minAnimationTime;
+	private long maxAnimationTime;
+	
+	private class Linker<Element1,Element2>{
+		private Hashtable<String, Element1> element1Lookup;
+		private Hashtable<String, Element2> element2Lookup;
+		
+		public Linker(){
+			this.element1Lookup = new Hashtable<String, Element1>();
+			this.element2Lookup = new Hashtable<String, Element2>();
+		}
+		
+		public void registerElement1(String id, Element1 e1){
+			this.element1Lookup.put(id, e1);
+		}
+		
+		public void registerElement2(String id, Element2 e2){
+			this.element2Lookup.put(id, e2);
+		}
+	}
+	
+	private Linker<String, Source> samplerSource;
+	private Linker<Integer, Channel> intChannel;
+	private Linker<Channel, Sampler> channelSampler;
+	
+	
+	private class Source{
+		private String mId;
+		private float[] mFloatSource;
+		
+		public Source(String id){
+			this.mId = id;
+		}
+	}
+	
+	private class Sampler{
+		private String mId;
+		private String mInputSource;
+		private String mOutputSource;
+		
+		public Sampler(String id){
+			this.mId = id;
+		}
+	}
 	
 	/**
 	 * use this to disable normals from importing since normals are only
@@ -82,162 +195,231 @@ public class Collada {
 	 * @param normals
 	 * @throws Exception
 	 */
-	public Collada(String fileName, boolean normals)throws Exception{
+	public ColladaAndroid(String fileName, boolean normals)throws Exception{
 		this.normals = normals;
-		this.init(Assets.getManager().openXmlDom(fileName));
+		this.init(Assets.getManager().openStream(fileName));
 	}
 	
-	public Collada(String fileName)throws Exception{
+	public ColladaAndroid(String fileName)throws Exception{
 		this.normals = true;
-		this.init(Assets.getManager().openXmlDom(fileName));
+		this.init(Assets.getManager().openStream(fileName));
 	}
 	
-	public Collada(Document document) throws Exception{
-		this.normals = true;
-		this.init(document);
+	private NameId getNameId(String name){
+		try{
+			return NameId.valueOf(mParser.getName());
+		} catch(Exception e){
+			return NameId.error;
+		}
 	}
 	
-	/**
-	 * use this to disable normals from importing since normals are only
-	 * needed if there is lighting.
-	 * @param document
-	 * @param normals
-	 * @throws Exception
-	 */
-	public Collada(Document document, boolean normals) throws Exception{
-		this.normals = normals;
-		this.init(document);
+	private NameId getTagId(){
+		return this.getNameId(this.mParser.getName());
 	}
 	
-	private void init(Document document) throws Exception{
-		XPathFactory factory = XPathFactory.newInstance();
-	    this.xpath = factory.newXPath();
-		this.document = document;
-		this.primitives = new TreeMap<String, Primitive>();
-		this.surfaces = new TreeMap<String, Surface>();
-		this.channelOffset = new TreeMap<String, Integer>();
-		this.jointChannels = new ArrayList<Channel>();
+	private String getAttr(NameId id){
+		return this.mParser.getAttributeValue(null, id.name());
+	}
+	
+	private NameId getAttrId(NameId id){
+		try{
+			return NameId.valueOf(this.getAttr(id));
+		} catch(Exception e){
+			return NameId.error;
+		}
+	}
+	
+	private void init(InputStream stream) throws Exception{
 		
-		NodeList nodes = document.getElementsByTagName("asset");
-		org.w3c.dom.Node node;
-		this.scale = 1;
-		if(nodes.getLength() > 0){
-			node = document.getElementsByTagName("asset").item(0);
-			node = this.getChildNodeByType("unit", node);
-			String unit = this.getAttribute("meter", node);
-			if(unit != null){
-				this.scale = Float.parseFloat(unit);
+		this.samplerSource = new Linker<String, Source>();
+		this.intChannel = new Linker<Integer, Channel>();
+		this.channelSampler = new Linker<Channel, Sampler>();
+		
+		this.mParser = Xml.newPullParser();
+		this.mParser.setInput(stream, null);
+
+		boolean done = false;
+		int eventType = this.mParser.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT && !done){
+        	switch(eventType){
+        	case XmlPullParser.START_TAG:
+        		switch(this.getTagId()){
+        		case library_visual_scenes:
+        			this.parseLibraryVisualScenes();
+        			break;
+        		case library_animations:
+        			this.parseLibraryAnimations();
+        			break;
+        		case library_materials:
+        			this.parseLibraryMaterials();
+        			break;
+        		case library_effects:
+        			this.parseLibraryEffects();
+        			break;
+        		case library_geometries:
+        			this.parseLibraryGeometries();
+        			break;
+        		case library_controllers:
+        			this.parseLibraryControllers();
+        			break;
+        		}
+        	}
+        	eventType = this.mParser.next();
+        }
+	}
+	
+	private void parseLibraryAnimations() throws Exception{
+		int eventType = this.mParser.next();
+		while (eventType != XmlPullParser.END_DOCUMENT){
+        	switch(eventType){
+        	case XmlPullParser.START_TAG:
+        		switch(this.getTagId()){
+        		case animation:
+        			this.parseAnimation();
+        			break;
+        		}
+        	case XmlPullParser.END_TAG:
+        		switch(this.getTagId()){
+        		case library_animations:
+        			return;
+        		}
+        	}
+        	eventType = this.mParser.next();
+		}
+	}
+	
+	private void parseAnimation() throws Exception{
+		int eventType = this.mParser.next();
+		while (eventType != XmlPullParser.END_DOCUMENT){
+        	switch(eventType){
+        	case XmlPullParser.START_TAG:
+        		switch(this.getTagId()){
+        		case animation:
+        			this.parseAnimation();
+        			break;
+        		case channel:
+        			this.parseChannel();
+        			break;
+        		case source:
+        			this.parseSource();
+        			break;
+        		case sampler:
+        			this.parseSampler();
+        		}
+        	case XmlPullParser.END_TAG:
+        		switch(this.getTagId()){
+        		case animation:
+        			return;
+        		}
+        	}
+        	eventType = this.mParser.next();
+		}
+	}
+	
+	private void parseChannel() throws Exception{
+		Channel c = new Channel();
+		String source = this.getAttr(NameId.source);
+		this.channelSampler.registerElement1(source, c);
+	}
+	
+	private void parseSource() throws Exception{
+		String id = this.getAttr(NameId.id);
+		Source source = new Source(id);
+		this.samplerSource.registerElement2(id, source);
+		
+		int eventType = this.mParser.next();
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case float_array:
+					source.mFloatSource = this.parseFloatArray();
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				switch(this.getTagId()){
+        		case source:
+        			return;
+        		}
 			}
 		}
-		
-		node = document.getElementsByTagName("scene").item(0);
-		node = this.getChildNodeByType("instance_visual_scene", node);
-		node = this.getNodeByUrl(this.getAttribute("url", node));
-		this.root = this.convertSceneNode(node);		
-		
-		if(this.jointChannels.size() > 0){
-			NodeList animations = document.getElementsByTagName("library_animations");
-			if(animations != null && animations.getLength() > 0){
-				this.animation = this.convertAnimations(animations.item(0));
-			}
-		}
 	}
 	
-	private Animation convertAnimations(org.w3c.dom.Node animations){
-		NodeList children = animations.getChildNodes();
-		this.minAnimationTime = Long.MAX_VALUE;
-		this.maxAnimationTime = Long.MIN_VALUE;
-		
-		for(int i = 0; i < children.getLength(); i++){
-			org.w3c.dom.Node child = children.item(i);
-			if(child.getNodeName().equalsIgnoreCase("animation")){
-				this.convertAnimation(child);
-			}
-		}
-		
-		if(this.minAnimationTime < this.maxAnimationTime){
-			Animation a = new Animation(this.jointChannels.size());
-			for(Channel c : this.jointChannels){
-				a.addChannel(c);
-				c.setRange(this.minAnimationTime, this.maxAnimationTime);
-			}
-			return a;
-		}
-		
-		return null;
+	private String[] textToStringArray(){
+		return this.mParser.getText().trim().split("[ \t\n\r]+");
 	}
 	
-	private long minAnimationTime;
-	private long maxAnimationTime;
-	
-	private void convertAnimation(org.w3c.dom.Node animation){
-		NodeList children = animation.getChildNodes();
-		for(int i=0; i < children.getLength(); i++){
-			org.w3c.dom.Node child = children.item(i);
-			String type = child.getNodeName();
-			if(type.equals("animation")){
-				this.convertAnimation(child);
-			} else if(type.equals("channel")){
-				this.convertChannel(child);
-			}
-		}
-	}
-	
-	private void convertChannel(org.w3c.dom.Node channel){
-		String url = this.getAttribute("source", channel);
-		String target = this.getAttribute("target", channel);
-		int offset;
-		if(this.channelOffset.containsKey(target)){
-			offset = this.channelOffset.get(target);
-		} else {
-			return;
-		}
-		
-		float[] time = null;
+	private float[] parseFloatArray() throws Exception{
+		int eventType = this.mParser.next();
 		float[] values = null;
-		
-		channel = this.getNodeByUrl(url);
-		
-		for(int i = 0; i < channel.getChildNodes().getLength(); i++){
-			org.w3c.dom.Node input = channel.getChildNodes().item(i);
-			if(input.getNodeName().equals("input")){
-				String semantic = this.getAttribute("semantic", input);
-				if(semantic.equals("INPUT")){
-					input = this.getNodeByUrl(this.getAttribute("source", input));
-					time = this.convertToFloatArray(this.getChildNodeByType("float_array", input));
-				} else if(semantic.equals("OUTPUT")){
-					input = this.getNodeByUrl(this.getAttribute("source", input));
-					values = this.convertToFloatArray(this.getChildNodeByType("float_array", input));	
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			switch(eventType){
+			case XmlPullParser.TEXT:
+				String[] strings = this.textToStringArray();
+				values = new float[strings.length];
+				for(int i = 0; i<strings.length; i++){
+					values[i] = Float.parseFloat(strings[i]);
 				}
+				break;
+			case XmlPullParser.END_TAG:
+				switch(this.getTagId()){
+        		case float_array:
+        			return values;
+        		}
 			}
 		}
+		return null;
+	}
 		
-		if(time.length > 0){
-			int channelCount = values.length / time.length;
-			
-			for(int i = 0; i < channelCount; i++){
-				Channel c = this.jointChannels.get(offset+i);
-				for(int j = 0; j < time.length; j++){
-					c.addKeyFrame(new Channel.KeyFrame(values[j*channelCount+i], (long)(time[j]*1000)));
-				}
-			}
-			long startTime = (long)(time[0]*1000);
-			long endTime = (long)(time[time.length-1]*1000);
-			if(startTime < this.minAnimationTime){
-				this.minAnimationTime = startTime;
-			}
-			if(endTime > this.maxAnimationTime){
-				this.maxAnimationTime = endTime;
+	
+	
+	private void parseSampler() throws Exception{
+		String id = this.getAttr(NameId.id);
+		Sampler sampler = new Sampler(id);
+		this.channelSampler.registerElement2(id, sampler);
+
+		int eventType = this.mParser.next();
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			switch(eventType){
+        	case XmlPullParser.START_TAG:
+        		switch(this.getTagId()){
+        		case input:
+        			switch(this.getAttrId(NameId.semantic)){
+        			case INPUT:
+        				sampler.mInputSource = this.getAttr(NameId.source);
+        				break;
+        			case OUTPUT:
+        				sampler.mOutputSource = this.getAttr(NameId.source);
+        			}
+        		}
+        		break;
+        	case XmlPullParser.END_TAG:
+        		switch(this.getTagId()){
+        		case sampler:
+        			return;
+        		}
 			}
 		}
 	}
+		
+	private void parseLibraryVisualScenes(){
+		
+	}
 	
-	private String getAttribute(String name, org.w3c.dom.Node node){
-		org.w3c.dom.Node attr = node.getAttributes().getNamedItem(name);
-		if(attr != null){
-			return attr.getNodeValue();
-		}
-		return null;
+	private void parseLibraryMaterials(){
+		
+	}
+	
+	private void parseLibraryEffects(){
+		
+	}
+	
+	private void parseLibraryGeometries(){
+		
+	}
+	
+	private void parseLibraryControllers(){
+		
 	}
 	
 	private void generateChannels(String name, boolean rotate, boolean x, boolean y, boolean z){
@@ -271,7 +453,7 @@ public class Collada {
 		}
 	}
 	
-	private Joint convertJoint(org.w3c.dom.Node node){
+/*	private Joint convertJoint(org.w3c.dom.Node node){
 		String name = getAttribute("id", node);
 		Joint joint = new JointRotate(name);
 		JointOrient jointO = new JointOrient(name+"<orient>");
@@ -721,7 +903,7 @@ public class Collada {
 		}
 		
 		void setNormal(float[] values, int offset){
-			if(Collada.this.normals){
+			if(ColladaAndroid.this.normals){
 				this.normals2 = new Vector<Float>();
 				this.normals = values;
 				this.normalOffset = offset;
@@ -817,7 +999,7 @@ public class Collada {
 			}
 		}
 		return null;
-	}
+	}*/
 	
 	public Node getSceneGraph(){
 		return this.root;

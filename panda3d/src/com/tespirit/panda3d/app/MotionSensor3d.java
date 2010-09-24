@@ -28,6 +28,7 @@ public class MotionSensor3d implements SensorEventListener{
 		this.rotationMatrix = new float[16];
 		this.acceleration = MotionSensor3d.nullArray;
 		this.geoMagnetic = MotionSensor3d.nullArray;
+		this.lastTime = -1;
 	}
 
 	@Override
@@ -45,17 +46,18 @@ public class MotionSensor3d implements SensorEventListener{
 		} else {
 			time = 0;
 		}
+		this.lastTime = event.timestamp;
+		
 		switch(event.sensor.getType()){
 		case Sensor.TYPE_ACCELEROMETER:
-			this.onAccelerateController.update(this.acceleration[0],
-					                           this.acceleration[1],
-					                       	   this.acceleration[2],
-					                       	   time);
-			
-			this.acceleration = event.values;
+			this.acceleration = event.values.clone();
+			/*this.onAccelerateController.update(this.acceleration[0],
+                    this.acceleration[1],
+                	   this.acceleration[2],
+                	   time);*/
 			break;
 		case Sensor.TYPE_MAGNETIC_FIELD:
-			this.geoMagnetic = event.values;
+			this.geoMagnetic = event.values.clone();
 			break;
 		}
 		

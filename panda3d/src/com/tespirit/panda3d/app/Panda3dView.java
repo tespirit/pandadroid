@@ -1,5 +1,7 @@
 package com.tespirit.panda3d.app;
 
+import java.util.List;
+
 import com.tespirit.panda3d.R;
 import com.tespirit.panda3d.controllers.AccelerationController3d;
 import com.tespirit.panda3d.controllers.Controller2d;
@@ -214,7 +216,7 @@ public class Panda3dView extends GLSurfaceView {
 	 * @return null if the device does not support motion sensors.
 	 */
 	public Camera createMotionSensorCamera(float zoomDistance){
-		SensorManager s = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+		SensorManager s = (SensorManager)this.context.getSystemService(Context.SENSOR_SERVICE);
 		Sensor accelerometer = s.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER);
 		Sensor geoMagnetic = s.getDefaultSensor(SensorManager.SENSOR_MAGNETIC_FIELD);
 		if(accelerometer == null || geoMagnetic == null){
@@ -233,12 +235,13 @@ public class Panda3dView extends GLSurfaceView {
 		MotionSensor3d motionSensor = new MotionSensor3d(e, a);
 		
 		//register the motion sensor!		
-		if(!s.registerListener(motionSensor, accelerometer, SensorManager.SENSOR_DELAY_GAME)){
+		if(!s.registerListener(motionSensor, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)){
 			return null;
 		}
 		if(!s.registerListener(motionSensor, geoMagnetic, SensorManager.SENSOR_DELAY_GAME)){
 			return null;
 		}
+		this.renderer.setCamera(camera);
 		return camera;
 	}
 }

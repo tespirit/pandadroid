@@ -44,6 +44,7 @@ public class Pandamonium extends Activity {
 
 
     	view.createTouchRotateCamera(-4);
+        //view.createMotionSensorCamera(-4);
     	
     	view.setTouchDownController(new TranslateAbsolute(view));
     	
