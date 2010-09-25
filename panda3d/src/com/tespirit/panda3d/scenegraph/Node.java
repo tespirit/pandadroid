@@ -64,4 +64,19 @@ public abstract class Node {
 	public static Node getNode(int uid){
 		return Node.nodes.get(uid);
 	}
+	
+	//for debugging
+	private static int current = 0;
+	public static Node nextNode(){
+		Node node = Node.nodes.get(Node.current);
+		Node.current++;
+		Node.current %= Node.nodes.size();
+		return node;
+	}
+	public static Node prevNode(){
+		Node node = Node.nodes.get(Node.current);
+		Node.current += Node.nodes.size() - 1;
+		Node.current %= Node.nodes.size();
+		return node;
+	}
 }

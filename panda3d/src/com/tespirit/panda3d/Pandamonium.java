@@ -16,7 +16,6 @@ import com.tespirit.panda3d.animation.JointRotateY;
 import com.tespirit.panda3d.animation.JointRotateZ;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
-import com.tespirit.panda3d.convert.Collada;
 import com.tespirit.panda3d.convert.ColladaAndroid;
 import com.tespirit.panda3d.debug.Debug;
 import com.tespirit.panda3d.render.Renderer;
@@ -56,10 +55,10 @@ public class Pandamonium extends Activity {
     	r.setLightGroup(lights);
     	
     	try{
-    	//	AnimationStuff a = this.loadCandy();
-    	//	r.setSceneGraph(a.j);
-    	//	r.addTimeUpdate(a.a);
-    		r.setSceneGraph(this.loadCollada());	
+    		AnimationStuff a = this.loadCandy();
+    		r.setSceneGraph(a.j);
+    		r.addTimeUpdate(a.a);
+    	//	r.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		Debug.print(e);
     		r.setSceneGraph(this.createTestSG());

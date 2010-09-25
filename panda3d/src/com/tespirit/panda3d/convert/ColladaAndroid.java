@@ -539,7 +539,12 @@ public class ColladaAndroid {
 		
 		if(this.moveToChildNode(NameId.visual_scene, NameId.library_visual_scenes)){
 			while(this.moveToChildNode(NameId.node, NameId.visual_scene)){
-				Node node = this.parseNode();
+				Node node;
+				if(this.getAttrId(NameId.type) == NameId.JOINT){
+					node = this.parseSkeleton();
+				} else {
+					node = this.parseNode();
+				}
 				if(node != null){
 					nodes.add(node);
 				}
@@ -672,7 +677,7 @@ public class ColladaAndroid {
 		this.generateChannels(name, true, true, true, true); //rotate
 		
 		JointTranslate joint = new JointTranslate(name);
-		JointRotate subJoint = new JointRotate();
+		JointRotate subJoint = new JointRotate(name+"<rotate>");
 		joint.appendChild(subJoint);
 		
 		int eventType = this.mParser.getEventType();

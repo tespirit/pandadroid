@@ -27,6 +27,8 @@ public class RendererDebug extends Renderer{
 	public boolean renderLightPoint;
 	public boolean lightsOn;
 	
+	public Node selected;
+	
 	private Point pointBuffer;
 	
 	public static class Point{
@@ -49,6 +51,7 @@ public class RendererDebug extends Renderer{
 
 	private WireBox boundingBox;
 	private Color boundingBoxColor;
+	private Color selectedColor;
 	private Axis axis;
 	private FloatBuffer point;
 	
@@ -64,6 +67,8 @@ public class RendererDebug extends Renderer{
 		this.boundingBox = new WireBox();
 		this.boundingBoxColor = new Color();
 		this.boundingBoxColor.setColor(1, 1, 0);
+		this.selectedColor = new Color();
+		this.selectedColor.setColor(1, 1, 1);
 		
 		this.normalBuffers = new Hashtable<Integer, FloatBuffer>();
 		
@@ -116,7 +121,11 @@ public class RendererDebug extends Renderer{
 		}
 		if(this.renderBoundingBox && node.getBoundingBox() != null){
 			this.boundingBox.setBox(node.getBoundingBox());
-			this.boundingBoxColor.render();
+			if(node == this.selected){
+				this.selectedColor.render();
+			} else {
+				this.boundingBoxColor.render();
+			}
 			this.boundingBox.render();
 		}
 		

@@ -175,6 +175,16 @@ public class Debug {
 		Debug.animations.add(a);
 	}
 	
+	public static void selectNode(Node node){
+		Debug.renderer.selected = node;
+		if(node != null){
+			Debug.print(node.getName());
+			if(node.getTransform() != null){
+				Debug.print(node.getTransform());
+			}
+		}
+	}
+	
 	static class DebugKeys implements OnKeyListener{
 		
 		public DebugKeys(){
@@ -235,7 +245,11 @@ public class Debug {
 						Debug.print("Next animation: "+currentAnimation);
 					}
 					break;
+				case KeyEvent.KEYCODE_EQUALS:
+					Debug.selectNode(Node.nextNode());
+					break;
 				}
+				
 			}
 
 			return true;

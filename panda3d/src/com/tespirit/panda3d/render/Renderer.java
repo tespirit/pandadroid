@@ -222,7 +222,7 @@ public abstract class Renderer {
 	
 	public RenderableNode select(float x, float y){
 		Ray ray = camera.createRay(x, y);
-		Ray objectRay = ray.clone();
+		Ray objectRay = new Ray();
 		Matrix3d invertWT = new Matrix3d();
 		for(RenderableNode node : this.renderableNodes){
 			objectRay.transformBy(ray, invertWT.invert(node.getWorldTransform()));
