@@ -12,14 +12,24 @@ public class Group extends Transform {
 	public Group(){
 		super();
 		this.children = new ArrayList<Node>();
-		this.transform = new Matrix3d();//optimize later to share a single matrix buffer.
 		this.boundingBox = new AxisAlignedBox();
 	}
 	
 	public Group(String n){
 		super(n);
 		this.children = new ArrayList<Node>();
-		this.transform = new Matrix3d();//optimize later to share a single matrix buffer.
+		this.boundingBox = new AxisAlignedBox();
+	}
+	
+	public Group(ArrayList<Node> childern){
+		super();
+		this.children = childern;
+		this.boundingBox = new AxisAlignedBox();
+	}
+	
+	public Group(String n, ArrayList<Node> children){
+		super(n);
+		this.children = children;
 		this.boundingBox = new AxisAlignedBox();
 	}
 	

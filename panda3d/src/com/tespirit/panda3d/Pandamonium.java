@@ -55,10 +55,10 @@ public class Pandamonium extends Activity {
     	r.setLightGroup(lights);
     	
     	try{
-    		AnimationStuff a = this.loadCandy();
-    		r.setSceneGraph(a.j);
-    		r.addTimeUpdate(a.a);
-    	//	r.setSceneGraph(this.loadCollada());	
+    	//	AnimationStuff a = this.loadAnimation("test_anim.dae");
+    	//	r.setSceneGraph(a.j);
+    	//	r.addTimeUpdate(a.a);
+    		r.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		Debug.print(e);
     		r.setSceneGraph(this.createTestSG());
@@ -72,11 +72,11 @@ public class Pandamonium extends Activity {
    		//view.setFocusableInTouchMode(true);
     }
     
-    public AnimationStuff loadCandy() throws Exception{
-    	ColladaAndroid candyC = new ColladaAndroid("test_anim.dae");
+    public AnimationStuff loadAnimation(String file) throws Exception{
+    	ColladaAndroid ca = new ColladaAndroid(file);
     	AnimationStuff a = new AnimationStuff();
-    	a.a = candyC.getAnimation();
-    	a.j = candyC.getSceneGraph();
+    	a.a = ca.getAnimation();
+    	a.j = ca.getSceneGraph();
     	a.a.attachSkeleton((Joint)a.j);
     	Debug.addTestAnimation(a.a);
     	return a;

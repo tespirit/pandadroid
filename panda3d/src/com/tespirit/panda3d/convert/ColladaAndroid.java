@@ -550,10 +550,7 @@ public class ColladaAndroid {
 				}
 			}
 			if(nodes.size() > 1){
-				Group group = new Group();
-				for(Node node : nodes){
-					group.appendChild(node);
-				}
+				Group group = new Group("<root>", nodes);
 				this.mRoot = group;
 			} else if(nodes.size() == 1){
 				this.mRoot = nodes.get(0);
@@ -564,10 +561,8 @@ public class ColladaAndroid {
 	private Node parseNode() throws Exception{
 		String name = this.getAttr(NameId.id);
 		Matrix3d transform = new Matrix3d();
-		Group group = null;
-		Model model = null;
-		Joint joint = null;
-		Node retVal = null;
+		ArrayList<Node> children = new ArrayList<Node>();
+		boolean hasChildNodes = false;
 		
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
@@ -588,7 +583,8 @@ public class ColladaAndroid {
 					this.parseScale(transform);
 					break;
 				case instance_geometry:
-					model = new Model(name);
+					Model model = new Model(name);
+					name = name+"<group>"; //if this is a group, it will get this name.
 					ModelLink modelLink = new ModelLink();
 					modelLink.mModel = model;
 					modelLink.mPrimitiveId = this.getRefAttr(NameId.url);
@@ -596,19 +592,18 @@ public class ColladaAndroid {
 						modelLink.mSurfaceId = this.getRefAttr(NameId.target);
 					}
 					this.mModels.add(modelLink);
+					children.add(model);
 					break;
 				case node:
+					Node child;
 					if(this.getAttrId(NameId.type) == NameId.JOINT){
-						joint = this.parseSkeleton();
+						child  = this.parseSkeleton();
 					} else {
-						Node child = parseNode();
-						if(child != null){
-							if(group == null){
-								group = new Group(name);
-								retVal = group;
-							}
-							group.appendChild(child);
-						}
+						child = parseNode();
+					}
+					if(child != null){
+						hasChildNodes = true;
+						children.add(child);
 					}
 					break;
 				}
@@ -616,15 +611,13 @@ public class ColladaAndroid {
 			case XmlPullParser.END_TAG:
 				switch(this.getTagId()){
 				case node:
-					if((model != null || joint != null) && group != null){
-						group.appendChild(joint);
-						group.appendChild(model);
-					} else if(model != null){
-						retVal = model;
-					} else if(joint != null){
-						retVal = joint;
+					Node retVal = null;
+					if(hasChildNodes || children.size() > 1){
+						Group group = new Group(name, children);
+						retVal = group;
+					} else if(children.size() == 1){
+						retVal = children.get(0);
 					}
-					
 					if(retVal != null){
 						retVal.getTransform().copy(transform);
 					}
@@ -747,8 +740,9 @@ public class ColladaAndroid {
 		String name = this.getAttr(NameId.id);
 		this.generateChannels(name, true, true, true, true); //rotate
 		
+		Matrix3d orientMatrix = new Matrix3d();
+		
 		Joint joint = new JointRotate(name);
-		JointOrient jointO = new JointOrient(name+"<orient>");
 		
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
@@ -757,15 +751,15 @@ public class ColladaAndroid {
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
 				case matrix:
-					this.parseMatrix(jointO.getTransform());
+					this.parseMatrix(orientMatrix);
 					break;
 				case translate:
-					this.parseTranslate(jointO.getTransform());
+					this.parseTranslate(orientMatrix);
 					break;
 				case rotate:
 					String sid = this.getAttr(NameId.sid);
 					if(sid != null && sid.startsWith("jointOrient")){
-						this.parseRotate(jointO.getTransform());
+						this.parseRotate(orientMatrix);
 					} else {
 						this.parseRotate(joint.getTransform());
 					}
@@ -780,9 +774,11 @@ public class ColladaAndroid {
 				break;
 			case XmlPullParser.END_TAG:
 				if(this.getTagId() == NameId.node){
-					if(jointO.getTransform().isIdentity3x3()){
-						joint.getTransform().multiply(jointO.getTransform());
+					if(orientMatrix.isIdentity3x3()){
+						joint.getTransform().multiply(orientMatrix);
 					} else {
+						JointOrient jointO = new JointOrient(name+"<orient>");
+						jointO.getTransform().copy(orientMatrix);
 						jointO.appendChild(joint);
 						joint = jointO;
 					}
