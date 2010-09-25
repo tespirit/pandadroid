@@ -118,6 +118,27 @@ public class Debug {
 		Debug.print(text);
 	}
 	
+	public static void print(Exception e){
+		StackTraceElement[] st = e.getStackTrace();
+		Debug.print("Exception: " + e.getMessage());
+		for(int i = 0; i < st.length; i++){
+			Debug.print(st[i]);
+		}
+	}
+	
+	public static void print(StackTraceElement ste){
+		String output = "    at " + 
+						ste.getClassName() + 
+						"." + 
+						ste.getMethodName() + 
+						"(" + 
+						ste.getFileName() + 
+						":" + 
+						ste.getLineNumber() + 
+						")";
+		Debug.print(output);
+	}
+	
 	public static void print(Matrix3d val){
 		Debug.print(val.getXAxis());
 		Debug.print(val.getYAxis());

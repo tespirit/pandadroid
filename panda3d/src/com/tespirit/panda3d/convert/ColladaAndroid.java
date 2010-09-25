@@ -3,14 +3,7 @@ package com.tespirit.panda3d.convert;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.Vector;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import android.util.Xml;
 
@@ -33,11 +26,10 @@ import com.tespirit.panda3d.scenegraph.Node;
 import com.tespirit.panda3d.surfaces.Color;
 import com.tespirit.panda3d.surfaces.Surface;
 import com.tespirit.panda3d.surfaces.Texture;
+import com.tespirit.panda3d.vectors.Color4;
 import com.tespirit.panda3d.vectors.Matrix3d;
 import com.tespirit.panda3d.vectors.Vector3d;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlPullParser;
 
 
@@ -69,7 +61,7 @@ public class ColladaAndroid {
 	private boolean mImportNormals;
 	
 	private enum NameId{
-		assets,
+		asset,
 		unit,
 		meter,
 		
@@ -82,6 +74,7 @@ public class ColladaAndroid {
 		library_geometries,
 		library_controllers,
 		library_visual_scenes,
+		library_images,
 		
 		animation,
 		sampler,
@@ -126,13 +119,16 @@ public class ColladaAndroid {
 		bind_material,
 		technique_common,
 		instance_material,
+		material,
 		instance_effect,
+		effect,
 		profile_COMMON,
 		technique,
 		diffuse,
 		texture,
-		init_from,
 		color,	
+		image,
+		init_from,
 		
 		error
 	};
@@ -148,7 +144,9 @@ public class ColladaAndroid {
 	private ArrayList<ModelLink> mModels;
 	private ArrayList<String> mChannelOrder;
 	private Hashtable<String, Primitive> mPrimitives;
-	private Hashtable<String, Surface> mSurfaces;
+	private Hashtable<String, String> mTextureNames;
+	private Hashtable<String, String> mEffectsLink;
+	private Hashtable<String, Effect> mEffects;
 	
 	private class ModelLink{
 		Model mModel;
@@ -172,6 +170,24 @@ public class ColladaAndroid {
 		
 		public Sampler(String id){
 			this.mId = id;
+		}
+	}
+	
+	private class Effect{
+		Color4 color;
+		String textureId;
+	}
+	
+	private class InvalidRefException extends Exception{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5048613965778781497L;
+		public InvalidRefException(NameId tag, String id, String target){
+			super("<"+tag.toString() + " id='" + id + "'/>: ref '" + target + "' not found.");
+		}
+		public InvalidRefException(NameId tag, String target){
+			super("<"+tag.toString() + "'/>: ref '" + target + "' not found.");
 		}
 	}
 	
@@ -230,11 +246,19 @@ public class ColladaAndroid {
 	 * @throws Exception
 	 */
 	private boolean moveToChildNode(NameId id, NameId parentId) throws Exception{
-		while(this.mParser.next() != XmlPullParser.END_DOCUMENT){
-			if(this.mParser.getEventType() == XmlPullParser.START_TAG && this.getTagId() == id){
-				return true;
-			} else if(this.mParser.getEventType() == XmlPullParser.END_TAG && this.getTagId() == parentId){
-				return false;
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				if(this.getTagId() == id){
+					return true;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == parentId){
+					return false;
+				}
 			}
 		}
 		return false;
@@ -248,19 +272,22 @@ public class ColladaAndroid {
 		this.mModels = new ArrayList<ModelLink>();
 		this.mChannelOrder = new ArrayList<String>();
 		this.mPrimitives = new Hashtable<String, Primitive>();
-		this.mSurfaces = new Hashtable<String, Surface>();
+		this.mTextureNames = new Hashtable<String, String>();
+		this.mEffectsLink = new Hashtable<String, String>();
+		this.mEffects = new Hashtable<String, Effect>();
 		
 		this.mParser = Xml.newPullParser();
 		this.mParser.setInput(stream, null);
 
-		boolean done = false;
 		int eventType = this.mParser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT && !done){
+        while (eventType != XmlPullParser.END_DOCUMENT){
         	switch(eventType){
         	case XmlPullParser.START_TAG:
-        		switch(this.getTagId()){
-        		case assets:
+        		NameId tagId = this.getTagId();
+        		switch(tagId){
+        		case asset:
         			this.parseAssets();
+        			break;
         		case library_visual_scenes:
         			this.parseLibraryVisualScenes();
         			break;
@@ -279,6 +306,9 @@ public class ColladaAndroid {
         		case library_controllers:
         			this.parseLibraryControllers();
         			break;
+        		case library_images:
+        			this.parseLibraryImages();
+        			break;
         		}
         		break;
         	}
@@ -293,7 +323,7 @@ public class ColladaAndroid {
         		throw new Exception("Model primitive data not found: "+ml.mPrimitiveId);
         	}
         	ml.mModel.setPrimative(p);
-        	ml.mModel.setSurface(this.mSurfaces.get(ml.mSurfaceId));
+        	ml.mModel.setSurface(this.createSurface(ml.mSurfaceId));
         }
         
         if(this.mChannelOrder.size() > 0 && this.mMaxAnimationTime >= this.mMinAnimationTime){
@@ -309,8 +339,29 @@ public class ColladaAndroid {
         }
 	}
 	
+	private Surface createSurface(String materialId){
+		Surface surface = Surface.getDefaultSurface();
+		if(materialId == null){
+			return surface;
+		}
+		String effectId = this.mEffectsLink.get(materialId);
+		Effect effect = this.mEffects.get(effectId);
+		if(effect != null){
+			if(effect.textureId != null){
+				Texture texture = new Texture();
+				texture.setDiffuseTextureName(this.mTextureNames.get(effect.textureId));
+				surface = texture;
+			} else if(effect.color != null){
+				Color color = new Color();
+				color.getColor().copy( effect.color);
+				surface = color;
+			}
+		}
+		return surface;
+	}
+	
 	private void parseAssets() throws Exception{
-		if(this.moveToChildNode(NameId.unit, NameId.assets)){
+		if(this.moveToChildNode(NameId.unit, NameId.asset)){
 			String meterScale = this.getAttr(NameId.meter);
 			if(meterScale != null && meterScale.length() > 0){
 				this.mScale = Float.parseFloat(meterScale);
@@ -330,8 +381,9 @@ public class ColladaAndroid {
 		String samplerId = null;
 		String targetId = null;
 		
-		int eventType = this.mParser.next();
+		int eventType = this.mParser.getEventType();
 		while (eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
         	switch(eventType){
         	case XmlPullParser.START_TAG:
         		switch(this.getTagId()){
@@ -350,10 +402,10 @@ public class ColladaAndroid {
         			while(this.moveToChildNode(NameId.input, NameId.sampler)){
         				switch(this.getAttrId(NameId.semantic)){
             			case INPUT:
-            				sampler.mInputSource = this.getAttr(NameId.source);
+            				sampler.mInputSource = this.getRefAttr(NameId.source);
             				break;
             			case OUTPUT:
-            				sampler.mOutputSource = this.getAttr(NameId.source);
+            				sampler.mOutputSource = this.getRefAttr(NameId.source);
             				break;
             			}
         			}
@@ -368,11 +420,10 @@ public class ColladaAndroid {
         		}
         		break;
         	}
-        	eventType = this.mParser.next();
 		}
 	}
 	
-	private void createChannels(String samplerId, String targetId){
+	private void createChannels(String samplerId, String targetId) throws Exception{
 		if(samplerId == null || targetId == null){
 			return;
 		}
@@ -389,7 +440,17 @@ public class ColladaAndroid {
 			targetIds[0] = targetId;
 		}
 		
+		if(!this.mSamplers.containsKey(samplerId)){
+			throw new InvalidRefException(NameId.channel, samplerId);
+		}
 		Sampler sampler = this.mSamplers.get(samplerId);
+		
+		if(!this.mSources.containsKey(sampler.mInputSource)){
+			throw new InvalidRefException(NameId.sampler, sampler.mId, sampler.mInputSource);
+		}
+		if(!this.mSources.containsKey(sampler.mOutputSource)){
+			throw new InvalidRefException(NameId.sampler, sampler.mId, sampler.mOutputSource);
+		}
 		float[] input = this.mSources.get(sampler.mInputSource).mFloatSource;
 		float[] output = this.mSources.get(sampler.mOutputSource).mFloatSource;
 		
@@ -420,8 +481,8 @@ public class ColladaAndroid {
 	}
 	
 	private void parseSource() throws Exception{
+		String id = this.getAttr(NameId.id);
 		if(this.moveToChildNode(NameId.float_array, NameId.source)){
-			String id = this.getAttr(NameId.id);
 			Source source = new Source(id);
 			source.mFloatSource = this.parseFloatArray();
 			this.mSources.put(source.mId, source);
@@ -429,18 +490,28 @@ public class ColladaAndroid {
 	}
 	
 	private String[] parseStringArray(NameId id) throws Exception{
-		int eventType = this.mParser.next();
-		String[] values = null;
+		String value = this.parseString(id);
+		if(value != null){
+			return value.split("[ \t\n\r]+");
+		} else {
+			return null;
+		}
+	}
+	
+	private String parseString(NameId parentId) throws Exception{
+		String value = null;
+		
+		int eventType = this.mParser.getEventType();
 		while (eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
 			switch(eventType){
 			case XmlPullParser.TEXT:
-				values = this.mParser.getText().trim().split("[ \t\n\r]+");
+				value = this.mParser.getText().trim();
 				break;
 			case XmlPullParser.END_TAG:
-				switch(this.getTagId()){
-        		case id:
-        			return values;
-        		}
+				if(this.getTagId() == parentId){
+					return value;
+				}
 				break;
 			}
 		}
@@ -466,20 +537,22 @@ public class ColladaAndroid {
 	private void parseLibraryVisualScenes() throws Exception{
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
-		while(this.moveToChildNode(NameId.visual_scene, NameId.library_visual_scenes)){
-			Node node = this.parseNode();
-			if(node != null){
-				nodes.add(node);
+		if(this.moveToChildNode(NameId.visual_scene, NameId.library_visual_scenes)){
+			while(this.moveToChildNode(NameId.node, NameId.visual_scene)){
+				Node node = this.parseNode();
+				if(node != null){
+					nodes.add(node);
+				}
 			}
-		}
-		if(nodes.size() > 1){
-			Group group = new Group();
-			for(Node node : nodes){
-				group.appendChild(node);
+			if(nodes.size() > 1){
+				Group group = new Group();
+				for(Node node : nodes){
+					group.appendChild(node);
+				}
+				this.mRoot = group;
+			} else if(nodes.size() == 1){
+				this.mRoot = nodes.get(0);
 			}
-			this.mRoot = group;
-		} else if(nodes.size() == 1){
-			this.mRoot = nodes.get(0);
 		}
 	}
 	
@@ -491,8 +564,9 @@ public class ColladaAndroid {
 		Joint joint = null;
 		Node retVal = null;
 		
-		int eventType = this.mParser.next();
-		while (eventType != XmlPullParser.END_DOCUMENT){
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
 			switch(eventType){
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
@@ -601,8 +675,9 @@ public class ColladaAndroid {
 		JointRotate subJoint = new JointRotate();
 		joint.appendChild(subJoint);
 		
-		int eventType = this.mParser.next();
-		while (eventType != XmlPullParser.END_DOCUMENT){
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
 			switch(eventType){
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
@@ -670,8 +745,9 @@ public class ColladaAndroid {
 		Joint joint = new JointRotate(name);
 		JointOrient jointO = new JointOrient(name+"<orient>");
 		
-		int eventType = this.mParser.next();
-		while (eventType != XmlPullParser.END_DOCUMENT){
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
 			switch(eventType){
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
@@ -716,41 +792,75 @@ public class ColladaAndroid {
 	private void parseLibraryGeometries() throws Exception{
 		while(this.moveToChildNode(NameId.geometry, NameId.library_geometries)){
 			String name = this.getAttr(NameId.id);
-			Inputs inputs = new Inputs();
-			Vector<Integer> indices = new Vector<Integer>();
-			
 			if(this.moveToChildNode(NameId.mesh, NameId.geometry)){
-				int eventType = this.mParser.getEventType();
-				while(eventType != XmlPullParser.END_DOCUMENT){
-					eventType = this.mParser.next();
-					switch(eventType){
-					case XmlPullParser.START_TAG:
-						switch(this.getTagId()){
-						case source:
-							this.parseSource();
-							break;
-						case vertices:
-							this.parseInputs(inputs, NameId.vertices);
-							break;
-						case polygons:
-							this.parseInputs(inputs, NameId.polygons);
-							this.parseP(indices, NameId.polygons);
-							break;
-						case triangles:
-							this.parseInputs(inputs, NameId.triangles);
-							this.parseP(indices, NameId.triangles);
-							break;
-						}
-						break;
-					case XmlPullParser.END_TAG:
-						if(this.getTagId() == NameId.geometry){
-							this.createPrimitive(name, inputs, indices);
-						}
-						break;
-					}
-				}
+				this.parseMesh(name);
 			}
 		}
+	}
+	
+	private void parseMesh(String name) throws Exception{
+		Inputs inputs = new Inputs();
+		Vector<Integer> indices = new Vector<Integer>();
+		
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case source:
+					this.parseSource();
+					break;
+				case vertices:
+					while(this.moveToChildNode(NameId.input, NameId.vertices)){
+						this.parseInput(inputs);
+					}
+					break;
+				case polygons:
+					indices = parseIndices(inputs, NameId.polygons);
+					break;
+				case triangles:
+					indices = parseIndices(inputs, NameId.triangles);
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == NameId.geometry){
+					this.createPrimitive(name, inputs, indices);
+					return;
+				}
+				break;
+			}
+		}
+	}
+	
+	private Vector<Integer> parseIndices(Inputs inputs, NameId parentId) throws Exception{
+		Vector<Integer> indices = new Vector<Integer>();
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case input:
+					this.parseInput(inputs);
+					break;
+				case p:
+					String[] values = this.parseStringArray(NameId.p);
+					for(int i = 0; i < values.length; i++){
+						indices.add(Integer.parseInt(values[i]));
+					}
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == parentId){
+					return indices;
+				}
+				break;
+			}
+		}
+		return indices;
 	}
 	
 	private void createPrimitive(String name, Inputs inputs, Vector<Integer> indices){
@@ -799,7 +909,7 @@ public class ColladaAndroid {
 		int nextIndex = 0;
 		for(int i = 0; i < indices.size()/count; i++){
 			String id = "";
-			for(int j = 0; j < count; i++){
+			for(int j = 0; j < count; j++){
 				id += indices.get(i*count+j)+",";
 			}
 			if(remap.containsKey(id)){
@@ -900,280 +1010,126 @@ public class ColladaAndroid {
 		int mColorOffset = -1;
 	}
 	
-	private void parseInputs(Inputs inputs, NameId parentId)throws Exception{
-		while(this.moveToChildNode(NameId.input, parentId)){
-			String offsetString = this.getAttr(NameId.offset);
-			int offset = -1;
-			if(offsetString != null){
-				offset = Integer.parseInt(offsetString);
+	private void parseInput(Inputs inputs){
+		String offsetString = this.getAttr(NameId.offset);
+		int offset = -1;
+		if(offsetString != null){
+			offset = Integer.parseInt(offsetString);
+		}
+		switch(this.getAttrId(NameId.semantic)){
+		case POSITION:
+			inputs.mPosition = this.getRefAttr(NameId.source);
+			if(offset != -1){
+				inputs.mPositionOffset = offset;
 			}
-			switch(this.getAttrId(NameId.semantic)){
-			case POSITION:
-				inputs.mPosition = this.getRefAttr(NameId.source);
-				if(offset != -1){
-					inputs.mPositionOffset = offset;
+			break;
+		case NORMAL:
+			inputs.mNormal = this.getRefAttr(NameId.source);
+			if(offset != -1){
+				inputs.mNormalOffset = offset;
+			}
+			break;
+		case TEXCOORD:
+			inputs.mTexcoord = this.getRefAttr(NameId.source);
+			if(offset != -1){
+				inputs.mTexcoordOffset = offset;
+			}
+			break;
+		case COLOR:
+			inputs.mColor = this.getRefAttr(NameId.source);
+			if(offset != -1){
+				inputs.mColorOffset = offset;
+			}
+			break;
+		case VERTEX:
+			if(inputs.mPositionOffset == -1){
+				inputs.mPositionOffset = offset;
+			}
+			if(inputs.mNormalOffset == -1){
+				inputs.mNormalOffset = offset;
+			}
+			if(inputs.mTexcoordOffset == -1){
+				inputs.mTexcoordOffset = offset;
+			}
+			if(inputs.mColorOffset == -1){
+				inputs.mColorOffset = offset;
+			}
+			break;
+		}
+	}
+	
+	private void parseLibraryMaterials() throws Exception{
+		while(this.moveToChildNode(NameId.material, NameId.library_materials)){
+			String id = this.getAttr(NameId.id);
+			if(this.moveToChildNode(NameId.instance_effect, NameId.material)){
+				String effectsTarget = this.getRefAttr(NameId.url);
+				if(effectsTarget != null){
+					this.mEffectsLink.put(id, effectsTarget);
 				}
-				break;
-			case NORMAL:
-				inputs.mNormal = this.getRefAttr(NameId.source);
-				if(offset != -1){
-					inputs.mNormalOffset = offset;
-				}
-				break;
-			case TEXCOORD:
-				inputs.mTexcoord = this.getRefAttr(NameId.source);
-				if(offset != -1){
-					inputs.mTexcoordOffset = offset;
-				}
-				break;
-			case COLOR:
-				inputs.mColor = this.getRefAttr(NameId.source);
-				if(offset != -1){
-					inputs.mColorOffset = offset;
-				}
-				break;
-			case VERTEX:
-				if(inputs.mPositionOffset == -1){
-					inputs.mPositionOffset = offset;
-				}
-				if(inputs.mNormalOffset == -1){
-					inputs.mNormalOffset = offset;
-				}
-				if(inputs.mTexcoordOffset == -1){
-					inputs.mTexcoordOffset = offset;
-				}
-				if(inputs.mColorOffset == -1){
-					inputs.mColorOffset = offset;
-				}
-				break;
 			}
 		}
 	}
 	
-	private void parseLibraryMaterials(){
-		
-	}
-	
-	private void parseLibraryEffects(){
-		
-	}
-	
-	private void parseLibraryControllers(){
-		
-	}
-/*
-	
-	private Surface convertMaterial(org.w3c.dom.Node node){
-		node = this.getChildNodeByType("bind_material", node);
-		node = this.getChildNodeByType("technique_common", node);
-		node = this.getChildNodeByType("instance_material", node);
-		
-		String id = this.getAttribute("target", node);
-		
-		Surface s = this.surfaces.get(id);
-		if(s != null){
-			return s;
-		}
-		
-		node = this.getNodeByUrl(id);
-		node = this.getChildNodeByType("instance_effect", node);
-		String url = this.getAttribute("url", node);
-		node = this.getNodeByUrl(url);
-		node = this.getChildNodeByType("profile_COMMON", node);
-		node = this.getChildNodeByType("technique", node);
-		NodeList children = node.getChildNodes();
-		
-		//get first non text node
-		for(int i = 0; i < children.getLength(); i++){
-			node = children.item(i);
-			if(node.getNodeType() != org.w3c.dom.Node.TEXT_NODE){
-				break;
+	private void parseLibraryEffects() throws Exception{
+		while(this.moveToChildNode(NameId.effect, NameId.library_effects)){
+			String id = this.getAttr(NameId.id);
+			if(this.moveToChildNode(NameId.diffuse, NameId.effect)){
+				Effect effect = this.parseEffectParam(NameId.diffuse);
+				if(effect != null){
+					this.mEffects.put(id, effect);
+				}
 			}
 		}
-		
-		//for now, only diffuse is imported.
-		node = this.getChildNodeByType("diffuse", node);
-		
-		org.w3c.dom.Node texture = this.getChildNodeByType("texture", node);
-		if(texture != null){
-			url = this.getAttribute("texture", texture);
-			texture = this.getNodeByUrl(url);
-			
-			texture = this.getChildNodeByType("init_from", texture);
-			String textureName = texture.getFirstChild().getNodeValue().trim();
-			textureName = textureName.replace('\\', '/');
-			int index = textureName.lastIndexOf('/');
-			if(index != -1){
-				textureName = textureName.substring(index+1);
-			}
-			
-			Texture t = new Texture();
-			t.setDiffuseTextureName(textureName);
-			s = t;
-		} else {
-			org.w3c.dom.Node color = this.getChildNodeByType("color", node);
-			if(color != null){
-				float[] values = this.convertToFloatArray(color);
-				Color c = new Color();
-				c.setColor(values[0], values[1], values[2], values[3]);
-				s = c;
-			} else {
-				s = Surface.getDefaultSurface();
-			}
-		}
-		
-		this.surfaces.put(id, s);
-		
-		return s;
 	}
 	
-	private Primitive convertGeometry(org.w3c.dom.Node node){
-		String url = this.getAttribute("url", node);
-		if(url != null){
-			//check model cache!
-			Primitive p = this.primitives.get(url);
-			if(p != null){
-				return p;
-			}
-			node = this.getNodeByUrl(url);
-			if(node == null || !node.getNodeName().equalsIgnoreCase("geometry")){
-				return null;
-			}
-			node = this.getChildNodeByType("mesh", node);
-			if(node != null){
-				org.w3c.dom.Node indices = this.getChildNodeByType("polygons", node);
-				if(indices != null){
-					p = this.convertPolygon(indices);
-				} else {
-					indices = this.getChildNodeByType("triangles", node);
-					if(indices != null){
-						p = convertTriangles(indices);
+	private Effect parseEffectParam(NameId paramId) throws Exception{
+		Effect effect = new Effect();
+		
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case texture:
+					effect.textureId = this.getAttr(NameId.texture);
+					break;
+				case color:
+					float[] colorBuffer = this.parseFloatArray(NameId.color);
+					if(colorBuffer != null){
+						effect.color = new Color4(colorBuffer);
 					}
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == paramId)
+					return effect;
+				break;
+			}
+		}
+		return null;
+	}
+	
+	private void parseLibraryControllers() throws Exception{
+		
+	}
+	
+	private void parseLibraryImages() throws Exception{
+		while(this.moveToChildNode(NameId.image, NameId.library_images)){
+			String id = this.getAttr(NameId.id);
+			if(this.moveToChildNode(NameId.init_from, NameId.image)){
+				String texture = this.parseString(NameId.init_from);
+				if(texture != null){
+					int lastIndex = texture.lastIndexOf('/');
+					if(lastIndex != -1){
+						texture = texture.substring(lastIndex);
+					}
+					this.mTextureNames.put(id, texture);
 				}
 			}
-			
-			this.primitives.put(url, p);
-			
-			return p;
-		}
-		return null;
-	}
-	
-	private Primitive convertTriangles(org.w3c.dom.Node triangles){
-		ColladaVb vb = this.convertVertexBuffer(triangles);
-		int count = Integer.parseInt(this.getAttribute("count", triangles));
-		IndexBuffer ib = new IndexBuffer(count * 3);
-		org.w3c.dom.Node p = this.getChildNodeByType("p", triangles);
-		int[] values = this.convertToIntArray(p);
-		int stride = values.length/count;
-		for(int i = 0; i < count; i++){
-			ib.addTriangle(vb.registerVertex(values, i*3),
-					   	   vb.registerVertex(values, i*3+stride),
-					       vb.registerVertex(values, i*3+stride*2));
-		}
-		ib.resetBufferPosition();
-		
-		TriangleIndices t = new TriangleIndices(vb.createVb(), ib);
-		return t;
-	}
-	
-	private Primitive convertPolygon(org.w3c.dom.Node polygon){
-		ColladaVb vb = this.convertVertexBuffer(polygon);
-		int count = Integer.parseInt(this.getAttribute("count", polygon));
-		IndexBuffer ib = new IndexBuffer(count * 3); //assume triangles!
-		NodeList polygons = polygon.getChildNodes();
-		for(int i = 0; i < polygons.getLength(); i++){
-			org.w3c.dom.Node p = polygons.item(i);
-			if(p.getNodeName().equalsIgnoreCase("p")){
-				int[] values = this.convertToIntArray(p);
-				int stride = values.length/3;
-				ib.addTriangle(vb.registerVertex(values, 0),
-							   vb.registerVertex(values, stride),
-							   vb.registerVertex(values, stride*2));
-			}
-		}
-		ib.resetBufferPosition();
-			
-		TriangleIndices t = new TriangleIndices(vb.createVb(), ib);
-		return t;
-	}
-	
-	
-	
-	private void convertInput(org.w3c.dom.Node input, ColladaVb vb, int currentOffset){
-		String type = input.getNodeName().toLowerCase();
-		
-		if(!type.equals("input")){
-			return;
-		}
-		
-		String semantic = this.getAttribute("semantic", input);
-		String offsetStr = this.getAttribute("offset", input);
-		int offset;
-		
-		if(offsetStr == null){
-			offset = currentOffset;
-		} else {
-			offset = Integer.parseInt(this.getAttribute("offset", input));
-		}
-		
-		input = this.getNodeByUrl(this.getAttribute("source", input));
-		
-		if(semantic.equals("VERTEX")){
-			for(int i = 0; i < input.getChildNodes().getLength(); i++){
-				this.convertInput(input.getChildNodes().item(i), vb, offset);
-			}
-		} else if(semantic.equals("POSITION")){
-			input = this.getChildNodeByType("float_array", input);
-			vb.setPosition(this.convertToFloatArray(input), offset);
-		} else if(semantic.equals("NORMAL")){
-			input = this.getChildNodeByType("float_array", input);
-			vb.setNormal(this.convertToFloatArray(input), offset);
-		} else if(semantic.equals("TEXCOORD")){
-			input = this.getChildNodeByType("float_array", input);
-			vb.setTexcoord(this.convertToFloatArray(input), offset);
-		} else if(semantic.equals("COLOR")){
-			input = this.getChildNodeByType("float_array", input);
-			vb.setColor(this.convertToFloatArray(input), offset);
 		}
 	}
-	
-	private ColladaVb convertVertexBuffer(org.w3c.dom.Node source){
-		ColladaVb vb = new ColladaVb();
-		
-		NodeList inputs = source.getChildNodes();
-		for(int i = 0; i < inputs.getLength() && vb.count < ColladaVb.MAX; i++){
-			org.w3c.dom.Node input = inputs.item(i);
-			this.convertInput(input, vb, 0);
-		}
-		
-		vb.generateTypes();
-		return vb;
-	}
-	
-	
-	private org.w3c.dom.Node getNodeByUrl(String url){
-		if(url == null) return null;
-		if(url.startsWith("#")){
-			url = url.substring(1);
-		}
-		try{
-			XPathExpression expr = this.xpath.compile("//*[@id='"+url+"']");
-			return (org.w3c.dom.Node)expr.evaluate(this.document, XPathConstants.NODE);
-		} catch(Exception e){
-			return null;
-		}
-	}
-	
-	private org.w3c.dom.Node getChildNodeByType(String type, org.w3c.dom.Node node){
-		for(int i = 0; i < node.getChildNodes().getLength(); i++){
-			org.w3c.dom.Node child = node.getChildNodes().item(i);
-			if(child.getNodeName().equalsIgnoreCase(type)){
-				return child;
-			}
-		}
-		return null;
-	}*/
 	
 	public Node getSceneGraph(){
 		return this.mRoot;
