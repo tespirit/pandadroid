@@ -221,6 +221,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		public void setup(Texture texture) {
 			Bitmap bitmap = Assets.getManager().openBitmap(texture.getDiffuseTextureName());
 			if(bitmap == null){
+				texture.setDiffuseTextureId(0);
 				return;
 			}
 			

@@ -44,7 +44,7 @@ public class Pandamonium extends Activity {
         Debug.setConsole((TextView)findViewById(R.id.console));
 
 
-    	view.createTouchRotateCamera(-4);
+    	view.createTouchRotateCamera(-2);
         //view.createMotionSensorCamera(-4);
     	
     	view.setTouchDownController(new TranslateAbsolute(view));
@@ -86,7 +86,6 @@ public class Pandamonium extends Activity {
     public Node loadCollada() throws Exception{
     	ColladaAndroid jC = new ColladaAndroid("jocelyn.dae");
     	ColladaAndroid dC = new ColladaAndroid("doug.dae");
-    	ColladaAndroid tC = new ColladaAndroid("test_cube.dae");
 		Group g = new Group();
 		Node j = jC.getSceneGraph();
 		j.getTransform().translate(-0.4f, 0, 0);
@@ -96,8 +95,7 @@ public class Pandamonium extends Activity {
 		d.getTransform().translate(0.4f, 0, 0);
 		g.appendChild(d);
 		
-		Node t = tC.getSceneGraph();
-		g.appendChild(t);
+		Debug.print(g);
 		
 		return g;
     }

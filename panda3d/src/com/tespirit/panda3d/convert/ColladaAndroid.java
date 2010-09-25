@@ -918,14 +918,15 @@ public class ColladaAndroid {
 			}
 			
 			remap.put(id, nextIndex);
+			indicesRemap.add(nextIndex);
 			nextIndex++;
 			
 			int index;
 			if(position != null){
 				index = indices.get(i*count+inputs.mPositionOffset)*3;
-				positionRemap.add(position[index]);
-				positionRemap.add(position[index+1]);
-				positionRemap.add(position[index+2]);
+				positionRemap.add(position[index]*this.mScale);
+				positionRemap.add(position[index+1]*this.mScale);
+				positionRemap.add(position[index+2]*this.mScale);
 			}
 			if(normal != null){
 				index = indices.get(i*count+inputs.mNormalOffset)*3;
@@ -936,7 +937,7 @@ public class ColladaAndroid {
 			if(texcoord != null){
 				index = indices.get(i*count+inputs.mTexcoordOffset)*2;
 				texcoordRemap.add(texcoord[index]);
-				texcoordRemap.add(texcoord[index+1]);
+				texcoordRemap.add(1-texcoord[index+1]);
 			}
 			if(color != null){
 				index = indices.get(i*count+inputs.mColorOffset)*4;
@@ -979,24 +980,15 @@ public class ColladaAndroid {
 		vb.resetBufferPosition();
 		
 		IndexBuffer ib = mesh.getIndexBuffer();
-		for(int i = 0; i < indicesRemap.size(); i++){
-			ib.addTriangle(indicesRemap.get(i++),
-						   indicesRemap.get(i++),
-						   indicesRemap.get(i++));
+		for(int i = 0; i < indicesRemap.size(); i+=3){
+			ib.addTriangle(indicesRemap.get(i),
+						   indicesRemap.get(i+1),
+						   indicesRemap.get(i+2));
 		}
 		ib.resetBufferPosition();
 		
 		this.mPrimitives.put(name, mesh);
 		
-	}
-	
-	private void parseP(Vector<Integer> indices, NameId parentId) throws Exception{
-		while(this.moveToChildNode(NameId.p, parentId)){
-			String[] values = this.parseStringArray(NameId.p);
-			for(int i = 0; i < values.length; i++){
-				indices.add(Integer.parseInt(values[i]));
-			}
-		}
 	}
 	
 	private class Inputs{
@@ -1123,7 +1115,7 @@ public class ColladaAndroid {
 				if(texture != null){
 					int lastIndex = texture.lastIndexOf('/');
 					if(lastIndex != -1){
-						texture = texture.substring(lastIndex);
+						texture = texture.substring(lastIndex+1);
 					}
 					this.mTextureNames.put(id, texture);
 				}
