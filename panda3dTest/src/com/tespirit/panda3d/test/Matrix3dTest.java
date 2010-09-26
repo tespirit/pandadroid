@@ -43,20 +43,21 @@ public class Matrix3dTest extends TestCase{
 	
 	public void testScale() {
 		Matrix3d m = new Matrix3d();
-		Matrix3d m2 = new Matrix3d(2.0f, 0.0f, 0.0f, 0.0f,
-								   0.0f, 2.0f, 0.0f, 0.0f,
-								   0.0f, 0.0f, 2.0f, 0.0f);
-		m.scale(2.0f);
+		Matrix3d m2 = new Matrix3d(2, 0, 0,
+								   0, 2, 0,
+								   0, 0, 2,
+								   0, 0, 0);
+		m.scale(2);
 		
 		Assert.assertTrue(m.equals(m2));
 		
 		m.scale(0.5f);
 		
-		m.scale(new Vector3d(3.0f, 4.0f, 5.0f));
+		m.scale(new Vector3d(3, 4, 5));
 		
-		m2.setValue(3.0f, 0, 0);
-		m2.setValue(4.0f, 1, 1);
-		m2.setValue(5.0f, 2, 2);
+		m2.setValue(3, 0, 0);
+		m2.setValue(4, 1, 1);
+		m2.setValue(5, 2, 2);
 		
 		Assert.assertTrue(m.equals(m2));
 	}
@@ -65,21 +66,21 @@ public class Matrix3dTest extends TestCase{
 		Matrix3d m = new Matrix3d();
 		Matrix3d m2 = new Matrix3d();
 		
-		Vector3d v = new Vector3d(2.0f, 3.0f, 4.0f);
+		Vector3d v = new Vector3d(2, 3, 4);
 		
 		m.translate(v);
 		
-		m2.setValue(2.0f, 3,0);
-		m2.setValue(3.0f, 3,1);
-		m2.setValue(4.0f, 3,2);
+		m2.setValue(2, 3, 0);
+		m2.setValue(3, 3, 1);
+		m2.setValue(4, 3, 2);
 		
 		Assert.assertTrue(m.equals(m2));
 		
-		m.translate(1.0f, 2.0f, 3.0f);
+		m.translate(1, 2, 3);
 		
-		m2.setValue(3.0f, 3,0);
-		m2.setValue(5.0f, 3,1);
-		m2.setValue(7.0f, 3,2);
+		m2.setValue(3, 3, 0);
+		m2.setValue(5, 3, 1);
+		m2.setValue(7, 3, 2);
 
 		Assert.assertTrue(m.equals(m2));
 	}
@@ -91,6 +92,8 @@ public class Matrix3dTest extends TestCase{
 	}
 
 	public void testMultiply(){
+		float[] buffer = Matrix3d.createBuffer(3);
+		float[] buffer2 = Matrix3d.createBuffer(5);
 		Matrix3d m = new Matrix3d();
 		Matrix3d i = Matrix3d.IDENTITY;
 		
@@ -98,9 +101,10 @@ public class Matrix3dTest extends TestCase{
 		m.multiply(i, i);
 		Assert.assertTrue(m.equals(i));
 		
-		m = new Matrix3d(2.0f, 2.0f, 2.0f, 2.0f,
-						 2.0f, 2.0f, 2.0f, 2.0f,
-						 2.0f, 2.0f, 2.0f, 2.0f);
+		m = new Matrix3d(2, 2, 2, 
+						 2, 2, 2, 
+						 2, 2, 2, 
+						 2, 2, 2);
 		
 		Matrix3d c = m.clone();
 		
@@ -115,22 +119,55 @@ public class Matrix3dTest extends TestCase{
 		 * 0 0 0 1		0 0 0 1		0 0 0 1
 		 */
 		
-		c = new Matrix3d(1.0f, 2.0f, 3.0f, 1.0f,
-		 		 		 0.0f, 1.0f, 2.0f, 2.0f,
-		 		 		 3.0f, 0.0f, 1.0f, 3.0f);
+		c = new Matrix3d(1, 0, 3, 
+						 2, 1, 0, 
+						 3, 2, 1, 
+						 1, 2, 3);
 		
+		Matrix3d cb = new Matrix3d(buffer);
+		Matrix3d cb2 = new Matrix3d(buffer2, Matrix3d.SIZE*2);
+		cb.copy(c);
+		cb2.copy(c);
 		
-		m = new Matrix3d(1.0f, 0.0f, 2.0f, 1.0f,
-				 		 2.0f, 1.0f, 0.0f, 2.0f,
-				 		 0.0f, 2.0f, 1.0f, 3.0f);
+		m = new Matrix3d(1, 2, 0,
+						 0, 1, 2,
+						 2, 0, 1,
+						 1, 2, 3);
 		
-		Matrix3d r = new Matrix3d(5.0f, 8.0f, 5.0f, 15.0f,
-		 		 				  2.0f, 5.0f, 2.0f, 10.0f,
-		 		 				  3.0f, 2.0f, 7.0f, 9.0f);
+		Matrix3d mb = new Matrix3d(buffer, Matrix3d.SIZE);
+		Matrix3d mb2 = new Matrix3d(buffer2, Matrix3d.SIZE);
+		mb.copy(m);
+		mb2.copy(m);
+		
+		Matrix3d r = new Matrix3d(5, 2, 3,
+								  8, 5, 2,
+								  5, 2, 7,
+								  15, 10, 9);
+		
+		Matrix3d rb = new Matrix3d(buffer, Matrix3d.SIZE*2);
+		Matrix3d rb2 = new Matrix3d(buffer2, Matrix3d.SIZE*3);
+		rb.copy(r);
+		rb2.copy(r);
+		
+		Matrix3d t = new Matrix3d();
+		t.multiply(c,m);
+		Assert.assertTrue(t.equals(r));
+		
+		Matrix3d tb2 = new Matrix3d(buffer2, Matrix3d.SIZE*4);
+		tb2.multiply(cb2, mb2);
+		Assert.assertTrue(t.equals(rb2));
 		
 		m.multiply(c);
 		
 		Assert.assertTrue(m.equals(r));
+		
+		mb.multiply(cb);
+		mb2.multiply(cb2);
+		
+		Assert.assertTrue(mb.equals(rb));
+		Assert.assertTrue(mb2.equals(rb2));
+		
+		
 	
 		/*
 		 * 1 0 2 1		1 2 3 1		7 2 5 8
@@ -138,17 +175,35 @@ public class Matrix3dTest extends TestCase{
 		 * 0 2 1 3		3 0 1 3		3 2 5 10
 		 * 0 0 0 1		0 0 0 1		0 0 0 1
 		 */
-		m = new Matrix3d(1.0f, 0.0f, 2.0f, 1.0f,
-		 		 		 2.0f, 1.0f, 0.0f, 2.0f,
-		 		 		 0.0f, 2.0f, 1.0f, 3.0f);
-
-		r = new Matrix3d(7.0f, 2.0f, 5.0f, 8.0f,
-		  		 		 2.0f, 5.0f, 8.0f, 6.0f,
-		  		 		 3.0f, 2.0f, 5.0f, 10.0f);
+		m = new Matrix3d(1, 2, 0,
+						 0, 1, 2,
+						 2, 0, 1,
+						 1, 2, 3);
+		
+		mb.copy(m);
+		mb2.copy(m);
+		
+		r = new Matrix3d(7, 2, 3,
+						 2, 5, 2,
+						 5, 8, 5,
+						 8, 6, 10);
+		
+		rb.copy(r);
+		rb2.copy(r);
+		
+		t.multiply(m,c);
+		Assert.assertTrue(t.equals(r));
+		tb2.multiply(cb2, mb2);
+		Assert.assertTrue(t.equals(rb2));
+		
 
 		c.multiply(m);
 
 		Assert.assertTrue(c.equals(r));
+		
+		cb.multiply(mb);
+		cb2.multiply(mb2);
+		Assert.assertTrue(cb.equals(rb));
 	}
 	
 	public void testInvert(){

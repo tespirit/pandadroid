@@ -21,8 +21,6 @@ public class Matrix3d {
 			buffer[index+1] = 1.0f;
 			index+=Matrix3d.SIZEROW;
 			buffer[index+2] = 1.0f;
-			index+=Matrix3d.SIZEROW;
-			buffer[index+3] = 1.0f;
 		}
 		return buffer;
 	}
@@ -39,8 +37,7 @@ public class Matrix3d {
 	 * creates a matrix with its own float buffer.
 	 */
 	public Matrix3d(){
-		this(new float[Matrix3d.SIZE44]);
-		Matrix.setIdentityM(this.m, this.offset);
+		this(Matrix3d.createBuffer(1));
 	}
 	
 	/**
@@ -58,65 +55,25 @@ public class Matrix3d {
 	public Matrix3d(float[] values, int offset){
 		this.m = values;
 		this.offset = offset;
-		this.xAxis = new Vector3d(this.m);
-		this.yAxis = new Vector3d(this.m, Vector3d.SIZE);
-		this.zAxis = new Vector3d(this.m, Vector3d.SIZE*2);
-		this.translation = new Vector3d(this.m, Vector3d.SIZE*3);
+		this.xAxis = new Vector3d(this.m, offset);
+		this.xAxis.makeDirectional();
+		this.yAxis = new Vector3d(this.m, offset+Vector3d.SIZE);
+		this.yAxis.makeDirectional();
+		this.zAxis = new Vector3d(this.m, offset+Vector3d.SIZE*2);
+		this.zAxis.makeDirectional();
+		this.translation = new Vector3d(this.m, offset+Vector3d.SIZE*3);
+		this.translation.makePositional();
 	}
 	
-	public Matrix3d(float a1, float a2, float a3, float a4, 
-					float b1, float b2, float b3, float b4, 
-					float c1, float c2, float c3, float c4){
+	public Matrix3d(float a1, float a2, float a3, 
+					float b1, float b2, float b3, 
+					float c1, float c2, float c3,
+					float d1, float d2, float d3){
 		this(new float[Matrix3d.SIZE44]);
-		
-		this.m[0] = a1;
-		this.m[1] = b1;
-		this.m[2] = c1;
-		this.m[3] = 0;
-		
-		this.m[4] = a2;
-		this.m[5] = b2;
-		this.m[6] = c2;
-		this.m[7] = 0;
-		
-		this.m[8] = a3;
-		this.m[9] = b3;
-		this.m[10] = c3;
-		this.m[11] = 0;
-		
-		this.m[12] = a4;
-		this.m[13] = b4;
-		this.m[14] = c4;
-		this.m[15] = 1;
-		
-		
-	}
-	
-	public Matrix3d(float a1, float a2, float a3, float a4, 
-					float b1, float b2, float b3, float b4, 
-					float c1, float c2, float c3, float c4, 
-					float d1, float d2, float d3, float d4){
-		this(new float[Matrix3d.SIZE44]);
-		
-		this.m[0] = a1;
-		this.m[1] = b1;
-		this.m[2] = c1;
-		this.m[3] = d1;
-		
-		this.m[4] = a2;
-		this.m[5] = b2;
-		this.m[6] = c2;
-		this.m[7] = d2;
-		
-		this.m[8] = a3;
-		this.m[9] = b3;
-		this.m[10] = c3;
-		this.m[11] = d3;
-		
-		this.m[12] = a4;
-		this.m[13] = b4;
-		this.m[14] = c4;
-		this.m[15] = d4;
+		this.xAxis.set(a1, a2, a3);
+		this.yAxis.set(b1, b2, b3);
+		this.zAxis.set(c1, c2, c3);
+		this.translation.set(d1, d2, d3);
 	}
 	
 	public Vector3d getXAxis(){
@@ -177,9 +134,10 @@ public class Matrix3d {
 	 * @param m
 	 */
 	public void copy(Matrix3d m){
-		for(int i = 0; i < Matrix3d.SIZE44; i++){
-			this.m[i + this.offset] = m.m[i+m.offset];
-		}
+		this.xAxis.copy(m.xAxis);
+		this.yAxis.copy(m.yAxis);
+		this.zAxis.copy(m.zAxis);
+		this.translation.copy(m.translation);
 	}
 	
 	/**
@@ -331,9 +289,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d multiply(Matrix3d m){
-		Matrix3d m2 = this.clone();
-		Matrix.multiplyMM(this.m, this.offset, m.m, m.offset, m2.m, m2.offset);
-		return this;
+		return this.multiply(m, this);
 	}
 	
 	/**
@@ -343,7 +299,61 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d multiply(Matrix3d m1, Matrix3d m2){
-		Matrix.multiplyMM(this.m, this.offset, m1.m, m1.offset, m2.m, m2.offset);
+		float a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3;
+		
+		a1 = m2.getValue(0, 0) * m1.getValue(0,0) +
+			 m2.getValue(0, 1) * m1.getValue(1,0) +
+			 m2.getValue(0, 2) * m1.getValue(2,0);
+		
+		a2 = m2.getValue(0, 0) * m1.getValue(0,1) +
+		 	 m2.getValue(0, 1) * m1.getValue(1,1) +
+		 	 m2.getValue(0, 2) * m1.getValue(2,1);
+		
+		a3 = m2.getValue(0, 0) * m1.getValue(0,2) +
+		 	 m2.getValue(0, 1) * m1.getValue(1,2) +
+		 	 m2.getValue(0, 2) * m1.getValue(2,2);
+		
+		b1 = m2.getValue(1, 0) * m1.getValue(0,0) +
+		 	 m2.getValue(1, 1) * m1.getValue(1,0) +
+		 	 m2.getValue(1, 2) * m1.getValue(2,0);
+	
+		b2 = m2.getValue(1, 0) * m1.getValue(0,1) +
+	 	 	 m2.getValue(1, 1) * m1.getValue(1,1) +
+	 	 	 m2.getValue(1, 2) * m1.getValue(2,1);
+	
+		b3 = m2.getValue(1, 0) * m1.getValue(0,2) +
+	 	 	 m2.getValue(1, 1) * m1.getValue(1,2) +
+	 	 	 m2.getValue(1, 2) * m1.getValue(2,2);
+		
+		c1 = m2.getValue(2, 0) * m1.getValue(0,0) +
+	 	 	 m2.getValue(2, 1) * m1.getValue(1,0) +
+	 	 	 m2.getValue(2, 2) * m1.getValue(2,0);
+
+		c2 = m2.getValue(2, 0) * m1.getValue(0,1) +
+		 	 m2.getValue(2, 1) * m1.getValue(1,1) +
+		 	 m2.getValue(2, 2) * m1.getValue(2,1);
+	
+		c3 = m2.getValue(2, 0) * m1.getValue(0,2) +
+		 	 m2.getValue(2, 1) * m1.getValue(1,2) +
+		 	 m2.getValue(2, 2) * m1.getValue(2,2);
+	
+		d1 = m2.getValue(3, 0) * m1.getValue(0,0) +
+		 	 m2.getValue(3, 1) * m1.getValue(1,0) +
+		 	 m2.getValue(3, 2) * m1.getValue(2,0) + m1.getValue(3, 0);
+	
+		d2 = m2.getValue(3, 0) * m1.getValue(0,1) +
+		 	 m2.getValue(3, 1) * m1.getValue(1,1) +
+		 	 m2.getValue(3, 2) * m1.getValue(2,1) + m1.getValue(3, 1);
+	
+		d3 = m2.getValue(3, 0) * m1.getValue(0,2) +
+		 	 m2.getValue(3, 1) * m1.getValue(1,2) +
+		 	 m2.getValue(3, 2) * m1.getValue(2,2) + m1.getValue(3, 2);
+		
+		this.xAxis.set(a1, a2, a3);
+		this.yAxis.set(b1, b2, b3);
+		this.zAxis.set(c1, c2, c3);
+		this.translation.set(d1, d2, d3);
+
 		return this;
 	}
 	
