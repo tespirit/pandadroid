@@ -1,7 +1,5 @@
 package com.tespirit.panda3d.vectors;
 
-import android.opengl.Matrix;
-
 public class Matrix3d {
 	
 	private float[] m;
@@ -262,7 +260,9 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d rotateEuler(float x, float y, float z){
-		Matrix.setRotateEulerM (this.m, this.offset, x, y, z);
+		this.rotateX(x);
+		this.rotateY(y);
+		this.rotateZ(z);
 		return this;
 	}
 	
@@ -283,7 +283,63 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d rotateAxis(float t, float x, float y, float z){
-		Matrix.rotateM(this.m, this.offset, t, x, y, z);
+		float ta1, ta2, ta3, tb1, tb2, tb3, tc1, tc2, tc3;
+		
+		//compute 3x3 matrix
+		float cosT = (float)Math.cos(Math.toRadians(t));
+		float sinT = (float)Math.sin(Math.toRadians(t));
+		float flipCosT = 1.0f-cosT;
+		
+		ta1 = flipCosT*x*x+cosT;
+		ta2 = flipCosT*x*y+sinT*z;
+		ta3 = flipCosT*x*z-sinT*y;
+		
+		tb1 = flipCosT*x*y-sinT*z;
+		tb2 = flipCosT*y*y+cosT;
+		tb3 = flipCosT*y*z+sinT*x;
+
+		tc1 = flipCosT*x*z+sinT*y;
+		tc2 = flipCosT*y*z-sinT*x;
+		tc3 = flipCosT*z*z+cosT;
+		
+		float a1, a2, a3, b1, b2, b3, c1, c2, c3;
+		
+		//push 3x3 matrix onto this 3x3 matrix.
+		a1 = this.xAxis.getX()*ta1 + 
+			 this.xAxis.getY()*tb1 +
+			 this.xAxis.getZ()*tc1;
+		a2 = this.xAxis.getX()*ta2 + 
+		 	 this.xAxis.getY()*tb2 +
+		 	 this.xAxis.getZ()*tc2;
+		a3 = this.xAxis.getX()*ta3 + 
+	 	 	 this.xAxis.getY()*tb3 +
+	 	 	 this.xAxis.getZ()*tc3;
+		
+		b1 = this.yAxis.getX()*ta1 + 
+			 this.yAxis.getY()*tb1 +
+			 this.yAxis.getZ()*tc1;
+		b2 = this.yAxis.getX()*ta2 + 
+		 	 this.yAxis.getY()*tb2 +
+		 	 this.yAxis.getZ()*tc2;
+		b3 = this.yAxis.getX()*ta3 + 
+		 	 this.yAxis.getY()*tb3 +
+		 	 this.yAxis.getZ()*tc3;
+		
+		c1 = this.zAxis.getX()*ta1 + 
+			 this.zAxis.getY()*tb1 +
+			 this.zAxis.getZ()*tc1;
+		c2 = this.zAxis.getX()*ta2 + 
+		 	 this.zAxis.getY()*tb2 +
+		 	 this.zAxis.getZ()*tc2;
+		c3 = this.zAxis.getX()*ta3 + 
+		 	 this.zAxis.getY()*tb3 +
+		 	 this.zAxis.getZ()*tc3;
+		
+		this.xAxis.set(a1, a2, a3);
+		this.yAxis.set(b1, b2, b3);
+		this.zAxis.set(c1, c2, c3);
+		
+		//Matrix.rotateM(this.m, this.offset, t, x, y, z);
 		return this;
 	}
 	
