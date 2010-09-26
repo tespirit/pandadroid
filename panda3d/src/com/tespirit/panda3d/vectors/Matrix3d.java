@@ -239,9 +239,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d scale(float s){
-		Matrix.scaleM(this.m, this.offset, s, s, s);
-		
-		return this;
+		return this.scale(s, s, s);
 	}
 	
 	/**
@@ -252,15 +250,17 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d scale(float x, float y, float z){
-		Matrix.scaleM(this.m, this.offset, x, y, z);
+		this.m[this.offset] *= x;
+		this.m[this.offset+5] *= y;
+		this.m[this.offset+10] += z;
+		
+//		Matrix.scaleM(this.m, this.offset, x, y, z);
 		
 		return this;
 	}
 	
 	public Matrix3d scale(Vector3d v){
-		Matrix.scaleM(this.m, this.offset, v.getX(), v.getY(), v.getZ());
-		
-		return this;
+		return this.scale(v.getX(), v.getY(), v.getZ());
 	}
 	
 	public Matrix3d rotateEuler(float x, float y, float z){
