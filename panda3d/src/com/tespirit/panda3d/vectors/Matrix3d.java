@@ -147,6 +147,7 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d invert(Matrix3d m){
+		//TODO: Optimize by using direct matrix access.
 		float subDetX, subDetY, subDetZ;
 		subDetX = m.yAxis.getY()*m.zAxis.getZ() - m.yAxis.getZ()*m.zAxis.getY();
 		subDetY = m.yAxis.getX()*m.zAxis.getZ() - m.yAxis.getZ()*m.zAxis.getX();
@@ -203,6 +204,8 @@ public class Matrix3d {
 	
 	public Matrix3d transpose(Matrix3d m){
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3;
+		
+		//TODO: Optimize by using direct matrix access.
 		
 		a1 = m.xAxis.getX();
 		a2 = m.yAxis.getX();
@@ -305,6 +308,7 @@ public class Matrix3d {
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3;
 		
 		//push 3x3 matrix onto this 3x3 matrix.
+		//TODO: Optimize by using direct matrix access.
 		a1 = this.xAxis.getX()*ta1 + 
 			 this.xAxis.getY()*tb1 +
 			 this.xAxis.getZ()*tc1;
@@ -375,7 +379,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Vector3d transform(Vector3d vin, Vector3d vout){
-
+		//TODO: Optimize by using direct matrix access.
 		float x = vin.getX()*this.xAxis.getX() + 
 				  vin.getY()*this.yAxis.getX() + 
 				  vin.getZ()*this.zAxis.getX() + 
@@ -412,6 +416,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d multiply(Matrix3d m1, Matrix3d m2){
+		//TODO: Optimize by using direct matrix access.
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3;
 		
 		a1 = m2.getValue(0, 0) * m1.getValue(0,0) +
