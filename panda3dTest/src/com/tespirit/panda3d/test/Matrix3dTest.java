@@ -70,17 +70,13 @@ public class Matrix3dTest extends TestCase{
 		
 		m.translate(v);
 		
-		m2.setValue(2, 3, 0);
-		m2.setValue(3, 3, 1);
-		m2.setValue(4, 3, 2);
+		m2.getTranslation().set(2, 3, 4);
 		
 		Assert.assertTrue(m.equals(m2));
 		
 		m.translate(1, 2, 3);
 		
-		m2.setValue(3, 3, 0);
-		m2.setValue(5, 3, 1);
-		m2.setValue(7, 3, 2);
+		m2.getTranslation().set(3, 5, 7);
 
 		Assert.assertTrue(m.equals(m2));
 	}

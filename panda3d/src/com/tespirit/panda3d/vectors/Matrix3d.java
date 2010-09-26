@@ -252,9 +252,7 @@ public class Matrix3d {
 	public Matrix3d scale(float x, float y, float z){
 		this.m[this.offset] *= x;
 		this.m[this.offset+5] *= y;
-		this.m[this.offset+10] += z;
-		
-//		Matrix.scaleM(this.m, this.offset, x, y, z);
+		this.m[this.offset+10] *= z;
 		
 		return this;
 	}
@@ -269,23 +267,19 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d rotateEuler(Vector3d v){
-		Matrix.setRotateEulerM (this.m, this.offset, v.getX(), v.getY(), v.getZ());
-		return this;
+		return this.rotateEuler(v.getX(), v.getY(), v.getZ());
 	}
 	
 	public Matrix3d rotateX(float t){
-		Matrix.rotateM(this.m, this.offset, t, 1, 0, 0);
-		return this;
+		return this.rotateAxis(t, 1, 0, 0);
 	}
 	
 	public Matrix3d rotateY(float t){
-		Matrix.rotateM(this.m, this.offset, t, 0, 1, 0);
-		return this;
+		return this.rotateAxis(t, 0, 1, 0);
 	}
 	
 	public Matrix3d rotateZ(float t){
-		Matrix.rotateM(this.m, this.offset, t, 0, 0, 1);
-		return this;
+		return this.rotateAxis(t, 0, 0, 1);
 	}
 	
 	public Matrix3d rotateAxis(float t, float x, float y, float z){
@@ -294,18 +288,18 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d rotateAxis(float t, Vector3d v){
-		Matrix.rotateM(this.m, this.offset, t, v.getX(), v.getY(), v.getZ());
-		return this;
+		return this.rotateAxis(t, v.getX(), v.getY(), v.getZ());
 	}
 	
 	public Matrix3d translate(float x, float y, float z){
-		Matrix.translateM(this.m, this.offset, x, y, z);
+		this.m[this.offset+12] += x;
+		this.m[this.offset+13] += y;
+		this.m[this.offset+14] += z;
 		return this;
 	}
 	
 	public Matrix3d translate(Vector3d v){
-		Matrix.translateM(this.m, this.offset, v.getX(), v.getY(), v.getZ());
-		return this;
+		return this.translate(v.getX(), v.getY(), v.getZ());
 	}
 	
 	/**
