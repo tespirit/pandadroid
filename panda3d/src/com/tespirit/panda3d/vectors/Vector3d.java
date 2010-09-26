@@ -76,6 +76,10 @@ public class Vector3d {
 		return this.v[this.offset+2];
 	}
 	
+	public float getPositional(){
+		return this.v[this.offset+3];
+	}
+	
 	public void setX(float x){
 		this.v[this.offset] = x;
 	}

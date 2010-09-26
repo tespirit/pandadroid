@@ -309,9 +309,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Vector3d transform(Vector3d v){
-		Vector3d vin = v.clone();
-		Matrix.multiplyMV(v.getBuffer(), v.getBufferOffset(), this.m, this.offset, vin.getBuffer(), vin.getBufferOffset());
-		return v;
+		return this.transform(v, v);
 	}
 	
 	/**
@@ -321,7 +319,24 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Vector3d transform(Vector3d vin, Vector3d vout){
-		Matrix.multiplyMV(vout.getBuffer(), vout.getBufferOffset(), this.m, this.offset, vin.getBuffer(), vin.getBufferOffset());
+
+		float x = vin.getX()*this.xAxis.getX() + 
+				  vin.getY()*this.yAxis.getX() + 
+				  vin.getZ()*this.zAxis.getX() + 
+				  vin.getPositional()*this.translation.getX();
+
+		float y = vin.getX()*this.xAxis.getY() + 
+		 		  vin.getY()*this.yAxis.getY() + 
+		 		  vin.getZ()*this.zAxis.getY() + 
+		 		  vin.getPositional()*this.translation.getY();
+
+		float z = vin.getX()*this.xAxis.getZ() + 
+		 		  vin.getY()*this.yAxis.getZ() + 
+		 		  vin.getZ()*this.zAxis.getZ() + 
+		 		  vin.getPositional()*this.translation.getZ();
+		
+		vout.set(x, y, z);
+		
 		return vout;
 	}
 	
