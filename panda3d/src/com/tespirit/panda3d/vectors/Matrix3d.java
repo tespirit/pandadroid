@@ -145,22 +145,84 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d invert(){
-		float[] temp = new float[Matrix3d.SIZE44];
-		if(Matrix.invertM(temp, 0, this.m, 0)){
-			this.m = temp;
-			this.offset = 0;
-			return this;
-		} else {
-			return null;
-		}
+		return invert(this);
 	}
 	
 	public Matrix3d invert(Matrix3d m){
-		if(Matrix.invertM(this.m, this.offset, m.m, m.offset)){
-			return this;
-		} else {
-			return null;
-		}
+		float subDetX, subDetY, subDetZ;
+		subDetX = m.yAxis.getY()*m.zAxis.getZ() - m.yAxis.getZ()*m.zAxis.getY();
+		subDetY = m.yAxis.getX()*m.zAxis.getZ() - m.yAxis.getZ()*m.zAxis.getX();
+		subDetZ = m.yAxis.getX()*m.zAxis.getY() - m.yAxis.getY()*m.zAxis.getX();
+		
+		float det = 1/(m.xAxis.getX()*subDetX - 
+					   m.xAxis.getY()*subDetY + 
+					   m.xAxis.getZ()*subDetZ);
+		
+		float a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2 ,d3;
+		
+		a1 = subDetX*det;
+		b1 = -subDetY*det;
+		c1 = subDetZ*det;
+		d1 = -m.translation.getX()*a1 - m.translation.getY()*b1 - m.translation.getZ()*c1;
+		
+		subDetX = m.xAxis.getY()*m.zAxis.getZ() - m.xAxis.getZ()*m.zAxis.getY();
+		subDetY = m.xAxis.getX()*m.zAxis.getZ() - m.xAxis.getZ()*m.zAxis.getX();
+		subDetZ = m.xAxis.getX()*m.zAxis.getY() - m.xAxis.getY()*m.zAxis.getX();
+		
+		a2 = -subDetX*det;
+		b2 = subDetY*det;
+		c2 = -subDetZ*det;
+		d2 = -m.translation.getX()*a2 - m.translation.getY()*b2 - m.translation.getZ()*c2;
+
+		subDetX = m.xAxis.getY()*m.yAxis.getZ() - m.xAxis.getZ()*m.yAxis.getY();
+		subDetY = m.xAxis.getX()*m.yAxis.getZ() - m.xAxis.getZ()*m.yAxis.getX();
+		subDetZ = m.xAxis.getX()*m.yAxis.getY() - m.xAxis.getY()*m.yAxis.getX();
+		
+		a3 = subDetX*det;
+		b3 = -subDetY*det;
+		c3 = subDetZ*det;
+		d3 = -m.translation.getX()*a3 - m.translation.getY()*b3 - m.translation.getZ()*c3;
+		
+		this.xAxis.set(a1, a2, a3);
+		this.yAxis.set(b1, b2, b3);
+		this.zAxis.set(c1, c2, c3);
+		this.translation.set(d1, d2, d3);
+		
+		return this;
+	}
+	
+	public Matrix3d fastInverse(){
+		return this.fastInverse(this);
+	}
+	
+	public Matrix3d fastInverse(Matrix3d m){
+		this.translation.set(-m.translation.dot(m.xAxis), 
+				 			 -m.translation.dot(m.yAxis), 
+				 			 -m.translation.dot(m.zAxis));
+		this.transpose(m);
+		return this;
+	}
+	
+	public Matrix3d transpose(Matrix3d m){
+		float a1, a2, a3, b1, b2, b3, c1, c2, c3;
+		
+		a1 = m.xAxis.getX();
+		a2 = m.yAxis.getX();
+		a3 = m.zAxis.getX();
+		
+		b1 = m.xAxis.getY();
+		b2 = m.yAxis.getY();
+		b3 = m.zAxis.getZ();
+		
+		c1 = m.xAxis.getZ();
+		c2 = m.yAxis.getZ();
+		c3 = m.zAxis.getZ();
+		
+		this.xAxis.set(a1, a2, a3);
+		this.yAxis.set(b1, b2, b3);
+		this.zAxis.set(c1, c2, c3);
+
+		return this;
 	}
 	
 	/**
@@ -168,21 +230,7 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d transpose(){
-		float temp;
-		
-		temp = this.m[1];
-		this.m[this.offset+1] = this.m[this.offset+4];
-		this.m[this.offset+4] = temp;
-		
-		temp = this.m[2];
-		this.m[this.offset+2] = this.m[this.offset+12];
-		this.m[this.offset+12] = temp;
-		
-		temp = this.m[6];
-		this.m[this.offset+6] = this.m[this.offset+13];
-		this.m[this.offset+13] = temp;
-		
-		return this;
+		return this.transpose(this);
 	}
 	
 	/**
@@ -358,23 +406,17 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d identity(){
-		Matrix.setIdentityM(this.m, this.offset);
+		this.xAxis.set(1, 0, 0);
+		this.yAxis.set(0, 1, 0);
+		this.zAxis.set(0, 0, 1);
+		this.translation.set(0, 0, 0);
 		return this;
 	}
 	
 	public Matrix3d identity3x3(){
-		this.m[this.offset+0] = 1;
-		this.m[this.offset+1] = 0;
-		this.m[this.offset+2] = 0;
-		
-		this.m[this.offset+4] = 0;
-		this.m[this.offset+5] = 1;
-		this.m[this.offset+6] = 0;
-		
-		this.m[this.offset+8] = 0;
-		this.m[this.offset+9] = 0;
-		this.m[this.offset+10] = 1;
-		
+		this.xAxis.set(1, 0, 0);
+		this.yAxis.set(0, 1, 0);
+		this.zAxis.set(0, 0, 1);
 		return this;
 	}
 	
