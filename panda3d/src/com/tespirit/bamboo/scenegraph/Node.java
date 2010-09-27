@@ -2,11 +2,16 @@ package com.tespirit.bamboo.scenegraph;
 
 import com.tespirit.bamboo.vectors.*;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public abstract class Node {
+public abstract class Node implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3573004398153804039L;
 	private String name;
 	private int uid;
 		

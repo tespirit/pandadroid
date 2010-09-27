@@ -4,6 +4,10 @@ import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
 public class TriangleList extends Primitive{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8960016570515255553L;
 	protected VertexBuffer vertexBuffer;
 	
 	public TriangleList(int vertexCount, int[] vertexTypes){

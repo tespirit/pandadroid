@@ -14,6 +14,10 @@ import com.tespirit.bamboo.render.ComponentRenderer;
  *
  */
 public class Material extends Surface{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1905762349360182602L;
 	private FloatBuffer ambient;
 	private FloatBuffer diffuse;
 	private FloatBuffer specular;

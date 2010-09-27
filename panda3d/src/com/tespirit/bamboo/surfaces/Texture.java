@@ -1,9 +1,15 @@
 package com.tespirit.bamboo.surfaces;
 
+
 import com.tespirit.bamboo.render.ComponentRenderer;
 
 public class Texture extends Surface{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1229859858483360355L;
+
 	private String diffuseTextureName;
 	
 	private int diffuseTextureId;

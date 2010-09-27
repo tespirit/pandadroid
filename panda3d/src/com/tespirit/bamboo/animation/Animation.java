@@ -1,12 +1,17 @@
 package com.tespirit.bamboo.animation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.tespirit.bamboo.render.TimeUpdate;
 
 import android.os.SystemClock;
 
-public class Animation implements TimeUpdate{
+public class Animation implements TimeUpdate, Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2061900709721915476L;
 	ArrayList<Channel> channels;
 	DofStream dofs;
 	long time;

@@ -1,5 +1,6 @@
 package com.tespirit.bamboo.primitives;
 
+
 import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
@@ -8,7 +9,11 @@ import com.tespirit.bamboo.vectors.AxisAlignedBox;
  * @author Todd Espiritu Santo
  *
  */
-public class TriangleIndices extends Primitive {
+public class TriangleIndices extends Primitive{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1986380555935180298L;
 	protected VertexBuffer vertexBuffer;
 	protected IndexBuffer indexBuffer;
 	

@@ -4,6 +4,10 @@ import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
 public class LineIndices extends Primitive{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8479128314367853227L;
 	protected VertexBuffer vertexBuffer;
 	protected IndexBuffer indexBuffer;
 	

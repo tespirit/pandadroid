@@ -5,6 +5,11 @@ import com.tespirit.bamboo.vectors.Vector3d;
 
 public class Box extends TriangleIndices {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6007609877682419505L;
+
 	public Box(AxisAlignedBox box){
 		this(box.getMin(), box.getMax());
 	}

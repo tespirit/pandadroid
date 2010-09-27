@@ -1,5 +1,6 @@
 package com.tespirit.bamboo.primitives;
 
+import java.io.Serializable;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
@@ -7,7 +8,11 @@ import java.nio.ByteBuffer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class VertexBuffer {	
+public class VertexBuffer implements Serializable{	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3130281885764952649L;
 	private FloatBuffer[] buffers;
 	private int count;
 	

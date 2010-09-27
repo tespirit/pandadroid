@@ -2,6 +2,11 @@ package com.tespirit.bamboo.animation;
 
 public class JointRotate extends Joint{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8315657350959674882L;
+
 	public JointRotate(){
 		super();
 	}

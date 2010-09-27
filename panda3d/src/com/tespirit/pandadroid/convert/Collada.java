@@ -6,7 +6,7 @@ import org.xmlpull.v1.XmlPullParser;
 import com.tespirit.pandadroid.app.Assets;
 
 import android.util.Xml;
-public class Collada extends com.tespirit.bamboo.convert.Collada{
+public class Collada extends com.tespirit.bamboo.io.Collada{
 
 	/**
 	 * use this to disable normals from importing since normals are only

@@ -5,6 +5,10 @@ import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.vectors.*;
 
 public class Model extends Transform implements RenderableNode{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8513346997009224558L;
 	private Primitive primitive;
 	private Surface surface;
 	

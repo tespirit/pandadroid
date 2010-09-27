@@ -1,6 +1,12 @@
 package com.tespirit.bamboo.animation;
 
-public class DofStream {
+import java.io.Serializable;
+
+public class DofStream implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6188834596391739597L;
 	float[] dofs;
 	int position;
 	

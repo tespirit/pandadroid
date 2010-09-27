@@ -1,6 +1,12 @@
 package com.tespirit.bamboo.vectors;
 
-public class Color4 {
+import java.io.Serializable;
+
+public class Color4 implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2946437517350424868L;
 	private float[] c;
 	private int offset;
 		

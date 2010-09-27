@@ -1,12 +1,17 @@
 package com.tespirit.bamboo.primitives;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.Buffer;
 
-public class IndexBuffer {
+public class IndexBuffer implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2531725665599885532L;
 	private IntBuffer buffer32;
 	private ShortBuffer buffer16;
 	private ByteBuffer buffer8;

@@ -4,6 +4,10 @@ import com.tespirit.bamboo.vectors.*;
 
 public class LOD extends Node{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4377773630935617770L;
 	private Node[] lods;
 	private float[] maxDistances;
 	private int currentLevel;

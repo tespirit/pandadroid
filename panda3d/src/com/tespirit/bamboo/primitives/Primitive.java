@@ -1,9 +1,16 @@
 package com.tespirit.bamboo.primitives;
 
+import java.io.Serializable;
+
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
-public abstract class Primitive {
+public abstract class Primitive implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7735764148071638696L;
+
 	protected int type;
 	
 	private static int[] enumTypes = {0,1,2,3,4, 5};

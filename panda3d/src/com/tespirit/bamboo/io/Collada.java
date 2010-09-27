@@ -1,4 +1,4 @@
-package com.tespirit.bamboo.convert;
+package com.tespirit.bamboo.io;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -340,6 +340,7 @@ public class Collada {
         		this.mAnimation.addChannel(c);
         	}
         }
+        this.mParser = null;
 	}
 	
 	private Surface createSurface(String materialId){

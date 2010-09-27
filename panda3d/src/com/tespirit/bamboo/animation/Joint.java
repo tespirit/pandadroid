@@ -19,6 +19,10 @@ import com.tespirit.bamboo.vectors.*;
  */
 public abstract class Joint extends Node{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6138379270722022703L;
 	protected Matrix3d localTransform;
 	protected Matrix3d worldTransform;
 	

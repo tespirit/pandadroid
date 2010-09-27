@@ -2,6 +2,11 @@ package com.tespirit.bamboo.primitives;
 
 public class Axis extends LineList{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 567484416852582765L;
+
 	public Axis() {
 		super(6, new int[]{VertexBuffer.POSITION, VertexBuffer.COLOR});
 		

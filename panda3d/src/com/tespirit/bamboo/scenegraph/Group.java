@@ -4,8 +4,13 @@ import java.util.*;
 
 import com.tespirit.bamboo.vectors.*;
 
-public class Group extends Transform {
+public class Group extends Transform{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8461771187366964690L;
+
 	private ArrayList<Node> children;
 	
 	private AxisAlignedBox boundingBox;

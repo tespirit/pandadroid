@@ -1,8 +1,13 @@
 package com.tespirit.bamboo.animation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Channel {
+public class Channel implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2281752068919363207L;
 	private ArrayList<KeyFrame> keys;
 	long lastTime;
 	int lastFrame;

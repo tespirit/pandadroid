@@ -1,5 +1,6 @@
 package com.tespirit.bamboo.surfaces;
 
+
 import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.Color4;
 
@@ -10,6 +11,10 @@ import com.tespirit.bamboo.vectors.Color4;
  */
 public class Color extends Surface{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4142008556798689478L;
 	Color4 color;
 	
 	public Color(){

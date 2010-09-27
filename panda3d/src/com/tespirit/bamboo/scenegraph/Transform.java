@@ -3,6 +3,10 @@ package com.tespirit.bamboo.scenegraph;
 import com.tespirit.bamboo.vectors.Matrix3d;
 
 public abstract class Transform extends Node{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -478622756118787843L;
 	protected Matrix3d transform;
 	protected Matrix3d worldTransform;
 	

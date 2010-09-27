@@ -1,7 +1,13 @@
 package com.tespirit.bamboo.vectors;
 
-public class Matrix3d {
+import java.io.Serializable;
+
+public class Matrix3d implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7691525818206944830L;
 	private float[] m;
 	private int offset;
 	
