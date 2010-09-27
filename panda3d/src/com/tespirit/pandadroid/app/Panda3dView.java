@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.app;
+package com.tespirit.pandadroid.app;
 
 import com.tespirit.bamboo.controllers.AccelerationController3d;
 import com.tespirit.bamboo.controllers.Controller2d;
@@ -9,8 +9,8 @@ import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
 import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.vectors.Color4;
-import com.tespirit.panda3d.R;
-import com.tespirit.panda3d.debug.Debug;
+import com.tespirit.pandadroid.R;
+import com.tespirit.pandadroid.debug.Debug;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -73,11 +73,11 @@ public class Panda3dView extends GLSurfaceView {
 	}
 	
 	private void initOpenGl1x(){
-		com.tespirit.panda3d.opengl1x.Renderer gl1x;
+		com.tespirit.pandadroid.opengl1x.Renderer gl1x;
 		if(this.debug){
 			gl1x = Debug.init(this);
 		} else {
-			gl1x = new com.tespirit.panda3d.opengl1x.Renderer();
+			gl1x = new com.tespirit.pandadroid.opengl1x.Renderer();
 		}
 		this.renderer = gl1x;
 		this.setRenderer(gl1x);

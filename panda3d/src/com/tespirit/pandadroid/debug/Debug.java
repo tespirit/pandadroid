@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.debug;
+package com.tespirit.pandadroid.debug;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -12,8 +12,8 @@ import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
-import com.tespirit.panda3d.opengl1x.Renderer;
-import com.tespirit.panda3d.app.Panda3dView;
+import com.tespirit.pandadroid.app.Panda3dView;
+import com.tespirit.pandadroid.opengl1x.Renderer;
 
 import android.text.Selection;
 import android.text.Spannable;

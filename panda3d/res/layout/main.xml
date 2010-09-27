@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:panda3d="http://schemas.android.com/apk/res/com.tespirit.panda3d"
+	xmlns:panda3d="http://schemas.android.com/apk/res/com.tespirit.pandadroid"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -24,7 +24,7 @@
     android:maxLines="10"
     android:minLines="10"
 />
-<com.tespirit.panda3d.app.Panda3dView 
+<com.tespirit.pandadroid.app.Panda3dView 
 	android:id="@+id/panda3d"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"

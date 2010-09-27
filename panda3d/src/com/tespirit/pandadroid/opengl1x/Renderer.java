@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.opengl1x;
+package com.tespirit.pandadroid.opengl1x;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -19,7 +19,7 @@ import com.tespirit.bamboo.surfaces.Material;
 import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
-import com.tespirit.panda3d.app.Assets;
+import com.tespirit.pandadroid.app.Assets;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;

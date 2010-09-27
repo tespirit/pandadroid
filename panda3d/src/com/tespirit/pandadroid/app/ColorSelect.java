@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.app;
+package com.tespirit.pandadroid.app;
 
 import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.surfaces.Surface;

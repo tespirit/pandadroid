@@ -1,4 +1,4 @@
-package com.tespirit.panda3d;
+package com.tespirit.pandadroid;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -17,10 +17,11 @@ import com.tespirit.bamboo.scenegraph.*;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Texture;
 
-import com.tespirit.panda3d.app.Panda3dView;
-import com.tespirit.panda3d.app.TranslateAbsolute;
-import com.tespirit.panda3d.debug.Debug;
-import com.tespirit.panda3d.convert.Collada;
+import com.tespirit.pandadroid.R;
+import com.tespirit.pandadroid.app.Panda3dView;
+import com.tespirit.pandadroid.app.TranslateAbsolute;
+import com.tespirit.pandadroid.convert.Collada;
+import com.tespirit.pandadroid.debug.Debug;
 
 import android.view.*;
 import android.widget.TextView;
@@ -55,10 +56,10 @@ public class Pandamonium extends Activity {
     	r.setLightGroup(lights);
     	
     	try{
-    		AnimationStuff a = this.loadAnimation("test_anim.dae");
-    		r.setSceneGraph(a.j);
-    		r.addTimeUpdate(a.a);
-    	//	r.setSceneGraph(this.loadCollada());	
+    	//	AnimationStuff a = this.loadAnimation("test_anim.dae");
+    	//	r.setSceneGraph(a.j);
+    	//	r.addTimeUpdate(a.a);
+    		r.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		Debug.print(e);
     		r.setSceneGraph(this.createTestSG());

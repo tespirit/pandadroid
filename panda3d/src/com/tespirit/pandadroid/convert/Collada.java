@@ -1,9 +1,9 @@
-package com.tespirit.panda3d.convert;
+package com.tespirit.pandadroid.convert;
 import java.io.InputStream;
 
 import org.xmlpull.v1.XmlPullParser;
 
-import com.tespirit.panda3d.app.Assets;
+import com.tespirit.pandadroid.app.Assets;
 
 import android.util.Xml;
 public class Collada extends com.tespirit.bamboo.convert.Collada{

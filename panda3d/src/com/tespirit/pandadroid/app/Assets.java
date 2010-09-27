@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.app;
+package com.tespirit.pandadroid.app;
 
 import java.io.IOException;
 import java.io.InputStream;

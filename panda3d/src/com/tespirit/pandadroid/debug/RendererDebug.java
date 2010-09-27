@@ -1,4 +1,4 @@
-package com.tespirit.panda3d.debug;
+package com.tespirit.pandadroid.debug;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,7 +19,7 @@ import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
-import com.tespirit.panda3d.opengl1x.Renderer;
+import com.tespirit.pandadroid.opengl1x.Renderer;
 
 public class RendererDebug extends Renderer{
 	public boolean renderNormals;
