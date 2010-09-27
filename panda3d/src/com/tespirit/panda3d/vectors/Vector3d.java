@@ -2,8 +2,6 @@ package com.tespirit.panda3d.vectors;
 
 import java.lang.Math;
 
-import android.opengl.Matrix;
-
 public class Vector3d {
 	private float[] v;
 	private int offset;
@@ -193,7 +191,7 @@ public class Vector3d {
 	}
 	
 	public float magnitude(){
-		return Matrix.length(this.v[this.offset], this.v[this.offset+1], this.v[this.offset+2]);
+		return (float)Math.sqrt(this.magnitude2());
 	}
 	
 	public float magnitude2(){
