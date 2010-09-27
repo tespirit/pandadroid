@@ -8,6 +8,10 @@ import com.tespirit.bamboo.vectors.Matrix3d;
 
 public class LightGroup extends Node{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7411701679489920130L;
 	private ArrayList<Light> lights;
 	
 	public LightGroup(){

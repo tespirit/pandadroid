@@ -8,6 +8,10 @@ import com.tespirit.bamboo.vectors.Ray;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 public class Camera extends Node implements RenderableNode{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4808239562403385262L;
 	private Matrix3d camera;
 	private Matrix3d pivot;
 	private Matrix3d worldTransform;
