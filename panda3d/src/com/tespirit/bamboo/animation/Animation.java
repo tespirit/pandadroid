@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import com.tespirit.bamboo.render.TimeUpdate;
 
-import android.os.SystemClock;
-
 public class Animation implements TimeUpdate, Serializable{
 	/**
 	 * 
