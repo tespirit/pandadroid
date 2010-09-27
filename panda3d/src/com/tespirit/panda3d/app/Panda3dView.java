@@ -1,17 +1,16 @@
 package com.tespirit.panda3d.app;
 
+import com.tespirit.bamboo.controllers.AccelerationController3d;
+import com.tespirit.bamboo.controllers.Controller2d;
+import com.tespirit.bamboo.controllers.ControllerDummy;
+import com.tespirit.bamboo.controllers.Dof3;
+import com.tespirit.bamboo.controllers.EulerController3d;
+import com.tespirit.bamboo.controllers.RotateController2d;
+import com.tespirit.bamboo.controllers.TranslateController2d;
+import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.panda3d.R;
-import com.tespirit.panda3d.controllers.AccelerationController3d;
-import com.tespirit.panda3d.controllers.Controller2d;
-import com.tespirit.panda3d.controllers.ControllerDummy;
-import com.tespirit.panda3d.controllers.Dof3;
-import com.tespirit.panda3d.controllers.EulerController3d;
-import com.tespirit.panda3d.controllers.RotateController2d;
-import com.tespirit.panda3d.controllers.TranslateController2d;
-import com.tespirit.panda3d.core.Assets;
 import com.tespirit.panda3d.debug.Debug;
-import com.tespirit.panda3d.render.Camera;
-import com.tespirit.panda3d.vectors.Color4;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -23,7 +22,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 public class Panda3dView extends GLSurfaceView {
-	private com.tespirit.panda3d.render.Renderer renderer;
+	private com.tespirit.bamboo.render.Renderer renderer;
 	private Controller2d touchUpController;
 	private Controller2d touchMoveController;
 	private Controller2d touchDownController;
@@ -84,7 +83,7 @@ public class Panda3dView extends GLSurfaceView {
 		this.setRenderer(gl1x);
 	}
 	
-	public com.tespirit.panda3d.render.Renderer getRenderer(){
+	public com.tespirit.bamboo.render.Renderer getRenderer(){
 		return this.renderer;
 	}
 	

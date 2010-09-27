@@ -3,24 +3,24 @@ package com.tespirit.panda3d;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.tespirit.panda3d.surfaces.Color;
-import com.tespirit.panda3d.surfaces.Texture;
-import com.tespirit.panda3d.render.LightGroup;
-import com.tespirit.panda3d.scenegraph.*;
+import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.animation.Channel;
+import com.tespirit.bamboo.animation.Joint;
+import com.tespirit.bamboo.animation.JointOrient;
+import com.tespirit.bamboo.animation.JointRotateY;
+import com.tespirit.bamboo.animation.JointRotateZ;
+import com.tespirit.bamboo.primitives.Box;
+import com.tespirit.bamboo.primitives.Plane;
+import com.tespirit.bamboo.render.LightGroup;
+import com.tespirit.bamboo.render.Renderer;
+import com.tespirit.bamboo.scenegraph.*;
+import com.tespirit.bamboo.surfaces.Color;
+import com.tespirit.bamboo.surfaces.Texture;
 
-import com.tespirit.panda3d.animation.Animation;
-import com.tespirit.panda3d.animation.Channel;
-import com.tespirit.panda3d.animation.Joint;
-import com.tespirit.panda3d.animation.JointOrient;
-import com.tespirit.panda3d.animation.JointRotateY;
-import com.tespirit.panda3d.animation.JointRotateZ;
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
 import com.tespirit.panda3d.convert.Collada;
 import com.tespirit.panda3d.debug.Debug;
-import com.tespirit.panda3d.render.Renderer;
-import com.tespirit.panda3d.primitives.Box;
-import com.tespirit.panda3d.primitives.Plane;
 
 import android.view.*;
 import android.widget.TextView;

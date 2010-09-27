@@ -3,18 +3,17 @@ package com.tespirit.panda3d.debug;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.tespirit.panda3d.animation.Animation;
+import com.tespirit.bamboo.animation.*;
+import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.Light;
+import com.tespirit.bamboo.render.LightGroup;
+import com.tespirit.bamboo.scenegraph.Group;
+import com.tespirit.bamboo.scenegraph.Model;
+import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamboo.vectors.Matrix3d;
+import com.tespirit.bamboo.vectors.Vector3d;
 import com.tespirit.panda3d.opengl1x.Renderer;
-import com.tespirit.panda3d.scenegraph.Node;
-import com.tespirit.panda3d.scenegraph.Group;
-import com.tespirit.panda3d.scenegraph.Model;
-import com.tespirit.panda3d.render.LightGroup;
-import com.tespirit.panda3d.render.Light;
-import com.tespirit.panda3d.render.Camera;
-import com.tespirit.panda3d.animation.*;
 import com.tespirit.panda3d.app.Panda3dView;
-import com.tespirit.panda3d.vectors.Matrix3d;
-import com.tespirit.panda3d.vectors.Vector3d;
 
 import android.text.Selection;
 import android.text.Spannable;

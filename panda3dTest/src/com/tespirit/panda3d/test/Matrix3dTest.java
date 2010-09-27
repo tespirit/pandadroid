@@ -3,7 +3,7 @@ package com.tespirit.panda3d.test;
 
 import junit.framework.*;
 
-import com.tespirit.panda3d.vectors.*;
+import com.tespirit.bamboo.vectors.*;
 
 public class Matrix3dTest extends TestCase{
 

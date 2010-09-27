@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.test;
 
-import com.tespirit.panda3d.vectors.*;
+import com.tespirit.bamboo.vectors.*;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

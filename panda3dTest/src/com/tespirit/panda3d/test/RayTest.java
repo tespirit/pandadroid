@@ -1,9 +1,9 @@
 package com.tespirit.panda3d.test;
 
-import com.tespirit.panda3d.vectors.AxisAlignedBox;
-import com.tespirit.panda3d.vectors.Plane;
-import com.tespirit.panda3d.vectors.Ray;
-import com.tespirit.panda3d.vectors.Vector3d;
+import com.tespirit.bamboo.vectors.AxisAlignedBox;
+import com.tespirit.bamboo.vectors.Plane;
+import com.tespirit.bamboo.vectors.Ray;
+import com.tespirit.bamboo.vectors.Vector3d;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

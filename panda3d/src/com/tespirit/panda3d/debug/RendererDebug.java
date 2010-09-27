@@ -7,17 +7,19 @@ import java.util.Hashtable;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.os.SystemClock;
+
+import com.tespirit.bamboo.primitives.Axis;
+import com.tespirit.bamboo.primitives.TriangleIndices;
+import com.tespirit.bamboo.primitives.TriangleList;
+import com.tespirit.bamboo.primitives.VertexBuffer;
+import com.tespirit.bamboo.primitives.WireBox;
+import com.tespirit.bamboo.render.Light;
+import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamboo.surfaces.Color;
+import com.tespirit.bamboo.vectors.Matrix3d;
+import com.tespirit.bamboo.vectors.Vector3d;
 import com.tespirit.panda3d.opengl1x.Renderer;
-import com.tespirit.panda3d.primitives.Axis;
-import com.tespirit.panda3d.primitives.TriangleIndices;
-import com.tespirit.panda3d.primitives.TriangleList;
-import com.tespirit.panda3d.primitives.VertexBuffer;
-import com.tespirit.panda3d.primitives.WireBox;
-import com.tespirit.panda3d.render.Light;
-import com.tespirit.panda3d.scenegraph.Node;
-import com.tespirit.panda3d.surfaces.Color;
-import com.tespirit.panda3d.vectors.Matrix3d;
-import com.tespirit.panda3d.vectors.Vector3d;
 
 public class RendererDebug extends Renderer{
 	public boolean renderNormals;
@@ -93,7 +95,7 @@ public class RendererDebug extends Renderer{
 		
 		this.mGl = gl;
 
-		this.updateScene();
+		this.updateScene(SystemClock.uptimeMillis());
 		
 		
 		if(this.pointBuffer != null){

@@ -1,12 +1,12 @@
 package com.tespirit.panda3d.app;
 
-import com.tespirit.panda3d.controllers.Controller2d;
-import com.tespirit.panda3d.scenegraph.Model;
-import com.tespirit.panda3d.scenegraph.Node;
-import com.tespirit.panda3d.vectors.Matrix3d;
-import com.tespirit.panda3d.vectors.Plane;
-import com.tespirit.panda3d.vectors.Ray;
-import com.tespirit.panda3d.vectors.Vector3d;
+import com.tespirit.bamboo.controllers.Controller2d;
+import com.tespirit.bamboo.scenegraph.Model;
+import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamboo.vectors.Matrix3d;
+import com.tespirit.bamboo.vectors.Plane;
+import com.tespirit.bamboo.vectors.Ray;
+import com.tespirit.bamboo.vectors.Vector3d;
 
 public class TranslateAbsolute extends SelectController2d{
 	Controller2d previousController;

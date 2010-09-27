@@ -1,11 +1,11 @@
 package com.tespirit.panda3d.app;
 
-import com.tespirit.panda3d.controllers.Controller2d;
-import com.tespirit.panda3d.controllers.Dof3;
-import com.tespirit.panda3d.controllers.MatrixController2d;
-import com.tespirit.panda3d.controllers.RotateController2d;
-import com.tespirit.panda3d.controllers.TranslateController2d;
-import com.tespirit.panda3d.scenegraph.Model;
+import com.tespirit.bamboo.controllers.Controller2d;
+import com.tespirit.bamboo.controllers.Dof3;
+import com.tespirit.bamboo.controllers.MatrixController2d;
+import com.tespirit.bamboo.controllers.RotateController2d;
+import com.tespirit.bamboo.controllers.TranslateController2d;
+import com.tespirit.bamboo.scenegraph.Model;
 
 public class MatrixSelect extends SelectController2d{
 	MatrixController2d selectController;

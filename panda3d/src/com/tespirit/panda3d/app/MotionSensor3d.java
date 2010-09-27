@@ -1,6 +1,6 @@
 package com.tespirit.panda3d.app;
 
-import com.tespirit.panda3d.controllers.Controller3d;
+import com.tespirit.bamboo.controllers.Controller3d;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

@@ -1,7 +1,7 @@
 package com.tespirit.panda3d.app;
 
-import com.tespirit.panda3d.scenegraph.Model;
-import com.tespirit.panda3d.surfaces.Surface;
+import com.tespirit.bamboo.scenegraph.Model;
+import com.tespirit.bamboo.surfaces.Surface;
 
 /**
  * A simple 2d controller changes the material of a selected object into 

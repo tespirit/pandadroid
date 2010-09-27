@@ -1,7 +1,7 @@
 package com.tespirit.panda3d.app;
 
-import com.tespirit.panda3d.controllers.Controller2d;
-import com.tespirit.panda3d.scenegraph.Model;
+import com.tespirit.bamboo.controllers.Controller2d;
+import com.tespirit.bamboo.scenegraph.Model;
 
 public abstract class SelectController2d implements Controller2d{
 	protected Panda3dView view;

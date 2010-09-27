@@ -4,27 +4,28 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import com.tespirit.panda3d.core.Assets;
-import com.tespirit.panda3d.primitives.IndexBuffer;
-import com.tespirit.panda3d.primitives.LineIndices;
-import com.tespirit.panda3d.primitives.LineList;
-import com.tespirit.panda3d.primitives.Points;
-import com.tespirit.panda3d.primitives.Primitive;
-import com.tespirit.panda3d.primitives.TriangleIndices;
-import com.tespirit.panda3d.primitives.TriangleList;
-import com.tespirit.panda3d.primitives.VertexBuffer;
-import com.tespirit.panda3d.render.Camera;
-import com.tespirit.panda3d.render.Light;
-import com.tespirit.panda3d.surfaces.Color;
-import com.tespirit.panda3d.surfaces.Material;
-import com.tespirit.panda3d.surfaces.Texture;
-import com.tespirit.panda3d.vectors.Color4;
-import com.tespirit.panda3d.vectors.Matrix3d;
+import com.tespirit.bamboo.primitives.IndexBuffer;
+import com.tespirit.bamboo.primitives.LineIndices;
+import com.tespirit.bamboo.primitives.LineList;
+import com.tespirit.bamboo.primitives.Points;
+import com.tespirit.bamboo.primitives.Primitive;
+import com.tespirit.bamboo.primitives.TriangleIndices;
+import com.tespirit.bamboo.primitives.TriangleList;
+import com.tespirit.bamboo.primitives.VertexBuffer;
+import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.Light;
+import com.tespirit.bamboo.surfaces.Color;
+import com.tespirit.bamboo.surfaces.Material;
+import com.tespirit.bamboo.surfaces.Texture;
+import com.tespirit.bamboo.vectors.Color4;
+import com.tespirit.bamboo.vectors.Matrix3d;
+import com.tespirit.panda3d.app.Assets;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
+import android.os.SystemClock;
 
-public class Renderer extends com.tespirit.panda3d.render.Renderer implements android.opengl.GLSurfaceView.Renderer{
+public class Renderer extends com.tespirit.bamboo.render.Renderer implements android.opengl.GLSurfaceView.Renderer{
 	protected GL10 mGl;
 	protected int mCurrentLightId;
 	
@@ -50,7 +51,7 @@ public class Renderer extends com.tespirit.panda3d.render.Renderer implements an
 		this.mGl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		this.mGl.glLoadIdentity();
 		
-		this.updateScene();
+		this.updateScene(SystemClock.uptimeMillis());
 		this.renderScene();
 	}
 
