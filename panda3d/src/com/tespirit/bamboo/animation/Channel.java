@@ -11,8 +11,6 @@ public class Channel implements Serializable{
 	private ArrayList<KeyFrame> keys;
 	long lastTime;
 	int lastFrame;
-	long endTime;
-	long startTime;
 	
 	public Channel(){
 		this.keys = new ArrayList<KeyFrame>();
@@ -38,11 +36,6 @@ public class Channel implements Serializable{
 		this.keys.add(k);
 	}
 	
-	public void setRange(long start, long end){
-		this.startTime = start;
-		this.endTime = end;
-	}
-	
 	/**
 	 * 
 	 * @param time milliseconds
@@ -50,7 +43,6 @@ public class Channel implements Serializable{
 	 */
 	public float getValue(long time){
 		if(this.keys.size() == 0) return 0;
-		time = ((time-this.startTime)% this.endTime)+this.startTime;
 		if(time < this.lastTime){
 			this.lastFrame = 0;
 		}

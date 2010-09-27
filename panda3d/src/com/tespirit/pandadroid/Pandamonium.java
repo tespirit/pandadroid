@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
+import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointOrient;
 import com.tespirit.bamboo.animation.JointRotateY;
@@ -56,10 +57,10 @@ public class Pandamonium extends Activity {
     	r.setLightGroup(lights);
     	
     	try{
-    	//	AnimationStuff a = this.loadAnimation("test_anim.dae");
-    	//	r.setSceneGraph(a.j);
-    	//	r.addTimeUpdate(a.a);
-    		r.setSceneGraph(this.loadCollada());	
+    		AnimationStuff a = this.loadAnimation("test_anim.dae");
+    		r.setSceneGraph(a.j);
+    		r.addTimeUpdate(a.a);
+    	//	r.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		Debug.print(e);
     		r.setSceneGraph(this.createTestSG());
@@ -120,24 +121,22 @@ public class Pandamonium extends Activity {
     	
     	Channel c1 = new Channel();
     	for(int i = 0; i < 11; i++){
-    		c1.addKeyFrame(new Channel.KeyFrame(30*i, 1000*i));
+    		c1.addKeyFrame(new Channel.KeyFrame(30*i, 500*i));
     	}
-    	c1.setRange(0, 1000*12);
     	
     	Channel c2 = new Channel();
     	c2.addKeyFrame(new Channel.KeyFrame(45, 1000));
     	c2.addKeyFrame(new Channel.KeyFrame(60, 1500));
     	c2.addKeyFrame(new Channel.KeyFrame(80, 1800));
-    	c2.setRange(0, 2000);
     	
     	Channel c3 = new Channel();
     	c3.addKeyFrame(new Channel.KeyFrame(10, 2000));
     	c3.addKeyFrame(new Channel.KeyFrame(20, 2600));
     	c3.addKeyFrame(new Channel.KeyFrame(40, 3200));
     	c3.addKeyFrame(new Channel.KeyFrame(80, 3800));
-    	c3.setRange(1400, 4400);
     	
     	Animation a = new Animation(3);
+    	a.addClip(new Clip(0, 500*11));
     	
     	a.addChannel(c1);
     	a.addChannel(c2);

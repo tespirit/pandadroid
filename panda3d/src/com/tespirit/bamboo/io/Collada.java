@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
+import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointOrient;
 import com.tespirit.bamboo.animation.JointRotate;
@@ -46,7 +47,7 @@ import org.xmlpull.v1.XmlPullParser;
  * @author Todd Espiritu Santo
  *
  */
-public class Collada {
+public class Collada implements BambooAsset{
 	private Node mRoot;
 	private LightGroup mLights;
 	private Camera[] mCameras;
@@ -336,10 +337,10 @@ public class Collada {
         		if(c == null){
         			c = new Channel();
         		}
-        		c.setRange(this.mMinAnimationTime, this.mMaxAnimationTime);
         		this.mAnimation.addChannel(c);
         	}
         }
+        this.mAnimation.addClip(new Clip(this.mMinAnimationTime, this.mMaxAnimationTime));
         this.mParser = null;
 	}
 	

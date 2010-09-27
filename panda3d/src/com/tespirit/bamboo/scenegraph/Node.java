@@ -85,4 +85,22 @@ public abstract class Node implements Serializable{
 		Node.current %= Node.nodes.size();
 		return node;
 	}
+	
+	@Override
+	public String toString(){
+		String className = super.toString();
+		int i = className.lastIndexOf('.');
+		if(i != -1){
+			className = className.substring(i+1);
+		}
+		i = className.indexOf('@');
+		if(i != -1){
+			className = className.substring(0, i);
+		}
+		String name = this.name;
+		if(name == null){
+			name = "<no name>";
+		}
+		return className+": " + name; 
+	}
 }

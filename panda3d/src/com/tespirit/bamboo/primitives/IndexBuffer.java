@@ -1,5 +1,6 @@
 package com.tespirit.bamboo.primitives;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -20,10 +21,14 @@ public class IndexBuffer implements Serializable{
 	private int type;
 	
 	public static void setTypeEnum(int int32, int short16, int byte8){
-		IndexBuffer.types[0] = int32;
-		IndexBuffer.types[1] = short16;
-		IndexBuffer.types[2] = byte8;
+		IndexBuffer.types[BUFFER32] = int32;
+		IndexBuffer.types[BUFFER16] = short16;
+		IndexBuffer.types[BUFFER8] = byte8;
 	}
+	
+	private static final int BUFFER32 = 0;
+	private static final int BUFFER16 = 1;
+	private static final int BUFFER8 = 2;
 	
 	private static int[] types = {0,1,2};
 	
@@ -33,7 +38,7 @@ public class IndexBuffer implements Serializable{
 		temp.order(ByteOrder.nativeOrder());
 		this.buffer16 = temp.asShortBuffer();
 		this.buffer = this.buffer16;
-		this.type = 1;
+		this.type = BUFFER16;
 	}
 	
 	public IndexBuffer(int count, int maxValue){
@@ -43,18 +48,18 @@ public class IndexBuffer implements Serializable{
 			temp.order(ByteOrder.nativeOrder());
 			this.buffer32 = temp.asIntBuffer();
 			this.buffer = this.buffer32;
-			this.type = 0;
+			this.type = BUFFER32;
 		} else if(maxValue > Byte.MAX_VALUE - Byte.MIN_VALUE){
 			ByteBuffer temp = ByteBuffer.allocateDirect(count * 2);
 			temp.order(ByteOrder.nativeOrder());
 			this.buffer16 = temp.asShortBuffer();
 			this.buffer = this.buffer16;
-			this.type = 1;
+			this.type = BUFFER16;
 		} else {
 			this.buffer8 = ByteBuffer.allocateDirect(count * 2);
 			this.buffer8.order(ByteOrder.nativeOrder());
 			this.buffer = this.buffer8;
-			this.type = 2;
+			this.type = BUFFER8;
 		}
 	}
 	
@@ -102,4 +107,54 @@ public class IndexBuffer implements Serializable{
 	public void resetBufferPosition(){
 		this.buffer.position(0);
 	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException{
+		out.writeInt(this.type);
+		out.writeInt(this.count);
+		switch(this.type){
+		case BUFFER32:
+			int[] output32 = new int[this.count];
+			this.buffer32.get(output32);
+			out.writeObject(output32);
+			break;
+		case BUFFER16:
+			short[] output16 = new short[this.count];
+			this.buffer16.get(output16);
+			out.writeObject(output16);
+			break;
+		case BUFFER8:
+			byte[] output8 = new byte[this.count];
+			this.buffer8.get(output8);
+			out.writeObject(output8);
+			break;
+		}
+		this.buffer.position(0);
+	}
+	
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
+    	this.type = in.readInt();
+    	this.count = in.readInt();
+    	
+    	ByteBuffer temp = ByteBuffer.allocateDirect(count * 4);
+		temp.order(ByteOrder.nativeOrder());
+    	switch(this.type){
+		case BUFFER32:
+			
+			this.buffer32 = temp.asIntBuffer();
+			this.buffer32.put((int[])in.readObject());
+			this.buffer = buffer32;
+			break;
+		case BUFFER16:
+			this.buffer16 = temp.asShortBuffer();
+			this.buffer16.put((short[])in.readObject());
+			this.buffer = buffer16;
+			break;
+		case BUFFER8:
+			this.buffer8 = temp;
+			this.buffer8.put((byte[])in.readObject());
+			this.buffer = buffer8;
+			break;
+		}
+    	this.buffer.position(0);
+    }
 }

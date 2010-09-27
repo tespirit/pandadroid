@@ -1,13 +1,16 @@
 package com.tespirit.bamboo.io;
 
+import java.io.EOFException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-import org.w3c.dom.Node;
+import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.LightGroup;
+import com.tespirit.bamboo.scenegraph.Node;
 
-import android.view.animation.Animation;
 
 /**
  * A simple io class for loading objects. This way the io can change without
@@ -15,7 +18,8 @@ import android.view.animation.Animation;
  * @author Todd Espiritu Santo
  *
  */
-public class Bamboo {
+public class Bamboo implements BambooAsset{
+
 	public static Node loadNode(InputStream stream) throws Exception{
 		ObjectInputStream o = new ObjectInputStream(stream);
 		Object obj = o.readObject();
@@ -48,5 +52,53 @@ public class Bamboo {
 		ObjectOutputStream o = new ObjectOutputStream(stream);
 		o.writeObject(animation);
 		o.close();
+	}
+	
+	private Node mRoot;
+	private Animation mAnimation;
+	private Camera[] mCameras;
+	private LightGroup mLights;
+	
+	public Bamboo(InputStream stream) throws Exception{
+		ObjectInputStream o = new ObjectInputStream(stream);
+		
+		try{
+		Object obj = o.readObject();
+		while(obj != null){
+			if(obj instanceof Node){
+				this.mRoot = (Node)obj;
+			} else if(obj instanceof Animation){
+				this.mAnimation = (Animation)obj;
+			} else if(obj instanceof LightGroup){
+				this.mLights = (LightGroup)obj;
+			} else if(obj instanceof Camera[]){
+				this.mCameras = (Camera[])obj;
+			}
+			obj = o.readObject();
+		}
+		} catch(EOFException e){
+			//end the input.
+		}
+		o.close();
+	}
+
+	@Override
+	public Animation getAnimation() {
+		return this.mAnimation;
+	}
+
+	@Override
+	public Camera[] getCameras() {
+		return this.mCameras;
+	}
+
+	@Override
+	public LightGroup getLightGroup() {
+		return this.mLights;
+	}
+
+	@Override
+	public Node getSceneGraph() {
+		return this.mRoot;
 	}
 }

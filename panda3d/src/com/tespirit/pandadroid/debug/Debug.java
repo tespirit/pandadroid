@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.tespirit.bamboo.animation.*;
-import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.Light;
-import com.tespirit.bamboo.render.LightGroup;
-import com.tespirit.bamboo.scenegraph.Group;
-import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
@@ -60,34 +55,9 @@ public class Debug {
 	}
 	
 	private static void printNode(Node node, String spacing, int depth){
-		String type;
-		if(node instanceof Group){
-			type = "- Group: ";
-		} else if (node instanceof Model){
-			type = "- Model: ";
-		} else if (node instanceof JointOrient){
-			type = "- JointOrient: ";
-		} else if (node instanceof JointRotate){
-			type = "- JointRotate: ";
-		} else if (node instanceof JointTranslate){
-			type = "- JointTranslate: ";
-		} else if (node instanceof Joint){
-			type = "- Joint: ";
-		} else if (node instanceof LightGroup){
-			type = "- LightGroup: ";
-		} else if (node instanceof Light){
-			type = "- Light: ";
-		} else if (node instanceof Camera){
-			type = "- Camera: ";
-		} else {
-			type = "- Node: ";
-		}
-		String name = node.getName();
-		if(name == null){
-			name = "<no name>";
-		}
+		String type = "- " + node.toString();
 
-		Debug.print(spacing+depth+type + name);
+		Debug.print(spacing+depth+type);
 		
 		spacing = spacing+"  ";
 		
@@ -222,7 +192,7 @@ public class Debug {
 					break;
 				case KeyEvent.KEYCODE_N:
 					if(currentAnimation != -1){
-						animations.get(currentAnimation).play();
+						animations.get(currentAnimation).play(android.os.SystemClock.uptimeMillis());
 						Debug.print("Playing animation " + currentAnimation);
 					}
 					break;
