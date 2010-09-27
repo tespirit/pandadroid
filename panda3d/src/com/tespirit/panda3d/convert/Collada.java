@@ -50,7 +50,7 @@ import org.xmlpull.v1.XmlPullParser;
  * @author Todd Espiritu Santo
  *
  */
-public class ColladaAndroid {
+public class Collada {
 	private Node mRoot;
 	private LightGroup mLights;
 	private Camera[] mCameras;
@@ -198,12 +198,12 @@ public class ColladaAndroid {
 	 * @param normals
 	 * @throws Exception
 	 */
-	public ColladaAndroid(String fileName, boolean normals)throws Exception{
+	public Collada(String fileName, boolean normals)throws Exception{
 		this.mImportNormals = normals;
 		this.init(Assets.getManager().openStream(fileName));
 	}
 	
-	public ColladaAndroid(String fileName)throws Exception{
+	public Collada(String fileName)throws Exception{
 		this.mImportNormals = true;
 		this.init(Assets.getManager().openStream(fileName));
 	}
