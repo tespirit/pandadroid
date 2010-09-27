@@ -19,8 +19,8 @@ import com.tespirit.bamboo.surfaces.Texture;
 
 import com.tespirit.panda3d.app.Panda3dView;
 import com.tespirit.panda3d.app.TranslateAbsolute;
-import com.tespirit.panda3d.convert.Collada;
 import com.tespirit.panda3d.debug.Debug;
+import com.tespirit.panda3d.convert.Collada;
 
 import android.view.*;
 import android.widget.TextView;
