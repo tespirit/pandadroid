@@ -44,6 +44,23 @@ public class VertexBuffer implements Serializable{
 		}
 	}
 	
+	/**
+	 * copy constructor
+	 * @param vertexBuffer
+	 */
+	public VertexBuffer(VertexBuffer vertexBuffer){
+		this(vertexBuffer.count, vertexBuffer.types);
+		for(int i = 0; i < this.types.length; i++){
+			FloatBuffer a = this.buffers[this.types[i]];
+			FloatBuffer b = vertexBuffer.buffers[this.types[i]];
+			for(int j = 0; j < this.count * strides[i]; j++){
+				a.put(b.get());
+			}
+			a.position(0);
+			b.position(0);
+		}
+	}
+	
 	private FloatBuffer allocateFloatBuffer(int stride){
 		ByteBuffer temp = ByteBuffer.allocateDirect(this.count*stride*4);
 		temp.order(ByteOrder.nativeOrder());
@@ -64,7 +81,7 @@ public class VertexBuffer implements Serializable{
 		this.buffers[VertexBuffer.POSITION].put(z);
 	}
 	
-	public void setPosition(Vector3d point){
+	public void addPosition(Vector3d point){
 		this.buffers[VertexBuffer.POSITION].put(point.getX());
 		this.buffers[VertexBuffer.POSITION].put(point.getY());
 		this.buffers[VertexBuffer.POSITION].put(point.getZ());

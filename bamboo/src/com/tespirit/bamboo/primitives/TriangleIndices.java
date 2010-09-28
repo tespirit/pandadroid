@@ -1,8 +1,10 @@
 package com.tespirit.bamboo.primitives;
 
+import java.util.Stack;
 
 import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
+import com.tespirit.bamboo.modifiers.VertexModifier;
 
 /**
  * This is a standard mesh class that has a vertex buffer and an index buffer.
@@ -16,11 +18,13 @@ public class TriangleIndices extends Primitive{
 	private static final long serialVersionUID = -1986380555935180298L;
 	protected VertexBuffer vertexBuffer;
 	protected IndexBuffer indexBuffer;
+	protected Stack<VertexModifier> modifierStack;
 	
 	public TriangleIndices(VertexBuffer vb, IndexBuffer ib){
 		this.vertexBuffer = vb;
-		this.renderAsTriangles();
 		this.indexBuffer = ib;
+		this.modifierStack = new Stack<VertexModifier>();
+		this.renderAsTriangles();
 	}
 	
 	public TriangleIndices(int indexCount, int vertexCount, int[] vertexTypes){
@@ -35,6 +39,16 @@ public class TriangleIndices extends Primitive{
 	
 	public IndexBuffer getIndexBuffer(){
 		return this.indexBuffer;
+	}
+	
+	public void addModifier(VertexModifier vm){
+		if(this.modifierStack.isEmpty()){
+			vm.setVertexBuffer(this.vertexBuffer);
+		} else {
+			vm.setVertexBuffer(this.modifierStack.peek().getModifiedBuffer());
+		}
+		this.vertexBuffer = vm.getModifiedBuffer();
+		this.modifierStack.push(vm);
 	}
 
 	@Override

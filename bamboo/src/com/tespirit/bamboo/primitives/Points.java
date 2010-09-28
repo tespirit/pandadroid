@@ -15,14 +15,14 @@ public class Points extends Primitive{
 	public Points(Vector3d[] points){
 		this(points.length);
 		for(Vector3d point : points){
-			this.vertexBuffer.setPosition(point);
+			this.vertexBuffer.addPosition(point);
 		}
 		this.vertexBuffer.resetBufferPosition();
 	}
 	
 	public Points(Vector3d point){
 		this(1);
-		this.vertexBuffer.setPosition(point);
+		this.vertexBuffer.addPosition(point);
 		this.vertexBuffer.resetBufferPosition();
 	}
 	
