@@ -4,12 +4,12 @@ import com.tespirit.bamboo.controllers.Controller2d;
 import com.tespirit.bamboo.scenegraph.Model;
 
 public abstract class SelectController2d implements Controller2d{
-	protected Panda3dView view;
+	protected PandadroidView view;
 	protected float x;
 	protected float y;
 	protected long time;
 	
-	public SelectController2d(Panda3dView view){
+	public SelectController2d(PandadroidView view){
 		this.view = view;
 	}
 

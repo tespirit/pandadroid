@@ -21,7 +21,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-public class Panda3dView extends GLSurfaceView {
+public class PandadroidView extends GLSurfaceView {
 	private com.tespirit.bamboo.render.Renderer renderer;
 	private Controller2d touchUpController;
 	private Controller2d touchMoveController;
@@ -29,19 +29,19 @@ public class Panda3dView extends GLSurfaceView {
 	private boolean debug;
 	private Context context;
 
-	public Panda3dView(Context context){
+	public PandadroidView(Context context){
 		super(context);
 		this.debug = false;
 		this.init(context);
 	}
 	
-	public Panda3dView(Context context, boolean debug){
+	public PandadroidView(Context context, boolean debug){
 		super(context);
 		this.debug = debug;
 		this.init(context);
 	}
 	
-	public Panda3dView(Context context, AttributeSet attrs){
+	public PandadroidView(Context context, AttributeSet attrs){
 		super(context, attrs);
 		
 		//setup custom attributes

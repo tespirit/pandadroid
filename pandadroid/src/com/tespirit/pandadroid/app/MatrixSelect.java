@@ -11,7 +11,7 @@ public class MatrixSelect extends SelectController2d{
 	MatrixController2d selectController;
 	Controller2d previousController;
 
-	public MatrixSelect(Panda3dView view, boolean rotate) {
+	public MatrixSelect(PandadroidView view, boolean rotate) {
 		super(view);
 		if(rotate){
 			this.selectController = new RotateController2d(Dof3.Y, Dof3.X);

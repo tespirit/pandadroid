@@ -12,7 +12,7 @@ public class TranslateAbsolute extends SelectController2d{
 	Controller2d previousController;
 	MoveController moveController;
 	
-	private Panda3dView view;
+	private PandadroidView view;
 	private Node node;
 	private Plane plane;
 	private Matrix3d inverter;
@@ -21,7 +21,7 @@ public class TranslateAbsolute extends SelectController2d{
 	float totalX;
 	float totalY;
 	
-	public TranslateAbsolute(Panda3dView view){
+	public TranslateAbsolute(PandadroidView view){
 		super(view);
 		this.view = view;
 		this.plane = new Plane();

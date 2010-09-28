@@ -19,7 +19,7 @@ import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Texture;
 
 import com.tespirit.pandadroid.R;
-import com.tespirit.pandadroid.app.Panda3dView;
+import com.tespirit.pandadroid.app.PandadroidView;
 import com.tespirit.pandadroid.app.TranslateAbsolute;
 import com.tespirit.pandadroid.convert.Collada;
 import com.tespirit.pandadroid.debug.Debug;
@@ -39,7 +39,7 @@ public class Pandamonium extends Activity {
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	setContentView(R.layout.main);
         
-        Panda3dView view = (Panda3dView)findViewById(R.id.panda3d);
+        PandadroidView view = (PandadroidView)findViewById(R.id.panda3d);
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
         Debug.setConsole((TextView)findViewById(R.id.console));

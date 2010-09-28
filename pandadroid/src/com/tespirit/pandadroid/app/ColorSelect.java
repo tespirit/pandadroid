@@ -14,7 +14,7 @@ public class ColorSelect extends SelectController2d{
 	Surface currentSurface;
 	Surface pickSurface;
 
-	public ColorSelect(Panda3dView view, Surface pickSurface) {
+	public ColorSelect(PandadroidView view, Surface pickSurface) {
 		super(view);
 		this.pickSurface = pickSurface;
 	}
