@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-<color name="titleColor">#666666</color>
-<color name="titleTextColor">#FF9955</color>
-<color name="consoleColor">#FFFFFF</color>
-<color name="consoleTextColor">#0000FF</color>
-</resources>
