@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="D:/android/apps/lib/bamboo.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/panda3d/bamboo.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="false" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="/lib/bamboo.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/bamboo/bamboo.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="false" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
