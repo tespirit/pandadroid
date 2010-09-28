@@ -13,7 +13,6 @@ import com.tespirit.bamboo.animation.JointRotateZ;
 import com.tespirit.bamboo.primitives.Box;
 import com.tespirit.bamboo.primitives.Plane;
 import com.tespirit.bamboo.render.LightGroup;
-import com.tespirit.bamboo.render.Renderer;
 import com.tespirit.bamboo.scenegraph.*;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Texture;
