@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:panda3d="http://schemas.android.com/apk/res/com.tespirit.pandadroid"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView
+	android:id="@+id/title"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:textSize="12px"
+    android:text="@string/output"
+    android:textColor="@color/titleTextColor"
+/>
+<TextView
+	android:id="@+id/console"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:textSize="10px"
+    android:textColor="@color/consoleTextColor"
+	android:background="@color/consoleColor"
+    android:typeface="monospace" 
+    android:maxLines="10"
+    android:minLines="10"
+/>
+<com.tespirit.pandadroid.app.Panda3dView 
+	android:id="@+id/panda3d"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	panda3d:debug="true"
+	panda3d:background_color="#444444"
+/>
+</LinearLayout>
