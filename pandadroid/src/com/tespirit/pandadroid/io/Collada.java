@@ -1,4 +1,4 @@
-package com.tespirit.pandadroid.convert;
+package com.tespirit.pandadroid.io;
 import java.io.InputStream;
 
 import org.xmlpull.v1.XmlPullParser;
