@@ -24,8 +24,8 @@
     android:maxLines="10"
     android:minLines="10"
 />
-<com.tespirit.pandadroid.app.Panda3dView 
-	android:id="@+id/panda3d"
+<com.tespirit.pandadroid.app.Pandadroid
+	android:id="@+id/pandadroid"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	panda3d:debug="true"

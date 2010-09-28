@@ -39,7 +39,7 @@ public class Pandamonium extends Activity {
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	setContentView(R.layout.main);
         
-        PandadroidView view = (PandadroidView)findViewById(R.id.panda3d);
+        PandadroidView view = (PandadroidView)findViewById(R.id.pandadroid);
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
         Debug.setConsole((TextView)findViewById(R.id.console));
@@ -50,25 +50,23 @@ public class Pandamonium extends Activity {
     	
     	view.setTouchDownController(new TranslateAbsolute(view));
     	
-    	Renderer r = view.getRenderer();
-    	
     	LightGroup lights = new LightGroup();
     	lights.createBasic();
-    	r.setLightGroup(lights);
+    	view.setLightGroup(lights);
     	
     	try{
     		AnimationStuff a = this.loadAnimation("test_anim.dae");
-    		r.setSceneGraph(a.j);
-    		r.addTimeUpdate(a.a);
-    	//	r.setSceneGraph(this.loadCollada());	
+    		view.setSceneGraph(a.j);
+    		view.addTimeUpdate(a.a);
+    	//	view.setSceneGraph(this.loadCollada());	
     	} catch(Exception e){
     		Debug.print(e);
-    		r.setSceneGraph(this.createTestSG());
+    		view.setSceneGraph(this.createTestSG());
     	}
     	/*
     	AnimationStuff a = this.createTestAnimation();
-    	r.addTimeUpdate(a.a);
-    	r.setSceneGraph(a.j);
+    	view.addTimeUpdate(a.a);
+    	view.setSceneGraph(a.j);
 */
     }
     

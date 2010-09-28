@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<declare-styleable  name="Panda3dView">
+<declare-styleable  name="PandadroidView">
 	<attr name="debug" format="boolean"/>
 	<attr name="background_color" format="color"/>
 </declare-styleable>

@@ -8,6 +8,9 @@ import com.tespirit.bamboo.controllers.EulerController3d;
 import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
 import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.LightGroup;
+import com.tespirit.bamboo.render.TimeUpdate;
+import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.pandadroid.R;
 import com.tespirit.pandadroid.debug.Debug;
@@ -45,9 +48,9 @@ public class PandadroidView extends GLSurfaceView {
 		super(context, attrs);
 		
 		//setup custom attributes
-		TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.Panda3dView);
-		this.debug = a.getBoolean(R.styleable.Panda3dView_debug, false);
-		int color = a.getColor(R.styleable.Panda3dView_background_color, 0x000000FF);
+		TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.PandadroidView);
+		this.debug = a.getBoolean(R.styleable.PandadroidView_debug, false);
+		int color = a.getColor(R.styleable.PandadroidView_background_color, 0x000000FF);
 		
 		Color4 bgColor = new Color4();
 		bgColor.set(Color.red(color), 
@@ -240,5 +243,33 @@ public class PandadroidView extends GLSurfaceView {
 		}
 		this.renderer.setCamera(camera);
 		return camera;
+	}
+	
+	public Node getSceneGraph(){
+		return this.renderer.getSceneGraph();
+	}
+	
+	public void setSceneGraph(Node sceneGraph){
+		this.renderer.setSceneGraph(sceneGraph);
+	}
+	
+	public LightGroup getLightGroup(){
+		return this.renderer.getLightGroup();
+	}
+	
+	public void setLightGroup(LightGroup lights){
+		this.renderer.setLightGroup(lights);
+	}
+	
+	public Camera getCamera(){
+		return this.renderer.getCamera();
+	}
+	
+	public void setCamera(Camera camera){
+		this.renderer.setCamera(camera);
+	}
+	
+	public void addTimeUpdate(TimeUpdate update){
+		this.renderer.addTimeUpdate(update);
 	}
 }
