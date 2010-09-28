@@ -16,7 +16,11 @@ public class Channel implements Serializable{
 		this.keys = new ArrayList<KeyFrame>();
 	}
 	
-	public static class KeyFrame{
+	public static class KeyFrame implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3417055351101570333L;
 		float value;
 		long time;
 		

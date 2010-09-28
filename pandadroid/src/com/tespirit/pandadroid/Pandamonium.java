@@ -10,6 +10,7 @@ import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointOrient;
 import com.tespirit.bamboo.animation.JointRotateY;
 import com.tespirit.bamboo.animation.JointRotateZ;
+import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.primitives.Box;
 import com.tespirit.bamboo.primitives.Plane;
 import com.tespirit.bamboo.render.LightGroup;
@@ -22,6 +23,7 @@ import com.tespirit.pandadroid.app.PandadroidView;
 import com.tespirit.pandadroid.app.TranslateAbsolute;
 import com.tespirit.pandadroid.debug.Debug;
 import com.tespirit.pandadroid.io.Collada;
+import com.tespirit.pandadroid.io.Bamboo;
 
 import android.view.*;
 import android.widget.TextView;
@@ -54,7 +56,7 @@ public class Pandamonium extends Activity {
     	view.setLightGroup(lights);
     	
     	try{
-    		AnimationStuff a = this.loadAnimation("test_anim.dae");
+    		AnimationStuff a = this.loadAnimation("test_anim.bam");
     		view.setSceneGraph(a.j);
     		view.addTimeUpdate(a.a);
     	//	view.setSceneGraph(this.loadCollada());	
@@ -70,10 +72,10 @@ public class Pandamonium extends Activity {
     }
     
     public AnimationStuff loadAnimation(String file) throws Exception{
-    	Collada ca = new Collada(file);
+    	BambooAsset ba = new Bamboo(file);
     	AnimationStuff a = new AnimationStuff();
-    	a.a = ca.getAnimation();
-    	a.j = ca.getSceneGraph();
+    	a.a = ba.getAnimation();
+    	a.j = ba.getSceneGraph();
     	a.a.attachSkeleton((Joint)a.j);
     	Debug.addTestAnimation(a.a);
     	return a;

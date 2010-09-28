@@ -19,10 +19,14 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -33,6 +37,7 @@ public class Bamporter extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JMenuItem openButton;
+	private JMenuItem saveAllButton;
 	private JMenuItem saveNodeButton;
 	private JMenuItem saveAnimationButton;
 	private JMenuItem exitButton;
@@ -62,6 +67,9 @@ public class Bamporter extends JFrame {
 		
 		openButton = new JMenuItem();
 		openButton.setText("Open");
+		saveAllButton = new JMenuItem();
+		saveAllButton.setText("Save All");
+		saveAllButton.setEnabled(false);
 		saveNodeButton = new JMenuItem();
 		saveNodeButton.setText("Save SceneGraph");
 		saveNodeButton.setEnabled(false);
@@ -74,7 +82,7 @@ public class Bamporter extends JFrame {
 		fileMenu.setText("File");
 		menu = new JMenuBar();
 		fileDialog = new JFileChooser();
-		root = new DefaultMutableTreeNode("SceneGraph");
+		root = new DefaultMutableTreeNode("Workspace");
 		tree = new JTree();
 		treeView = new JScrollPane();
 		output = new JEditorPane();
@@ -95,22 +103,39 @@ public class Bamporter extends JFrame {
 		Dimension minimumSize = new Dimension(50, 100);
 	    outputView.setMinimumSize(minimumSize);
 	    treeView.setMinimumSize(minimumSize);
-	    splitPane.setDividerLocation(200); 
-	    splitPane.setPreferredSize(new Dimension(500, 500));
+	    splitPane.setDividerLocation(300); 
+	    splitPane.setPreferredSize(new Dimension(800, 600));
 		
 		add(splitPane);
 		
 		menu.add(fileMenu);
 		fileMenu.add(openButton);
+		fileMenu.add(saveAllButton);
 		fileMenu.add(saveNodeButton);
 		fileMenu.add(saveAnimationButton);
 		fileMenu.addSeparator();
 		fileMenu.add(exitButton);
 		
+		tree.addTreeSelectionListener(new TreeSelectionListener(){
+
+			@Override
+			public void valueChanged(TreeSelectionEvent event) {
+				selectTreeNode(event);
+			}
+			
+		});
+		
 		openButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				openButtonAction(event);
+			}
+		});
+		
+		saveAllButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				saveAllButtonAction(event);
 			}
 		});
 		
@@ -121,8 +146,61 @@ public class Bamporter extends JFrame {
 			}
 		});
 		
+		saveAnimationButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				saveAnimationButtonAction(event);
+			}
+		});
+		
 		setJMenuBar(menu);
 		setSize(800, 600);
+	}
+
+	private void selectTreeNode(TreeSelectionEvent event) {
+		DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+		if(treeNode != null){
+			Object data = treeNode.getUserObject();
+			if(data instanceof Node){
+				this.selectNode((Node)data);
+			} else if(data instanceof Animation){
+				this.selectAnimation((Animation)data);
+			} else if(data instanceof Channel){
+				this.selectChannel((Channel)data);
+			}
+		}
+	}
+	
+	private void selectNode(Node node){
+		String text = node.toString();
+		if(node.getTransform() != null){
+			text += "\nLocalTransform:";
+			for(int j = 0; j < 4; j++){
+				text+= "\n\t";
+				for(int i = 0; i < 4; i++){
+					text += node.getTransform().getValue(j, i) + "\t";
+				}
+			}
+		}
+		if(node.getBoundingBox() != null){
+			text += "\nBoundingBox:\n\t";
+			for(int i = 0; i < 3; i++){
+				text += node.getBoundingBox().getMin().get(i) + "\t";
+			}
+			text += "\n\t";
+			for(int i = 0; i < 3; i++){
+				text += node.getBoundingBox().getMax().get(i) + "\t";
+			}
+		}
+		output.setText(text);
+	}
+	
+	private void selectAnimation(Animation animation){
+		
+	}
+	
+	private void selectChannel(Channel channel){
+		
 	}
 
 	private static void installLnF() {
@@ -166,24 +244,66 @@ public class Bamporter extends JFrame {
 			} catch (Exception e){
 				e.printStackTrace();
 				this.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
+				return;
 			}
 			root.removeAllChildren();
 			if(bamboo.getSceneGraph() != null){
-				root.add(createTree(bamboo.getSceneGraph()));
-				treeModel.reload();
+				DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
+				sceneGraph.add(createSceneGraphTree(bamboo.getSceneGraph()));
+				root.add(sceneGraph);
 				saveNodeButton.setEnabled(true);
+				saveAllButton.setEnabled(true);
 			} else {
 				saveNodeButton.setEnabled(false);
+				saveAllButton.setEnabled(false);
 			}
+			if(bamboo.getAnimation() != null){
+				
+				root.add(createAnimationTree(bamboo.getAnimation()));
+				saveAnimationButton.setEnabled(true);
+				saveAllButton.setEnabled(true);
+			} else {
+				saveAnimationButton.setEnabled(false);
+			}
+
+			treeModel.reload();
 		}
 	}
 	
-	private DefaultMutableTreeNode createTree(Node node){
+	private DefaultMutableTreeNode createSceneGraphTree(Node node){
 		DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node.toString());
+		treeNode.setUserObject(node);
 		for(int i = 0; i < node.getChildCount(); i++){
-			treeNode.add(this.createTree(node.getChild(i)));
+			treeNode.add(this.createSceneGraphTree(node.getChild(i)));
 		}
 		return treeNode;
+	}
+	
+	private DefaultMutableTreeNode createAnimationTree(Animation a){
+		DefaultMutableTreeNode animation = new DefaultMutableTreeNode("Animation");
+		animation.setUserObject(a);
+		for(int i = 0; i < a.getChannelCount(); i++){
+			DefaultMutableTreeNode channel = new DefaultMutableTreeNode("Channel "+i);
+			channel.setUserObject(a.getChannel(i));
+			animation.add(channel);
+		}
+		return animation;
+	}
+	
+	private void saveAllButtonAction(ActionEvent event) {
+		if(bamboo == null){
+			return;
+		}
+		
+		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
+			try{
+				FileOutputStream stream = new FileOutputStream(fileDialog.getSelectedFile());
+				Bamboo.save(bamboo, stream);
+			} catch (Exception e){
+				e.printStackTrace();
+				this.alertError("An error happened while saving. Please contact support :(");
+			}
+		}
 	}
 
 	private void saveNodeButtonAction(ActionEvent event) {
@@ -197,9 +317,27 @@ public class Bamporter extends JFrame {
 				Bamboo.save(bamboo.getSceneGraph(), stream);
 			} catch (Exception e){
 				e.printStackTrace();
+				this.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
 	}
+
+	private void saveAnimationButtonAction(ActionEvent event) {
+		if(bamboo == null){
+			return;
+		}
+		
+		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
+			try{
+				FileOutputStream stream = new FileOutputStream(fileDialog.getSelectedFile());
+				Bamboo.save(bamboo.getAnimation(), stream);
+			} catch (Exception e){
+				e.printStackTrace();
+				this.alertError("An error happened while saving. Please contact support :(");
+			}
+		}
+	}
+
 	
 	private void alertError(String message){
 		JOptionPane.showMessageDialog(null, message, "Uh oh!", JOptionPane.ERROR_MESSAGE);

@@ -19,6 +19,10 @@ import com.tespirit.bamboo.scenegraph.Node;
  *
  */
 public class Bamboo implements BambooAsset{
+	
+	public static BambooAsset loadAsset(InputStream stream) throws Exception{
+		return new Bamboo(stream);
+	}
 
 	public static Node loadNode(InputStream stream) throws Exception{
 		ObjectInputStream o = new ObjectInputStream(stream);
@@ -51,6 +55,23 @@ public class Bamboo implements BambooAsset{
 	public static void save(Animation animation, OutputStream stream) throws Exception{
 		ObjectOutputStream o = new ObjectOutputStream(stream);
 		o.writeObject(animation);
+		o.close();
+	}
+	
+	/**
+	 * right now this only saves out scenegraph and animation data.
+	 * @param asset
+	 * @param stream
+	 * @throws Exception
+	 */
+	public static void save(BambooAsset asset, OutputStream stream) throws Exception{
+		ObjectOutputStream o = new ObjectOutputStream(stream);
+		if(asset.getSceneGraph() != null){
+			o.writeObject(asset.getSceneGraph());
+		}
+		if(asset.getAnimation() != null){
+			o.writeObject(asset.getAnimation());
+		}
 		o.close();
 	}
 	

@@ -25,6 +25,14 @@ public class Animation implements TimeUpdate, Serializable{
 		this.clips = new ArrayList<Clip>();
 	}
 	
+	public Channel getChannel(int i){
+		return channels.get(i);
+	}
+	
+	public int getChannelCount(){
+		return channels.size();
+	}
+	
 	public void addClip(Clip clip){
 		this.clips.add(clip);
 		if(this.currentClip == null){

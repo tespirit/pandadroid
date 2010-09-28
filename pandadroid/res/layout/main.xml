@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:panda3d="http://schemas.android.com/apk/res/com.tespirit.pandadroid"
+	xmlns:pandadroid="http://schemas.android.com/apk/res/com.tespirit.pandadroid"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -24,11 +24,11 @@
     android:maxLines="10"
     android:minLines="10"
 />
-<com.tespirit.pandadroid.app.Pandadroid
+<com.tespirit.pandadroid.app.PandadroidView
 	android:id="@+id/pandadroid"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	panda3d:debug="true"
-	panda3d:background_color="#444444"
+	pandadroid:debug="true"
+	pandadroid:background_color="#444444"
 />
 </LinearLayout>
