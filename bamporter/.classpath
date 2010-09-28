@@ -2,9 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="D:/android/apps/lib/bamboo.jar"/>
 	<classpathentry kind="con" path="org.dyno.visual.swing.VS_LIBRARY/layoutext"/>
-	<classpathentry kind="lib" path="D:/android/apps/external_lib/xmlpull_1_1_3_4c.jar"/>
 	<classpathentry kind="lib" path="D:/android/apps/external_lib/xpp3-1.1.3.4.C.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/bamboo"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
