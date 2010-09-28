@@ -59,23 +59,23 @@ public class Bamboo implements BambooAsset{
 	private Camera[] mCameras;
 	private LightGroup mLights;
 	
-	public Bamboo(InputStream stream) throws Exception{
+	protected Bamboo(InputStream stream) throws Exception{
 		ObjectInputStream o = new ObjectInputStream(stream);
 		
 		try{
-		Object obj = o.readObject();
-		while(obj != null){
-			if(obj instanceof Node){
-				this.mRoot = (Node)obj;
-			} else if(obj instanceof Animation){
-				this.mAnimation = (Animation)obj;
-			} else if(obj instanceof LightGroup){
-				this.mLights = (LightGroup)obj;
-			} else if(obj instanceof Camera[]){
-				this.mCameras = (Camera[])obj;
+			Object obj = o.readObject();
+			while(obj != null){
+				if(obj instanceof Node){
+					this.mRoot = (Node)obj;
+				} else if(obj instanceof Animation){
+					this.mAnimation = (Animation)obj;
+				} else if(obj instanceof LightGroup){
+					this.mLights = (LightGroup)obj;
+				} else if(obj instanceof Camera[]){
+					this.mCameras = (Camera[])obj;
+				}
+				obj = o.readObject();
 			}
-			obj = o.readObject();
-		}
 		} catch(EOFException e){
 			//end the input.
 		}

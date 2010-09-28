@@ -195,12 +195,12 @@ public class Collada implements BambooAsset{
 	 * @param normals
 	 * @throws Exception
 	 */
-	public Collada(XmlPullParser input, boolean normals)throws Exception{
+	protected Collada(XmlPullParser input, boolean normals)throws Exception{
 		this.mImportNormals = normals;
 		this.init(input);
 	}
 	
-	public Collada(XmlPullParser input)throws Exception{
+	protected Collada(XmlPullParser input)throws Exception{
 		this.mImportNormals = true;
 		this.init(input);
 	}
@@ -339,8 +339,8 @@ public class Collada implements BambooAsset{
         		}
         		this.mAnimation.addChannel(c);
         	}
+        	this.mAnimation.addClip(new Clip(this.mMinAnimationTime, this.mMaxAnimationTime));
         }
-        this.mAnimation.addClip(new Clip(this.mMinAnimationTime, this.mMaxAnimationTime));
         this.mParser = null;
 	}
 	

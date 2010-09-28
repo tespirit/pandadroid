@@ -1,5 +1,6 @@
 package com.tespirit.bamporter;
 
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -12,16 +13,21 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.tespirit.bamboo.io.Bamboo;
+import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamporter.io.BambooHandler;
+import com.tespirit.bamporter.io.IOManager;
 
 public class Bamporter extends JFrame {
 
@@ -43,7 +49,7 @@ public class Bamporter extends JFrame {
 	private JScrollPane outputView;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
 
-	private Collada collada;	
+	private BambooAsset bamboo;	
 	
 	public Bamporter() {
 		initComponents();
@@ -52,12 +58,16 @@ public class Bamporter extends JFrame {
 	private void initComponents() {
 		setTitle("Bamporter");
 		
+		IOManager.init();
+		
 		openButton = new JMenuItem();
 		openButton.setText("Open");
 		saveNodeButton = new JMenuItem();
 		saveNodeButton.setText("Save SceneGraph");
+		saveNodeButton.setEnabled(false);
 		saveAnimationButton = new JMenuItem();
 		saveAnimationButton.setText("Save Animation");
+		saveAnimationButton.setEnabled(false);
 		exitButton = new JMenuItem();
 		exitButton.setText("Exit");
 		fileMenu = new JMenu();
@@ -73,8 +83,6 @@ public class Bamporter extends JFrame {
 		
 		layout = new GridLayout(1,0);
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		
-		
 
 		setLayout(layout);
 		treeView.setViewportView(tree);
@@ -152,17 +160,20 @@ public class Bamporter extends JFrame {
 	}
 	
 	private void openButtonAction(ActionEvent event) {
-		int result = fileDialog.showOpenDialog(this);
-		if(result == JFileChooser.APPROVE_OPTION){
+		if(this.showOpenDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				collada = new Collada(fileDialog.getSelectedFile());
+				bamboo = IOManager.open(fileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
+				this.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
 			}
 			root.removeAllChildren();
-			if(collada.getSceneGraph() != null){
-				root.add(createTree(collada.getSceneGraph()));
+			if(bamboo.getSceneGraph() != null){
+				root.add(createTree(bamboo.getSceneGraph()));
 				treeModel.reload();
+				saveNodeButton.setEnabled(true);
+			} else {
+				saveNodeButton.setEnabled(false);
 			}
 		}
 	}
@@ -176,19 +187,38 @@ public class Bamporter extends JFrame {
 	}
 
 	private void saveNodeButtonAction(ActionEvent event) {
-		if(collada == null){
+		if(bamboo == null){
 			return;
 		}
 		
-		int result = fileDialog.showSaveDialog(this);
-		if(result == JFileChooser.APPROVE_OPTION){
+		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
 				FileOutputStream stream = new FileOutputStream(fileDialog.getSelectedFile());
-				Bamboo.save(collada.getSceneGraph(), stream);
+				Bamboo.save(bamboo.getSceneGraph(), stream);
 			} catch (Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
-
+	
+	private void alertError(String message){
+		JOptionPane.showMessageDialog(null, message, "Uh oh!", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	private int showSaveDialog(){
+		fileDialog.resetChoosableFileFilters();
+		FileFilter prev = fileDialog.getFileFilter();
+		fileDialog.setFileFilter(BambooHandler.getInstance().getFilter());
+		int result = fileDialog.showSaveDialog(this);
+		fileDialog.setFileFilter(prev);
+		return result;
+	}
+	
+	private int showOpenDialog(){
+		fileDialog.resetChoosableFileFilters();
+		for(FileFilter filter : IOManager.getFilters()){
+			fileDialog.addChoosableFileFilter(filter);
+		}
+		return fileDialog.showOpenDialog(this);
+	}
 }
