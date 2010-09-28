@@ -186,6 +186,7 @@ public class VertexBuffer implements Serializable{
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
     	this.types = (int[])in.readObject();
     	this.count = in.readInt();
+    	this.buffers = new FloatBuffer[VertexBuffer.strides.length]; 
     	for(int i = 0; i < this.types.length; i++){
 			this.buffers[this.types[i]] = this.allocateFloatBuffer(strides[this.types[i]]);
 			this.buffers[this.types[i]].put((float[])in.readObject());
