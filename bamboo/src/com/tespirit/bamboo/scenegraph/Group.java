@@ -79,11 +79,14 @@ public class Group extends Node implements Externalizable{
 		}
 	}
 
+	//IO
+	private static final long serialVersionUID = -7994133683481188642L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		this.init();
-    	this.setName((String)in.readObject());
+    	this.setName(in.readUTF());
     	for(int i = 0; i < Matrix3d.SIZE; i++){
     		this.mTransform.setValue(in.readFloat(), i);
     	}
@@ -96,7 +99,7 @@ public class Group extends Node implements Externalizable{
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(this.getName());
+		out.writeUTF(this.getName());
 		for(int i = 0; i < Matrix3d.SIZE; i++){
 			out.writeFloat(this.mTransform.getValue(i));
 		}

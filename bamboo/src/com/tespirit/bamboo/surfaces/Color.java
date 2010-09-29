@@ -54,6 +54,9 @@ public class Color extends Surface implements Externalizable{
 		public abstract void setup(Color color);
 	}
 
+	//IO
+	private static final long serialVersionUID = -4275648857119940383L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

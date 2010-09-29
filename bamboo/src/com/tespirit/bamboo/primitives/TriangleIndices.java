@@ -91,6 +91,9 @@ public class TriangleIndices extends Primitive implements Externalizable{
 		public abstract void render(TriangleIndices triangles);
 	}
 
+	//IO
+	private static final long serialVersionUID = -4424119892618303511L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

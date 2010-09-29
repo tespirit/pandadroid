@@ -109,6 +109,9 @@ public class IndexBuffer implements Externalizable{
 	public void resetBufferPosition(){
 		this.buffer.position(0);
 	}
+	
+	//IO
+	private static final long serialVersionUID = 446637802592556955L;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,

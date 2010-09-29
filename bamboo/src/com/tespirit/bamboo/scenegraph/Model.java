@@ -4,13 +4,12 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 
 import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.vectors.*;
 
-public class Model extends Node implements RenderableNode, Externalizable {
+public class Model extends Node implements RenderableNode, Externalizable{
 	private Primitive mPrimitive;
 	private Surface mSurface;
 	
@@ -112,19 +111,13 @@ public class Model extends Node implements RenderableNode, Externalizable {
 	}
 	
 	//IO
-	private void writeObject(ObjectOutputStream out) throws IOException{
-		
-	}
-	
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
-    	
-    }
+	private static final long serialVersionUID = 385991631261527460L;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		this.init();
-    	this.setName((String)in.readObject());
+    	this.setName(in.readUTF());
     	this.mBoundingBox.getMin().set(in.readFloat(), in.readFloat(), in.readFloat());
     	this.mBoundingBox.getMax().set(in.readFloat(), in.readFloat(), in.readFloat());
     	for(int i = 0; i < Matrix3d.SIZE; i++){
@@ -136,7 +129,7 @@ public class Model extends Node implements RenderableNode, Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(this.getName());
+		out.writeUTF(this.getName());
 		out.writeFloat(this.mBoundingBox.getMin().getX());
 		out.writeFloat(this.mBoundingBox.getMin().getY());
 		out.writeFloat(this.mBoundingBox.getMin().getZ());

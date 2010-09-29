@@ -7,6 +7,7 @@ import java.io.ObjectOutput;
 
 public class JointTranslate extends Joint implements Externalizable{
 
+
 	public JointTranslate(){
 		super();
 	}
@@ -19,6 +20,10 @@ public class JointTranslate extends Joint implements Externalizable{
 	protected void updateLocalMatrix(DofStream dofs) {
 		this.mLocalTransform.getTranslation().set(dofs.getNext(), dofs.getNext(), dofs.getNext());
 	}
+	
+
+	//IO
+	private static final long serialVersionUID = 3068129007429760116L;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,

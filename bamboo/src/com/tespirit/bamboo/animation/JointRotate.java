@@ -23,6 +23,9 @@ public class JointRotate extends Joint implements Externalizable{
 		this.mLocalTransform.rotateZ(dofs.getNext());
 	}
 
+	//IO
+	private static final long serialVersionUID = 9114034209802305745L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

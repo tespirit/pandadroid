@@ -105,6 +105,9 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 	public void setWeightStrides(byte[] weightStrides){
 		this.mWeightStrides = weightStrides;
 	}
+	
+	//IO
+	private static final long serialVersionUID = -7926200357366584475L;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,

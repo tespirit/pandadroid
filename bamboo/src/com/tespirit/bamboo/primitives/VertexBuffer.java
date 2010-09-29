@@ -191,6 +191,9 @@ public class VertexBuffer implements Externalizable{
 		this.resetBufferPosition();
 	}
 
+	//IO
+	private static final long serialVersionUID = 5078756605943568977L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

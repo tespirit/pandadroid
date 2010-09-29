@@ -77,6 +77,9 @@ public class Animation implements TimeUpdate, Externalizable{
 		}
 	}
 
+	//IO
+	private static final long serialVersionUID = 61212447333296652L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

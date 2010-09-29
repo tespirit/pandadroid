@@ -28,6 +28,9 @@ public class JointOrient extends Joint implements Externalizable{
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
     	this.read(in);
     }
+    
+    //IO
+	private static final long serialVersionUID = -1269762051395304350L;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,

@@ -9,6 +9,7 @@ import java.io.ObjectOutput;
 import com.tespirit.bamboo.render.ComponentRenderer;
 
 public class Texture extends Surface implements Externalizable{
+
 	private String diffuseTextureName;
 	
 	private int diffuseTextureId;
@@ -56,16 +57,19 @@ public class Texture extends Surface implements Externalizable{
 		public abstract void render(Texture material);
 		public abstract void setup(Texture material);
 	}
+	
+	//IO
+	private static final long serialVersionUID = -2749691288631756854L;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		this.init();
-    	this.diffuseTextureName = (String)in.readObject();
+    	this.diffuseTextureName = in.readUTF();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(this.diffuseTextureName);
+		out.writeUTF(this.diffuseTextureName);
 	}
 }

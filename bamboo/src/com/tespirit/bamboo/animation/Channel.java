@@ -60,6 +60,10 @@ public class Channel implements Externalizable{
 		return this.keys.get(this.keys.size()-1).value;
 	}
 
+
+	//IO
+	private static final long serialVersionUID = -132392613099886504L;
+	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
