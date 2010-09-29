@@ -33,7 +33,7 @@ public class Pandamonium extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	setContentView(R.layout.main);
-        
+       
         PandadroidView view = (PandadroidView)findViewById(R.id.pandadroid);
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
@@ -49,13 +49,17 @@ public class Pandamonium extends Activity {
     	view.setLightGroup(lights);
     	
     	try{
-    		BambooAsset b = view.loadBamboo("test_anim.bam");
-    		Debug.addTestAnimation(b.getAnimation());
-    		b.getAnimation().attachSkeleton((Joint)b.getSceneGraph());
+    		BambooAsset b = view.loadBamboo("candy.bam");
+    		setupAnimation(b, "d_root1");
     	} catch(Exception e){
     		Debug.print(e);
     		view.setSceneGraph(this.createTestSG());
     	}
+    }
+    
+    public void setupAnimation(BambooAsset b, String skeletonName){
+		Debug.addTestAnimation(b.getAnimation());
+		b.getAnimation().attachSkeleton((Joint)Node.getNode(skeletonName));
     }
     
     public Node createTestSG(){

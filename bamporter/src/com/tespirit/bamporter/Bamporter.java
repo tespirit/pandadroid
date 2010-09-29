@@ -172,7 +172,7 @@ public class Bamporter extends JFrame {
 	}
 	
 	private void selectNode(Node node){
-		String text = node.toString();
+		String text = node.getNodeInfo();
 		if(node.getTransform() != null){
 			text += "\nLocalTransform:";
 			for(int j = 0; j < 4; j++){
