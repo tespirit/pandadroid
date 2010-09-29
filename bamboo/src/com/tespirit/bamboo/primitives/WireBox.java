@@ -4,11 +4,6 @@ import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 public class WireBox extends LineList{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7647189914114700763L;
 
 	public WireBox(){
 		this(new Vector3d(-0.5f, -0.5f, -0.5f), new Vector3d(0.5f, 0.5f, 0.5f));

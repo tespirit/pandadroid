@@ -1,7 +1,13 @@
 package com.tespirit.bamboo.modifiers;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.primitives.VertexBuffer;
+import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
 
@@ -11,18 +17,13 @@ import com.tespirit.bamboo.vectors.Vector3d;
  * @author Todd Espiritu Santo
  *
  */
-public class SkinModifier extends VertexModifier{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1749347314215953735L;
-	private Joint[] mSkeleton;
+public class SkinModifier extends VertexModifier implements Externalizable{
+	private String[] mSkeleton;
 	private Matrix3d[] mBindMatricesInv;
 	private float[] mWeights;
 	private byte[] mSkeletonMap;
 	private byte[] mWeightStrides;
 	
-	//these do not need to save out.
 	private Vector3d mPosition;
 	private Vector3d mNormal;
 	private Vector3d mWeight;
@@ -54,7 +55,8 @@ public class SkinModifier extends VertexModifier{
 	public void update() {
 		//compute transform matrices
 		for(int i = 0; i < this.mSkeleton.length; i++){
-			this.mTransformMatrices[i].multiply(this.mSkeleton[i].getWorldTransform(), this.mBindMatricesInv[i]);
+			Joint joint = (Joint)Node.getNode(this.mSkeleton[i]);
+			this.mTransformMatrices[i].multiply(joint.getWorldTransform(), this.mBindMatricesInv[i]);
 		}
 		
 		int weightIndex = 0;
@@ -86,7 +88,7 @@ public class SkinModifier extends VertexModifier{
 		this.mModifiedBuffer.resetBufferPosition();
 	}
 	
-	public void attachRig(Joint[] skeleton, Matrix3d[] bindMatricesInv){
+	public void attachRig(String[] skeleton, Matrix3d[] bindMatricesInv){
 		this.mSkeleton = skeleton;
 		this.mBindMatricesInv = bindMatricesInv;
 		this.init();
@@ -102,5 +104,29 @@ public class SkinModifier extends VertexModifier{
 	
 	public void setWeightStrides(byte[] weightStrides){
 		this.mWeightStrides = weightStrides;
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.mSkeleton = (String[])in.readObject();
+    	float[] buffer = (float[])in.readObject();
+    	this.mBindMatricesInv = new Matrix3d[buffer.length/Matrix3d.SIZE];
+    	for(int i = 0; i < this.mBindMatricesInv.length; i++){
+    		this.mBindMatricesInv[i] = new Matrix3d(buffer, Matrix3d.SIZE*i);
+    	}
+    	this.mWeights = (float[])in.readObject();
+    	this.mSkeletonMap = (byte[])in.readObject();
+    	this.mWeightStrides = (byte[])in.readObject();
+    	this.init();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(this.mSkeleton);
+		out.writeObject(this.mBindMatricesInv[0].getBuffer());
+		out.writeObject(this.mWeights);
+		out.writeObject(this.mSkeletonMap);
+		out.writeObject(this.mWeightStrides);
 	}
 }

@@ -1,7 +1,9 @@
 package com.tespirit.bamboo.primitives;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
@@ -9,11 +11,7 @@ import java.nio.ByteBuffer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class VertexBuffer implements Serializable{	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3130281885764952649L;
+public class VertexBuffer implements Externalizable{	
 	private FloatBuffer[] buffers;
 	private int count;
 	private int[] types;
@@ -59,6 +57,10 @@ public class VertexBuffer implements Serializable{
 			a.position(0);
 			b.position(0);
 		}
+	}
+	
+	public VertexBuffer(){
+		
 	}
 	
 	private FloatBuffer allocateFloatBuffer(int stride){
@@ -188,8 +190,22 @@ public class VertexBuffer implements Serializable{
 		}
 		this.resetBufferPosition();
 	}
-	
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException{
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.types = (int[])in.readObject();
+    	this.count = in.readInt();
+    	this.buffers = new FloatBuffer[VertexBuffer.strides.length]; 
+    	for(int i = 0; i < this.types.length; i++){
+			this.buffers[this.types[i]] = this.allocateFloatBuffer(strides[this.types[i]]);
+			this.buffers[this.types[i]].put((float[])in.readObject());
+			this.buffers[this.types[i]].position(0);
+		}
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeObject(this.types);
 		out.writeInt(this.count);
 		for(int i = 0; i < this.types.length; i++){
@@ -199,16 +215,5 @@ public class VertexBuffer implements Serializable{
 			this.buffers[this.types[i]].position(0);
 		}
 	}
-	
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
-    	this.types = (int[])in.readObject();
-    	this.count = in.readInt();
-    	this.buffers = new FloatBuffer[VertexBuffer.strides.length]; 
-    	for(int i = 0; i < this.types.length; i++){
-			this.buffers[this.types[i]] = this.allocateFloatBuffer(strides[this.types[i]]);
-			this.buffers[this.types[i]].put((float[])in.readObject());
-			this.buffers[this.types[i]].position(0);
-		}
-    }
 
 }

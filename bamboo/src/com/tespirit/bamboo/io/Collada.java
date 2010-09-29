@@ -10,7 +10,7 @@ import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointOrient;
 import com.tespirit.bamboo.animation.JointRotate;
-import com.tespirit.bamboo.animation.SkeletonNode;
+import com.tespirit.bamboo.animation.JointTranslate;
 import com.tespirit.bamboo.modifiers.SkinModifier;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.Primitive;
@@ -363,20 +363,14 @@ public class Collada implements BambooAsset{
 	}
 	
 	private void createSkin(String skinId){
-		if(!this.mSkinDatas.contains(skinId)){
+		if(!this.mSkinDatas.containsKey(skinId)){
 			return;
 		}
 		SkinData skinData = this.mSkinDatas.get(skinId);
 		TriangleIndices source = (TriangleIndices)this.mPrimitives.get(skinData.mSource);
-
-		//create rig
-		Joint[] joints = new Joint[skinData.mJoints.length];
-		for(int i = 0; i < joints.length; i++){
-			joints[i] = (Joint)Node.getNode(skinData.mJoints[i]);
-		}
 		
 		SkinModifier skin = new SkinModifier();
-		skin.attachRig(joints, skinData.mBindMatricesInv);
+		skin.attachRig(skinData.mJoints, skinData.mBindMatricesInv);
 		
 		//create weights and all!
 		Vector<Integer> skinRemap = this.mSkinRemaps.get(skinData.mSource);
@@ -406,7 +400,8 @@ public class Collada implements BambooAsset{
 			for(int j = 0; j < stride; j++){
 				int baseOffset = mapOffset+j*skinData.mStride;
 				skeletonVertex.add((byte)skinData.mSkeletonMap[baseOffset+skinData.mSkeletonOffset]);
-				weightVertex.add(skinData.mWeights[baseOffset+skinData.mWeightOffset]);
+				int weightIndex = skinData.mSkeletonMap[baseOffset+skinData.mWeightOffset];
+				weightVertex.add(skinData.mWeights[weightIndex]);
 				mapCount++;
 			}
 		}
@@ -797,12 +792,14 @@ public class Collada implements BambooAsset{
 		current.multiply(temp);
 	}
 	
-	private SkeletonNode parseSkeleton() throws Exception{
+	private Joint parseSkeleton() throws Exception{
 		String name = this.getAttr(NameId.id);
 		this.generateChannels(name, false, true, true, true); //translate
 		this.generateChannels(name, true, true, true, true); //rotate
 		
-		SkeletonNode skeleton = new SkeletonNode(name);
+		JointTranslate joint = new JointTranslate(name);
+		JointRotate subJoint = new JointRotate(name+"<rotate>");
+		joint.appendChild(subJoint);
 		
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
@@ -811,31 +808,31 @@ public class Collada implements BambooAsset{
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
 				case matrix:
-					this.parseMatrix(skeleton.getTransform());
+					this.parseMatrix(joint.getTransform());
 					break;
 				case translate:
-					this.parseTranslate(skeleton.getTransform());
+					this.parseTranslate(joint.getTransform());
 					break;
 				case rotate:
 					String sid = this.getAttr(NameId.sid);
 					if(sid != null && sid.startsWith("jointOrient")){
-						this.parseRotate(skeleton.getTransform());
+						this.parseRotate(joint.getTransform());
 					} else {
-						this.parseRotate(skeleton.getRotateTransform());
+						this.parseRotate(subJoint.getTransform());
 					}
 					break;
 				case node:
 					if(this.getAttrId(NameId.type) == NameId.JOINT){
 						Joint child = this.parseJoint();
-						skeleton.appendChild(child);
+						subJoint.appendChild(child);
 					}
 					break;
 				}
 				break;
 			case XmlPullParser.END_TAG:
 				if(this.getTagId() == NameId.node){
-					skeleton.createAllBones(0.05f);
-					return skeleton;
+					joint.createAllBones(0.05f);
+					return joint;
 				}
 				break;
 			}
@@ -1272,7 +1269,7 @@ public class Collada implements BambooAsset{
 	}
 	
 	private void parseSkin(String name) throws Exception{
-		String source = this.getAttr(NameId.source);
+		String source = this.getRefAttr(NameId.source);
 		SkinInputs inputs = new SkinInputs();
 		SkinData skinData = null;
 		int eventType = this.mParser.getEventType();

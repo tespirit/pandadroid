@@ -1,6 +1,10 @@
 package com.tespirit.bamboo.primitives;
 
-import java.util.Stack;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
 
 import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
@@ -11,30 +15,36 @@ import com.tespirit.bamboo.modifiers.VertexModifier;
  * @author Todd Espiritu Santo
  *
  */
-public class TriangleIndices extends Primitive{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1986380555935180298L;
+public class TriangleIndices extends Primitive implements Externalizable{
 	protected VertexBuffer vertexBuffer;
 	protected IndexBuffer indexBuffer;
-	protected Stack<VertexModifier> modifierStack;
+	protected ArrayList<VertexModifier> modifierStack;
+	
+	protected VertexBuffer topBuffer;
+	
+	public TriangleIndices(){
+		
+	}
 	
 	public TriangleIndices(VertexBuffer vb, IndexBuffer ib){
 		this.vertexBuffer = vb;
 		this.indexBuffer = ib;
-		this.modifierStack = new Stack<VertexModifier>();
+		this.init();
+	}
+	
+	public void init(){
+		this.topBuffer = this.vertexBuffer;
+		this.modifierStack = new ArrayList<VertexModifier>();
 		this.renderAsTriangles();
 	}
 	
 	public TriangleIndices(int indexCount, int vertexCount, int[] vertexTypes){
-		this.vertexBuffer = new VertexBuffer(vertexCount, vertexTypes);
-		this.renderAsTriangles(); //default setting.
-		this.indexBuffer = new IndexBuffer(indexCount, vertexCount);
+		this(new VertexBuffer(vertexCount, vertexTypes),
+			 new IndexBuffer(indexCount, vertexCount));
 	}
 	
 	public VertexBuffer getVertexBuffer(){
-		return this.vertexBuffer;
+		return this.topBuffer;
 	}
 	
 	public IndexBuffer getIndexBuffer(){
@@ -42,13 +52,15 @@ public class TriangleIndices extends Primitive{
 	}
 	
 	public void addModifier(VertexModifier vm){
-		if(this.modifierStack.isEmpty()){
-			vm.setVertexBuffer(this.vertexBuffer);
-		} else {
-			vm.setVertexBuffer(this.modifierStack.peek().getModifiedBuffer());
+		vm.setVertexBuffer(this.topBuffer);
+		this.topBuffer = vm.getModifiedBuffer();
+		this.modifierStack.add(vm);
+	}
+	
+	public void updateModifiers(){
+		for(int i = 0; i < this.modifierStack.size(); i++){
+			this.modifierStack.get(i).update();
 		}
-		this.vertexBuffer = vm.getModifiedBuffer();
-		this.modifierStack.push(vm);
 	}
 
 	@Override
@@ -77,5 +89,28 @@ public class TriangleIndices extends Primitive{
 		}
 		
 		public abstract void render(TriangleIndices triangles);
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.vertexBuffer = (VertexBuffer)in.readObject();
+    	this.indexBuffer = (IndexBuffer)in.readObject();
+    	this.init();
+    	int modifiers = in.readInt();
+    	for(int i = 0; i < modifiers; i++){
+    		VertexModifier vm = (VertexModifier)in.readObject();
+    		this.addModifier(vm);
+    	}
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(this.vertexBuffer);
+		out.writeObject(this.indexBuffer);
+		out.writeInt(this.modifierStack.size());
+		for(VertexModifier vm : this.modifierStack){
+			out.writeObject(vm);
+		}
 	}
 }

@@ -1,28 +1,34 @@
 package com.tespirit.bamboo.animation;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 
 import com.tespirit.bamboo.render.TimeUpdate;
 
-public class Animation implements TimeUpdate, Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2061900709721915476L;
-	ArrayList<Channel> channels;
-	DofStream dofs;
-	long time;
-	long startTime;
-	boolean playing;
-	Clip currentClip;
-	ArrayList<Clip> clips;
+public class Animation implements TimeUpdate, Externalizable{
+	private ArrayList<Channel> channels;
+	private ArrayList<Clip> clips;
+	private Clip currentClip;
+
+	private DofStream dofs;
+	private boolean playing;
 	
-	public Animation(int channels){
+	public Animation(){
+		
+	}
+	
+	public Animation(int channelCount){
+		this.init(channelCount);
+	}
+	
+	public void init(int channelCount){
 		this.channels = new ArrayList<Channel>();
-		this.dofs = new DofStream(channels);
-		this.playing = false;
 		this.clips = new ArrayList<Clip>();
+		this.dofs = new DofStream(channelCount);
+		this.playing = false;
 	}
 	
 	public Channel getChannel(int i){
@@ -68,6 +74,34 @@ public class Animation implements TimeUpdate, Serializable{
 				this.dofs.setNext(c.getValue(this.currentClip.getClipTime(time)));
 			}
 			this.dofs.reset();
+		}
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		int count = in.readInt();
+    	this.init(count);
+    	for(int i = 0; i < count; i++){
+    		this.addChannel((Channel)in.readObject());
+    	}
+    	
+    	count = in.readInt();
+    	for(int i = 0; i < count; i++){
+    		this.addClip(new Clip(in.readLong(), in.readLong()));
+    	}
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(this.channels.size());
+		for(Channel c : this.channels){
+			out.writeObject(c);
+		}
+		out.writeInt(this.clips.size());
+		for(Clip c : this.clips){
+			out.writeLong(c.getStart());
+			out.writeLong(c.getEnd());
 		}
 	}
 }

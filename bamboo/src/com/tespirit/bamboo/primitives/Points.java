@@ -5,11 +5,6 @@ import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 public class Points extends Primitive{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1640806254288255365L;
 	VertexBuffer vertexBuffer;
 	
 	public Points(Vector3d[] points){
@@ -62,6 +57,12 @@ public class Points extends Primitive{
 			Points.renderer = this;
 		}
 		public abstract void render(Points points);
+	}
+
+	@Override
+	public void updateModifiers() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

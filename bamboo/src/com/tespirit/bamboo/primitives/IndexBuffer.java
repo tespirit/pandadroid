@@ -1,18 +1,16 @@
 package com.tespirit.bamboo.primitives;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.Buffer;
 
-public class IndexBuffer implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2531725665599885532L;
+public class IndexBuffer implements Externalizable{
 	private IntBuffer buffer32;
 	private ShortBuffer buffer16;
 	private ByteBuffer buffer8;
@@ -63,6 +61,10 @@ public class IndexBuffer implements Serializable{
 		}
 	}
 	
+	public IndexBuffer(){
+		
+	}
+	
 	public int getCount(){
 		return this.count;
 	}
@@ -107,32 +109,11 @@ public class IndexBuffer implements Serializable{
 	public void resetBufferPosition(){
 		this.buffer.position(0);
 	}
-	
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException{
-		out.writeInt(this.type);
-		out.writeInt(this.count);
-		switch(this.type){
-		case BUFFER32:
-			int[] output32 = new int[this.count];
-			this.buffer32.get(output32);
-			out.writeObject(output32);
-			break;
-		case BUFFER16:
-			short[] output16 = new short[this.count];
-			this.buffer16.get(output16);
-			out.writeObject(output16);
-			break;
-		case BUFFER8:
-			byte[] output8 = new byte[this.count];
-			this.buffer8.get(output8);
-			out.writeObject(output8);
-			break;
-		}
-		this.buffer.position(0);
-	}
-	
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
-    	this.type = in.readInt();
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.type = in.readInt();
     	this.count = in.readInt();
     	
     	ByteBuffer temp = ByteBuffer.allocateDirect(count * 4);
@@ -156,5 +137,29 @@ public class IndexBuffer implements Serializable{
 			break;
 		}
     	this.buffer.position(0);
-    }
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(this.type);
+		out.writeInt(this.count);
+		switch(this.type){
+		case BUFFER32:
+			int[] output32 = new int[this.count];
+			this.buffer32.get(output32);
+			out.writeObject(output32);
+			break;
+		case BUFFER16:
+			short[] output16 = new short[this.count];
+			this.buffer16.get(output16);
+			out.writeObject(output16);
+			break;
+		case BUFFER8:
+			byte[] output8 = new byte[this.count];
+			this.buffer8.get(output8);
+			out.writeObject(output8);
+			break;
+		}
+		this.buffer.position(0);
+	}
 }

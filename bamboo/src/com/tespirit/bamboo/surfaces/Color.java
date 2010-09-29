@@ -1,6 +1,11 @@
 package com.tespirit.bamboo.surfaces;
 
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.Color4;
 
@@ -9,12 +14,7 @@ import com.tespirit.bamboo.vectors.Color4;
  * @author Todd Espiritu Santo
  *
  */
-public class Color extends Surface{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4142008556798689478L;
+public class Color extends Surface implements Externalizable{
 	Color4 color;
 	
 	public Color(){
@@ -52,6 +52,21 @@ public class Color extends Surface{
 		}
 		public abstract void render(Color color);
 		public abstract void setup(Color color);
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.color = new Color4();
+    	this.color.set(in.readFloat(),in.readFloat(),in.readFloat(),in.readFloat());
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeFloat(this.color.getRed());
+		out.writeFloat(this.color.getGreen());
+		out.writeFloat(this.color.getBlue());
+		out.writeFloat(this.color.getAlpha());
 	}
 
 }

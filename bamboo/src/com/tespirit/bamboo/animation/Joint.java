@@ -1,5 +1,8 @@
 package com.tespirit.bamboo.animation;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 
 import com.tespirit.bamboo.scenegraph.Node;
@@ -23,14 +26,11 @@ public abstract class Joint extends Node{
 	 * 
 	 */
 	private static final long serialVersionUID = -6138379270722022703L;
-	protected Matrix3d localTransform;
-	protected Matrix3d worldTransform;
-	
-	private AxisAlignedBox bone;
-	
-	protected ArrayList<Joint> children;
-	
-	private DofStream dofs;
+	protected Matrix3d mLocalTransform;
+	protected Matrix3d mWorldTransform;
+	protected ArrayList<Joint> mChildren;
+	private AxisAlignedBox mBone;
+	private DofStream mDofs;
 	
 	public Joint(){
 		this(null);
@@ -38,10 +38,15 @@ public abstract class Joint extends Node{
 	
 	public Joint(String name){
 		super(name);
-		this.children = new ArrayList<Joint>();
+		this.mChildren = new ArrayList<Joint>();
+	}
+	
+	@Override
+	protected void init(){
+		super.init();
 		float[] buffer = Matrix3d.createBuffer(2);
-		this.localTransform = new Matrix3d(buffer);
-		this.worldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
+		this.mLocalTransform = new Matrix3d(buffer);
+		this.mWorldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
 	}
 	
 	/**
@@ -51,7 +56,7 @@ public abstract class Joint extends Node{
 	 */
 	public void createAllBones(float radius){
 		this.createBone(radius);
-		for(Joint j : this.children){
+		for(Joint j : this.mChildren){
 			j.createAllBones(radius);
 		}
 	}
@@ -63,29 +68,29 @@ public abstract class Joint extends Node{
 	 * added before calling this.
 	 * @param radius
 	 */
-	public void createBone(float radius){
-		this.bone = new AxisAlignedBox();
+	public void createBone(float boneSize){
+		this.mBone = new AxisAlignedBox();
 		
-		Vector3d sizeOffset = new Vector3d(radius, radius, radius);
-		this.bone.grow(sizeOffset);
-		sizeOffset.set(-radius, -radius, -radius);
-		this.bone.grow(sizeOffset);
+		Vector3d sizeOffset = new Vector3d(boneSize, boneSize, boneSize);
+		this.mBone.grow(sizeOffset);
+		sizeOffset.set(-boneSize, -boneSize, -boneSize);
+		this.mBone.grow(sizeOffset);
 		
 		//now add children!
-		for(Joint j : this.children){
-			Vector3d top = j.localTransform.getTranslation();
-			sizeOffset.set(radius, radius, radius);
+		for(Joint j : this.mChildren){
+			Vector3d top = j.mLocalTransform.getTranslation();
+			sizeOffset.set(boneSize, boneSize, boneSize);
 			sizeOffset.add(top);
-			this.bone.grow(sizeOffset);
-			sizeOffset.set(-radius, -radius, -radius);
+			this.mBone.grow(sizeOffset);
+			sizeOffset.set(-boneSize, -boneSize, -boneSize);
 			sizeOffset.add(top);
-			this.bone.grow(sizeOffset);
+			this.mBone.grow(sizeOffset);
 		}
 	}
 	
 	public void setDofs(DofStream dofs){
-		this.dofs = dofs;
-		for(Joint j : this.children){
+		this.mDofs = dofs;
+		for(Joint j : this.mChildren){
 			j.setDofs(dofs);
 		}
 		
@@ -93,47 +98,88 @@ public abstract class Joint extends Node{
 	
 	@Override
 	public AxisAlignedBox getBoundingBox() {
-		return this.bone;
+		return this.mBone;
 	}
 	
 	public void appendChild(Joint joint){
-		this.children.add(joint);
-		if(this.dofs!= null){
-			joint.setDofs(this.dofs);
+		this.mChildren.add(joint);
+		if(this.mDofs!= null){
+			joint.setDofs(this.mDofs);
 		}
 	}
 
 	@Override
 	public Node getChild(int i) {
-		return this.children.get(i);
+		return this.mChildren.get(i);
 	}
 
 	@Override
 	public int getChildCount() {
-		return this.children.size();
+		return this.mChildren.size();
 	}
 
 	@Override
 	public Matrix3d getTransform() {
-		return this.localTransform;
+		return this.mLocalTransform;
 	}
 
 	@Override
 	public Matrix3d getWorldTransform() {
-		return this.worldTransform;
+		return this.mWorldTransform;
 	}
 
 	@Override
 	public void update(Matrix3d transform){
-		if(this.dofs != null){
-			this.updateLocalMatrix(this.dofs);
+		if(this.mDofs != null){
+			this.updateLocalMatrix(this.mDofs);
 		}
-		this.worldTransform.multiply(transform,this.localTransform);
-		for(Joint joint : this.children){
-			joint.update(this.worldTransform);
+		this.mWorldTransform.multiply(transform,this.mLocalTransform);
+		for(Joint joint : this.mChildren){
+			joint.update(this.mWorldTransform);
 		}
 	}
 	
+	protected void write(ObjectOutput out) throws IOException{
+		out.writeObject(this.getName());
+		if(this.mBone != null){
+			out.writeBoolean(true);
+    		out.writeFloat(this.mBone.getMin().getX());
+			out.writeFloat(this.mBone.getMin().getY());
+			out.writeFloat(this.mBone.getMin().getZ());
+			out.writeFloat(this.mBone.getMax().getX());
+			out.writeFloat(this.mBone.getMax().getY());
+			out.writeFloat(this.mBone.getMax().getZ());
+		} else {
+			out.writeBoolean(false);
+		}
+		for(int i = 0; i < Matrix3d.SIZE; i++){
+			out.writeFloat(this.mLocalTransform.getValue(i));
+		}
+		out.writeInt(this.mChildren.size());
+		for(Joint child : this.mChildren){
+			out.writeObject(child);
+		}
+	}
+	
+	protected void read(ObjectInput in) throws IOException, ClassNotFoundException{
+		this.init();
+    	this.setName((String)in.readObject());
+    	if(in.readBoolean()){
+    		this.mBone = new AxisAlignedBox();
+    		this.mBone.setMin(in.readFloat(), in.readFloat(), in.readFloat());
+    		this.mBone.setMax(in.readFloat(), in.readFloat(), in.readFloat());
+    	}
+    	for(int i = 0; i < Matrix3d.SIZE; i++){
+    		this.mLocalTransform.setValue(in.readFloat(), i);
+    	}
+    	int childCount = in.readInt();
+    	this.mChildren = new ArrayList<Joint>(childCount);
+    	for(int i = 0; i < childCount; i++){
+    		this.mChildren.add((Joint)in.readObject());
+    	}
+    }
+	
 	protected abstract void updateLocalMatrix(DofStream dofs);
+	
 
 }

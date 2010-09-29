@@ -1,13 +1,6 @@
 package com.tespirit.bamboo.animation;
 
-import java.io.Serializable;
-
-public class Clip implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4458717474108576702L;
+public class Clip {
 
 	private long mInitialTime;
 	private long mStart;
@@ -24,5 +17,13 @@ public class Clip implements Serializable {
 	
 	public long getClipTime(long currentTime){
 		return ((currentTime - this.mInitialTime)-this.mStart)%this.mEnd + this.mStart;
+	}
+	
+	public long getStart(){
+		return this.mStart;
+	}
+	
+	public long getEnd(){
+		return this.mEnd;
 	}
 }

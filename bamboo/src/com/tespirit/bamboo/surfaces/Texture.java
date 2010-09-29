@@ -1,20 +1,23 @@
 package com.tespirit.bamboo.surfaces;
 
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import com.tespirit.bamboo.render.ComponentRenderer;
 
-public class Texture extends Surface{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1229859858483360355L;
-
+public class Texture extends Surface implements Externalizable{
 	private String diffuseTextureName;
 	
 	private int diffuseTextureId;
 	
 	public Texture(){
+		this.init();
+	}
+	
+	public void init(){
 		TextureManager.getInstance().addTexture(this);
 	}
 	
@@ -52,5 +55,17 @@ public class Texture extends Surface{
 		}
 		public abstract void render(Texture material);
 		public abstract void setup(Texture material);
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.init();
+    	this.diffuseTextureName = (String)in.readObject();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(this.diffuseTextureName);
 	}
 }

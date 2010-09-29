@@ -1,65 +1,108 @@
 package com.tespirit.bamboo.scenegraph;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.*;
 
 import com.tespirit.bamboo.vectors.*;
 
-public class Group extends Transform{
+public class Group extends Node implements Externalizable{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8461771187366964690L;
+	private Matrix3d mTransform;
+	private Matrix3d mWorldTransform;
 
-	private ArrayList<Node> children;
-	
-	private AxisAlignedBox boundingBox;
+	private List<Node> mChildren;
 	
 	public Group(){
-		super();
-		this.children = new ArrayList<Node>();
-		this.boundingBox = new AxisAlignedBox();
+		this(null, new ArrayList<Node>());
 	}
 	
 	public Group(String n){
-		super(n);
-		this.children = new ArrayList<Node>();
-		this.boundingBox = new AxisAlignedBox();
+		this(n, new ArrayList<Node>());
 	}
 	
-	public Group(ArrayList<Node> childern){
-		super();
-		this.children = childern;
-		this.boundingBox = new AxisAlignedBox();
+	public Group(List<Node> childern){
+		this(null, childern);
 	}
 	
-	public Group(String n, ArrayList<Node> children){
+	public Group(String n, List<Node> children){
 		super(n);
-		this.children = children;
-		this.boundingBox = new AxisAlignedBox();
+		this.mChildren = children;
+	}
+	
+	@Override
+	protected void init(){
+		float[] m = new float[Matrix3d.SIZE*2];
+		this.mTransform = new Matrix3d(m);
+		this.mTransform.identity();
+		this.mWorldTransform = new Matrix3d(m, Matrix3d.SIZE);
 	}
 	
 	public void appendChild(Node node){
 		if(node != null){
-			this.children.add(node);
+			this.mChildren.add(node);
 		}
 	}
 	
 	@Override
 	public Node getChild(int i) {
-		return this.children.get(i);
+		return this.mChildren.get(i);
 	}
 	
 	@Override
 	public int getChildCount(){
-		return this.children.size();
+		return this.mChildren.size();
 	}
 	
-	/**
-	 * This will compute the bounding box
-	 */
 	@Override
 	public AxisAlignedBox getBoundingBox(){
-		return boundingBox;
+		return null;
+	}
+	
+	@Override
+	public Matrix3d getTransform() {
+		return this.mTransform;
+	}
+	
+	@Override
+	public Matrix3d getWorldTransform() {
+		return this.mWorldTransform;
+	}
+
+	@Override
+	public void update(Matrix3d transform) {
+		this.mWorldTransform.multiply(transform,this.mTransform);
+		for(int i = 0; i < this.mChildren.size(); i++){
+			this.mChildren.get(i).update(this.mWorldTransform);
+		}
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.init();
+    	this.setName((String)in.readObject());
+    	for(int i = 0; i < Matrix3d.SIZE; i++){
+    		this.mTransform.setValue(in.readFloat(), i);
+    	}
+    	int childCount = in.readInt();
+    	this.mChildren = new ArrayList<Node>(childCount);
+    	for(int i = 0; i < childCount; i++){
+    		this.mChildren.add((Node)in.readObject());
+    	}
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(this.getName());
+		for(int i = 0; i < Matrix3d.SIZE; i++){
+			out.writeFloat(this.mTransform.getValue(i));
+		}
+		out.writeInt(this.mChildren.size());
+		for(Node child : this.mChildren){
+			out.writeObject(child);
+		}
 	}
 }

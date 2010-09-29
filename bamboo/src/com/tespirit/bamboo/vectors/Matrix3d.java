@@ -1,13 +1,6 @@
 package com.tespirit.bamboo.vectors;
 
-import java.io.Serializable;
-
-public class Matrix3d implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7691525818206944830L;
+public class Matrix3d {
 	private float[] m;
 	private int offset;
 	
@@ -59,13 +52,10 @@ public class Matrix3d implements Serializable{
 	public Matrix3d(float[] values, int offset){
 		this.m = values;
 		this.offset = offset;
-		this.xAxis = new Vector3d(this.m, offset);
+		this.initVectors();
 		this.xAxis.makeDirectional();
-		this.yAxis = new Vector3d(this.m, offset+Vector3d.SIZE);
 		this.yAxis.makeDirectional();
-		this.zAxis = new Vector3d(this.m, offset+Vector3d.SIZE*2);
 		this.zAxis.makeDirectional();
-		this.translation = new Vector3d(this.m, offset+Vector3d.SIZE*3);
 		this.translation.makePositional();
 	}
 	
@@ -78,6 +68,13 @@ public class Matrix3d implements Serializable{
 		this.yAxis.set(b1, b2, b3);
 		this.zAxis.set(c1, c2, c3);
 		this.translation.set(d1, d2, d3);
+	}
+	
+	private void initVectors(){
+		this.xAxis = new Vector3d(this.m, offset);
+		this.yAxis = new Vector3d(this.m, offset+Vector3d.SIZE);
+		this.zAxis = new Vector3d(this.m, offset+Vector3d.SIZE*2);
+		this.translation = new Vector3d(this.m, offset+Vector3d.SIZE*3);
 	}
 	
 	public Vector3d getXAxis(){
