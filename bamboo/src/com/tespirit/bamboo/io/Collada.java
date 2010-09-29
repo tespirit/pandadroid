@@ -10,7 +10,8 @@ import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointOrient;
 import com.tespirit.bamboo.animation.JointRotate;
-import com.tespirit.bamboo.animation.JointTranslate;
+import com.tespirit.bamboo.animation.SkeletonNode;
+import com.tespirit.bamboo.modifiers.SkinModifier;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.TriangleIndices;
@@ -89,6 +90,7 @@ public class Collada implements BambooAsset{
 		TEXCOORD,
 		source,
 		float_array,
+		Name_array,
 		
 		id,
 		sid,
@@ -112,6 +114,16 @@ public class Collada implements BambooAsset{
 		triangles,
 		count,
 		p,
+		
+		instance_controller,
+		controller,
+		skin,
+		vertex_weights,
+		joints,
+		vcount,
+		v,
+		WEIGHT,
+		INV_BIND_MATRIX,
 		
 		bind_material,
 		technique_common,
@@ -144,6 +156,8 @@ public class Collada implements BambooAsset{
 	private Hashtable<String, String> mTextureNames;
 	private Hashtable<String, String> mEffectsLink;
 	private Hashtable<String, Effect> mEffects;
+	private Hashtable<String, Vector<Integer>> mSkinRemaps;
+	private Hashtable<String, SkinData> mSkinDatas;
 	
 	private class ModelLink{
 		Model mModel;
@@ -154,6 +168,7 @@ public class Collada implements BambooAsset{
 	private class Source{
 		private String mId;
 		private float[] mFloatSource;
+		private String[] mNameSource;
 		
 		public Source(String id){
 			this.mId = id;
@@ -280,6 +295,8 @@ public class Collada implements BambooAsset{
 		this.mTextureNames = new Hashtable<String, String>();
 		this.mEffectsLink = new Hashtable<String, String>();
 		this.mEffects = new Hashtable<String, Effect>();
+		this.mSkinRemaps = new Hashtable<String, Vector<Integer>>();
+		this.mSkinDatas = new Hashtable<String, SkinData>();
 		
 		this.mParser = input;
 
@@ -322,6 +339,7 @@ public class Collada implements BambooAsset{
         //assemble linked data!
         for(int i = 0; i < this.mModels.size(); i++){
         	ModelLink ml = this.mModels.get(i);
+        	this.createSkin(ml.mPrimitiveId);
         	Primitive p = this.mPrimitives.get(ml.mPrimitiveId);
         	if(p == null){
         		throw new Exception("Model primitive data not found: "+ml.mPrimitiveId);
@@ -342,6 +360,74 @@ public class Collada implements BambooAsset{
         	this.mAnimation.addClip(new Clip(this.mMinAnimationTime, this.mMaxAnimationTime));
         }
         this.mParser = null;
+	}
+	
+	private void createSkin(String skinId){
+		if(!this.mSkinDatas.contains(skinId)){
+			return;
+		}
+		SkinData skinData = this.mSkinDatas.get(skinId);
+		TriangleIndices source = (TriangleIndices)this.mPrimitives.get(skinData.mSource);
+
+		//create rig
+		Joint[] joints = new Joint[skinData.mJoints.length];
+		for(int i = 0; i < joints.length; i++){
+			joints[i] = (Joint)Node.getNode(skinData.mJoints[i]);
+		}
+		
+		SkinModifier skin = new SkinModifier();
+		skin.attachRig(joints, skinData.mBindMatricesInv);
+		
+		//create weights and all!
+		Vector<Integer> skinRemap = this.mSkinRemaps.get(skinData.mSource);
+		
+		int[] totalOffset = new int[skinData.mStrideMap.length];
+		int offset = 0;
+		for(int i = 0; i < totalOffset.length; i++){
+			totalOffset[i] = offset;
+			offset += skinData.mStrideMap[i];
+		}
+		
+		byte[] weightStrides = new byte[source.getVertexBuffer().getCount()];
+		Vector<Vector<Byte>> skeletonMapTemp = new Vector<Vector<Byte>>();
+		Vector<Vector<Float>> weightsTemp = new Vector<Vector<Float>>(); 
+		
+		int mapCount = 0;
+		
+		for(int i = 0; i < skinRemap.size(); i++){
+			int index = skinRemap.get(i);
+			int mapOffset = totalOffset[index]*skinData.mStride;
+			int stride = skinData.mStrideMap[index];
+			weightStrides[i] = (byte)stride;
+			Vector<Byte> skeletonVertex = new Vector<Byte>();
+			Vector<Float> weightVertex = new Vector<Float>();
+			skeletonMapTemp.add(skeletonVertex);
+			weightsTemp.add(weightVertex);
+			for(int j = 0; j < stride; j++){
+				int baseOffset = mapOffset+j*skinData.mStride;
+				skeletonVertex.add((byte)skinData.mSkeletonMap[baseOffset+skinData.mSkeletonOffset]);
+				weightVertex.add(skinData.mWeights[baseOffset+skinData.mWeightOffset]);
+				mapCount++;
+			}
+		}
+		
+		byte[] skeletonMap = new byte[mapCount];
+		float[] weights = new float[mapCount];
+		int current = 0;
+		for(int i = 0; i < skeletonMapTemp.size(); i++){
+			for(int j = 0; j < skeletonMapTemp.get(i).size(); j++){
+				skeletonMap[current] = skeletonMapTemp.get(i).get(j);
+				weights[current] = weightsTemp.get(i).get(j);
+			}
+		}
+		
+		skin.setSkeletonMap(skeletonMap);
+		skin.setWeights(weights);
+		skin.setWeightStrides(weightStrides);
+		
+		source.addModifier(skin);
+		
+		this.mPrimitives.put(skinId, source);
 	}
 	
 	private Surface createSurface(String materialId){
@@ -487,10 +573,36 @@ public class Collada implements BambooAsset{
 	
 	private void parseSource() throws Exception{
 		String id = this.getAttr(NameId.id);
-		if(this.moveToChildNode(NameId.float_array, NameId.source)){
-			Source source = new Source(id);
-			source.mFloatSource = this.parseFloatArray();
-			this.mSources.put(source.mId, source);
+		
+		String[] nameArray = null;
+		float[] floatArray = null;
+		
+		int eventType = this.mParser.getEventType();
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case float_array:
+					floatArray = this.parseFloatArray(NameId.float_array);
+					break;
+				case Name_array:
+					nameArray = this.parseStringArray(NameId.Name_array);
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == NameId.source){
+					if(floatArray != null || nameArray != null){
+						Source source = new Source(id);
+						source.mFloatSource = floatArray;
+						source.mNameSource = nameArray;
+						this.mSources.put(source.mId, source);
+					}
+					return;
+				}
+				break;
+			}
 		}
 	}
 	
@@ -523,16 +635,24 @@ public class Collada implements BambooAsset{
 		return null;
 	}
 	
-	private float[] parseFloatArray() throws Exception{
-		return parseFloatArray(NameId.float_array);
-	}
-	
 	private float[] parseFloatArray(NameId id) throws Exception{
 		String[] strings = this.parseStringArray(id);
 		if(strings != null){
 			float[] values = new float[strings.length];
 			for(int i = 0; i<strings.length; i++){
 				values[i] = Float.parseFloat(strings[i]);
+			}
+			return values;
+		}
+		return null;
+	}
+	
+	private int[] parseIntArray(NameId id) throws Exception{
+		String[] strings = this.parseStringArray(id);
+		if(strings != null){
+			int[] values = new int[strings.length];
+			for(int i = 0; i<strings.length; i++){
+				values[i] = Integer.parseInt(strings[i]);
 			}
 			return values;
 		}
@@ -588,16 +708,12 @@ public class Collada implements BambooAsset{
 					this.parseScale(transform);
 					break;
 				case instance_geometry:
-					Model model = new Model(name);
+					children.add(parseModel(name));
 					name = name+"<group>"; //if this is a group, it will get this name.
-					ModelLink modelLink = new ModelLink();
-					modelLink.mModel = model;
-					modelLink.mPrimitiveId = this.getRefAttr(NameId.url);
-					if(this.moveToChildNode(NameId.instance_material, NameId.instance_geometry)){
-						modelLink.mSurfaceId = this.getRefAttr(NameId.target);
-					}
-					this.mModels.add(modelLink);
-					children.add(model);
+					break;
+				case instance_controller:
+					children.add(parseModel(name));
+					name = name+"<group>"; //if this is a group, it will get this name.
 					break;
 				case node:
 					Node child;
@@ -632,6 +748,18 @@ public class Collada implements BambooAsset{
 		}
 		
 		return null;
+	}
+	
+	private Model parseModel(String name) throws Exception{
+		Model model = new Model(name);
+		ModelLink modelLink = new ModelLink();
+		modelLink.mModel = model;
+		modelLink.mPrimitiveId = this.getRefAttr(NameId.url);
+		if(this.moveToChildNode(NameId.instance_material, NameId.instance_geometry)){
+			modelLink.mSurfaceId = this.getRefAttr(NameId.target);
+		}
+		this.mModels.add(modelLink);
+		return model;
 	}
 	
 	Matrix3d temp = new Matrix3d();
@@ -669,14 +797,12 @@ public class Collada implements BambooAsset{
 		current.multiply(temp);
 	}
 	
-	private Joint parseSkeleton() throws Exception{
+	private SkeletonNode parseSkeleton() throws Exception{
 		String name = this.getAttr(NameId.id);
 		this.generateChannels(name, false, true, true, true); //translate
 		this.generateChannels(name, true, true, true, true); //rotate
 		
-		JointTranslate joint = new JointTranslate(name);
-		JointRotate subJoint = new JointRotate(name+"<rotate>");
-		joint.appendChild(subJoint);
+		SkeletonNode skeleton = new SkeletonNode(name);
 		
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
@@ -685,31 +811,31 @@ public class Collada implements BambooAsset{
 			case XmlPullParser.START_TAG:
 				switch(this.getTagId()){
 				case matrix:
-					this.parseMatrix(joint.getTransform());
+					this.parseMatrix(skeleton.getTransform());
 					break;
 				case translate:
-					this.parseTranslate(joint.getTransform());
+					this.parseTranslate(skeleton.getTransform());
 					break;
 				case rotate:
 					String sid = this.getAttr(NameId.sid);
 					if(sid != null && sid.startsWith("jointOrient")){
-						this.parseRotate(joint.getTransform());
+						this.parseRotate(skeleton.getTransform());
 					} else {
-						this.parseRotate(subJoint.getTransform());
+						this.parseRotate(skeleton.getRotateTransform());
 					}
 					break;
 				case node:
 					if(this.getAttrId(NameId.type) == NameId.JOINT){
 						Joint child = this.parseJoint();
-						subJoint.appendChild(child);
+						skeleton.appendChild(child);
 					}
 					break;
 				}
 				break;
 			case XmlPullParser.END_TAG:
 				if(this.getTagId() == NameId.node){
-					joint.createAllBones(0.05f);
-					return joint;
+					skeleton.createAllBones(0.05f);
+					return skeleton;
 				}
 				break;
 			}
@@ -912,17 +1038,28 @@ public class Collada implements BambooAsset{
 		}
 		Vector<Integer> indicesRemap = new Vector<Integer>();
 		
+		//for skinning data later on!
+		Vector<Integer> skinRemap = new Vector<Integer>();
+		this.mSkinRemaps.put(name, skinRemap);
+		
 		int nextIndex = 0;
 		for(int i = 0; i < indices.size()/count; i++){
 			String id = "";
+			int positionIndex = 0;
 			for(int j = 0; j < count; j++){
-				id += indices.get(i*count+j)+",";
+				int index = indices.get(i*count+j);
+				//for skinning!
+				if(j == inputs.mPositionOffset){
+					positionIndex = index;
+				}
+				id += index+",";
 			}
 			if(remap.containsKey(id)){
 				indicesRemap.add(remap.get(id));
 				continue;
 			}
-			
+
+			skinRemap.add(positionIndex);
 			remap.put(id, nextIndex);
 			indicesRemap.add(nextIndex);
 			nextIndex++;
@@ -1109,10 +1246,6 @@ public class Collada implements BambooAsset{
 		return null;
 	}
 	
-	private void parseLibraryControllers() throws Exception{
-		
-	}
-	
 	private void parseLibraryImages() throws Exception{
 		while(this.moveToChildNode(NameId.image, NameId.library_images)){
 			String id = this.getAttr(NameId.id);
@@ -1126,6 +1259,149 @@ public class Collada implements BambooAsset{
 					this.mTextureNames.put(id, texture);
 				}
 			}
+		}
+	}
+	
+	private void parseLibraryControllers() throws Exception{
+		while(this.moveToChildNode(NameId.controller, NameId.library_controllers)){
+			String name = this.getAttr(NameId.id);
+			if(this.moveToChildNode(NameId.skin, NameId.controller)){
+				this.parseSkin(name);
+			}
+		}
+	}
+	
+	private void parseSkin(String name) throws Exception{
+		String source = this.getAttr(NameId.source);
+		SkinInputs inputs = new SkinInputs();
+		SkinData skinData = null;
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case source:
+					this.parseSource();
+					break;
+				case joints:
+					while(this.moveToChildNode(NameId.input, NameId.joints)){
+						this.parseSkinInput(inputs);
+					}
+					break;
+				case vertex_weights:
+					skinData = this.parseVertexWeights(name, inputs);
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == NameId.skin){
+					this.convertSkinData(skinData, source, inputs);
+					return;
+				}
+				break;
+			}
+		}
+	}
+	
+	private class SkinData{
+		String mId;
+		String mSource;
+		int[] mStrideMap;
+		int[] mSkeletonMap;
+		String[] mJoints;
+		Matrix3d[] mBindMatricesInv;
+		float[] mWeights;
+		int mSkeletonOffset;
+		int mWeightOffset;
+		int mStride;
+		
+		SkinData(String id){
+			this.mId = id;
+		}
+	}
+	
+	private void convertSkinData(SkinData skinData, String source, SkinInputs input) throws Exception{
+		//convert the bind matrix!
+		float[] matrixBuffer = this.mSources.get(input.mBindMatrix).mFloatSource;
+		Matrix3d[] bindMatrixInv = new Matrix3d[matrixBuffer.length/Matrix3d.SIZE];
+		for(int i = 0; i < bindMatrixInv.length; i++){
+			bindMatrixInv[i] = new Matrix3d(matrixBuffer, Matrix3d.SIZE*i);
+		}
+		skinData.mBindMatricesInv = bindMatrixInv;
+		skinData.mSource = source;
+		skinData.mWeights = this.mSources.get(input.mWeights).mFloatSource;
+		skinData.mJoints = this.mSources.get(input.mJoint).mNameSource;
+		skinData.mSkeletonOffset = input.mJointOffset;
+		skinData.mWeightOffset = input.mWeightsOffset;
+		
+		//store this data so that it can be bound!
+		this.mSkinDatas.put(skinData.mId, skinData);
+	}
+	
+	private SkinData parseVertexWeights(String name, SkinInputs inputs) throws Exception{
+		SkinData skinData = new SkinData(name);
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case input:
+					this.parseSkinInput(inputs);
+					skinData.mStride++;
+					break;
+				case vcount:
+					skinData.mStrideMap = this.parseIntArray(NameId.vcount);
+					break;
+				case v:
+					skinData.mSkeletonMap = this.parseIntArray(NameId.v);
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if(this.getTagId() == NameId.vertex_weights){
+					return skinData;
+				}
+				break;
+			}
+		}
+		return null;
+	}
+	
+	private class SkinInputs{
+		String mJoint;
+		int mJointOffset = -1;
+		String mBindMatrix;
+		String mWeights;
+		int mWeightsOffset = -1;
+		
+	}
+	
+	private void parseSkinInput(SkinInputs inputs) throws Exception{
+		String offsetString = this.getAttr(NameId.offset);
+		int offset = -1;
+		if(offsetString != null){
+			offset = Integer.parseInt(offsetString);
+		}
+		switch(this.getAttrId(NameId.semantic)){
+		case JOINT:
+			//COLLADA uses the same identifier for two different cases......
+			if(offset == -1){
+				inputs.mJoint = this.getRefAttr(NameId.source);
+			} else {
+				inputs.mJointOffset = offset;
+			}
+			break;
+		case WEIGHT:
+			inputs.mWeights = this.getRefAttr(NameId.source);
+			if(offset != -1){
+				inputs.mWeightsOffset = offset;
+			}
+			break;
+		case INV_BIND_MATRIX:
+			inputs.mBindMatrix = this.getRefAttr(NameId.source);
+			break;
 		}
 	}
 	
