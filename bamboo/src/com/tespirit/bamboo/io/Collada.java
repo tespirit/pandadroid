@@ -670,7 +670,7 @@ public class Collada implements BambooAsset{
 				}
 			}
 			if(nodes.size() > 1){
-				Group group = new Group("<root>", nodes);
+				Group group = new Group("/root", nodes);
 				this.mRoot = group;
 			} else if(nodes.size() == 1){
 				this.mRoot = nodes.get(0);
@@ -704,11 +704,11 @@ public class Collada implements BambooAsset{
 					break;
 				case instance_geometry:
 					children.add(parseModel(name));
-					name = name+"<group>"; //if this is a group, it will get this name.
+					name = name+"/group"; //if this is a group, it will get this name.
 					break;
 				case instance_controller:
 					children.add(parseModel(name));
-					name = name+"<group>"; //if this is a group, it will get this name.
+					name = name+"/group"; //if this is a group, it will get this name.
 					break;
 				case node:
 					Node child;
@@ -798,7 +798,7 @@ public class Collada implements BambooAsset{
 		this.generateChannels(name, true, true, true, true); //rotate
 		
 		JointTranslate joint = new JointTranslate(name);
-		JointRotate subJoint = new JointRotate(name+"<rotate>");
+		JointRotate subJoint = new JointRotate(name+"/rotate");
 		joint.appendChild(subJoint);
 		
 		int eventType = this.mParser.getEventType();
@@ -905,7 +905,7 @@ public class Collada implements BambooAsset{
 					if(orientMatrix.isIdentity3x3()){
 						joint.getTransform().multiply(orientMatrix);
 					} else {
-						JointOrient jointO = new JointOrient(name+"<orient>");
+						JointOrient jointO = new JointOrient(name+"/orient");
 						jointO.getTransform().copy(orientMatrix);
 						jointO.appendChild(joint);
 						joint = jointO;
