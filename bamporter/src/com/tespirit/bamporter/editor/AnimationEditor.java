@@ -29,4 +29,9 @@ public class AnimationEditor extends TreeNodeEditor{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public String toString(){
+		return Util.getClassName(this.mAnimation);
+	}
 }

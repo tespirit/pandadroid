@@ -55,7 +55,7 @@ public class Debug {
 	}
 	
 	private static void printNode(Node node, String spacing, int depth){
-		String type = "- " + node.toString();
+		String type = "- " + node.nodeInfo();
 
 		Debug.print(spacing+depth+type);
 		
@@ -213,9 +213,6 @@ public class Debug {
 						currentAnimation++;
 						Debug.print("Next animation: "+currentAnimation);
 					}
-					break;
-				case KeyEvent.KEYCODE_EQUALS:
-					Debug.selectNode(Node.nextNode());
 					break;
 				}
 				

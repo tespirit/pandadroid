@@ -12,6 +12,7 @@ public class EditorPanels {
 	public static JEditorPane getTextInfo(){
 		if(mTextInfo == null){
 			mTextInfo = new JEditorPane();
+			mTextInfo.setEditable(false);
 		}
 		return mTextInfo;
 	}

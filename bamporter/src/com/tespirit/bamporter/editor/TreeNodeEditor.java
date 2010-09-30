@@ -3,12 +3,13 @@ package com.tespirit.bamporter.editor;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-public abstract class TreeNodeEditor implements Editor, TreeNode, Enumeration<TreeNodeEditor> {
+public abstract class TreeNodeEditor implements Editor, MutableTreeNode, Enumeration<TreeNodeEditor> {
 
 	private ArrayList<TreeNodeEditor> mChildren;
-	private TreeNodeEditor mParentNode;
+	private MutableTreeNode mParentNode;
 	
 	/**
 	 * Default constructor allows children.
@@ -34,11 +35,7 @@ public abstract class TreeNodeEditor implements Editor, TreeNode, Enumeration<Tr
 		node.setParent(null);
 		this.mChildren.remove(node);
 	}
-	
-	private void setParent(TreeNodeEditor node){
-		mParentNode = node;
-	}
-	
+		
 	@Override
 	public Enumeration<TreeNodeEditor> children() {
 		return this;
@@ -79,17 +76,61 @@ public abstract class TreeNodeEditor implements Editor, TreeNode, Enumeration<Tr
 
 	@Override
 	public boolean isLeaf() {
-		return this.getChildCount() > 0;
+		return this.getChildCount() == 0;
 	}
 
+	int mCurrentIndex = 0;
 	@Override
 	public boolean hasMoreElements() {
-		return this.mChildren.iterator().hasNext();
+		boolean retVal = this.mChildren.size() > this.mCurrentIndex;
+		if(retVal == false){
+			mCurrentIndex = 0;
+		}
+		return retVal;
 	}
 
 	@Override
 	public TreeNodeEditor nextElement() {
-		return this.mChildren.iterator().next();
+		TreeNodeEditor node = this.mChildren.get(this.mCurrentIndex);
+		this.mCurrentIndex++;
+		return node;
+	}
+	
+	@Override
+	public void insert(MutableTreeNode child, int index) {
+		if(child instanceof TreeNodeEditor){
+			TreeNodeEditor node = (TreeNodeEditor)child;
+			node.setParent(this);
+			this.mChildren.add(index, node);
+		}
+	}
+
+	@Override
+	public void remove(int index) {
+		this.mChildren.remove(index);
+	}
+
+	@Override
+	public void remove(MutableTreeNode node) {
+		this.mChildren.remove(node);
+	}
+
+	@Override
+	public void removeFromParent() {
+		if(this.mParentNode != null){
+			this.mParentNode.remove(this);
+		}
+	}
+
+	@Override
+	public void setParent(MutableTreeNode newParent) {
+		this.removeFromParent();
+		this.mParentNode = newParent;
+	}
+
+	@Override
+	public void setUserObject(Object object) {
+		//VOID these nodes are the userobjects!
 	}
 
 }

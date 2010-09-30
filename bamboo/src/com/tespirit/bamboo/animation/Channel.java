@@ -36,6 +36,10 @@ public class Channel implements Serializable{
 		
 	}
 	
+	public int getKeyFrameCount(){
+		return this.keys.size();
+	}
+	
 	public void addKeyFrame(KeyFrame k){
 		this.keys.add(k);
 	}

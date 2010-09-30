@@ -72,22 +72,7 @@ public abstract class Node implements Serializable{
 	}
 	
 	//for debugging
-	private static int current = 0;
-	public static Node nextNode(){
-		Node node = Node.nodes.get(Node.current);
-		Node.current++;
-		Node.current %= Node.nodes.size();
-		return node;
-	}
-	public static Node prevNode(){
-		Node node = Node.nodes.get(Node.current);
-		Node.current += Node.nodes.size() - 1;
-		Node.current %= Node.nodes.size();
-		return node;
-	}
-	
-	@Override
-	public String toString(){
+	public String nodeInfo(){
 		String className = super.toString();
 		int i = className.lastIndexOf('.');
 		if(i != -1){

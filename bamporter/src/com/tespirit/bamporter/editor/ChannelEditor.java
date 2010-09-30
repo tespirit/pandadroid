@@ -27,5 +27,10 @@ public class ChannelEditor extends TreeNodeEditor{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public String toString(){
+		return Util.getClassName(this.mChannel);
+	}
 
 }
