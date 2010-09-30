@@ -60,8 +60,7 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 		}
 		
 		int weightIndex = 0;
-		for(int i = 0; i < this.mSkeletonMap.length; i++){
-			Matrix3d transform = this.mTransformMatrices[this.mSkeletonMap[i]];
+		for(int i = 0; i < this.mWeightStrides.length; i++){
 			float stride = this.mWeightStrides[i];
 			this.mOriginalBuffer.nextVector3d(this.mPositionOriginal, VertexBuffer.POSITION);
 			this.mOriginalBuffer.nextVector3d(this.mNormalOriginal, VertexBuffer.NORMAL);
@@ -69,6 +68,7 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 			this.mPosition.set(0, 0, 0);
 			this.mNormal.set(0, 0, 0);
 			for(int j = 0; j < stride; j++){
+				Matrix3d transform = this.mTransformMatrices[this.mSkeletonMap[weightIndex+j]];
 				//compute position
 				this.mWeight.copy(mPositionOriginal);
 				this.mWeight.scale(this.mWeights[weightIndex+j]);

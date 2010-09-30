@@ -70,10 +70,14 @@ public abstract class Renderer {
 		return this.root;
 	}
 	
-	public void addTimeUpdate(TimeUpdate a){
-		if(a != null){
-			this.timeUpdates.add(a);
+	public void addTimeUpdate(TimeUpdate tu){
+		if(tu != null){
+			this.timeUpdates.add(tu);
 		}
+	}
+	
+	public void clearTimeUpdates(){
+		this.timeUpdates.clear();
 	}
 	
 	public int getTimeUpdateCount(){
