@@ -73,7 +73,6 @@ public abstract class Node {
 	}
 	
 	//for debugging
-	public String toString(){
 	public String getNodeInfo(){
 		String className = super.toString();
 		int i = className.lastIndexOf('.');

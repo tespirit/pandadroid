@@ -55,7 +55,7 @@ public class Debug {
 	}
 	
 	private static void printNode(Node node, String spacing, int depth){
-		String type = "- " + node.nodeInfo();
+		String type = "- " + node.getNodeInfo();
 
 		Debug.print(spacing+depth+type);
 		
