@@ -4,6 +4,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.tespirit.bamporter.app.BamporterFrame;
+import com.tespirit.bamporter.opengl.Renderer;
 
 public class Bamporter {
 
@@ -25,6 +26,7 @@ public class Bamporter {
 	 * Main entry of the class.
 	 */
 	public static void main(String[] args) {
+		Renderer.initGl();
 		installLnF();
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override

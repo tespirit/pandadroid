@@ -28,6 +28,7 @@ import com.tespirit.bamporter.editor.NodeEditor;
 import com.tespirit.bamporter.editor.TreeNodeEditor;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.io.IOManager;
+import com.tespirit.bamporter.opengl.Renderer;
 
 public class BamporterFrame extends JFrame{
 	private static final long serialVersionUID = 5177383861730200564L;
@@ -38,19 +39,22 @@ public class BamporterFrame extends JFrame{
 	private JTree tree;
 	private DefaultMutableTreeNode root;
 	private DefaultTreeModel treeModel;
-	private JScrollPane outputView;
+	private JScrollPane editorView;
 	private JMenuItem saveAllButton;
 	private JMenuItem saveNodeButton;
 	private JMenuItem saveAnimationButton;
+	private Renderer renderer;
 	
 	private BambooAsset bamboo;	
+	
+	private static final String TITLE = "Bamporter";
 	
 	public BamporterFrame() {
 		initComponents();
 	}
 
 	private void initComponents() {
-		setTitle("Bamporter");
+		setTitle(TITLE);
 		
 		IOManager.init();
 		
@@ -74,24 +78,32 @@ public class BamporterFrame extends JFrame{
 		root = new DefaultMutableTreeNode("Workspace");
 		tree = new JTree();
 		JScrollPane treeView = new JScrollPane();
-		outputView = new JScrollPane();
+		editorView = new JScrollPane();
 		
 		GridLayout layout = new GridLayout(1,0);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane splitPaneEditor = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
 		setLayout(layout);
 		treeView.setViewportView(tree);
 		treeModel = new DefaultTreeModel(root);
 		tree.setModel(treeModel);
 		splitPane.setTopComponent(treeView);
-		splitPane.setBottomComponent(outputView);
+		splitPane.setBottomComponent(splitPaneEditor);
+		splitPaneEditor.setBottomComponent(editorView);
+		
+		renderer = new Renderer();
+		splitPaneEditor.setTopComponent(renderer.getView());
 		
 		Dimension minimumSize = new Dimension(50, 100);
-	    outputView.setMinimumSize(minimumSize);
+		editorView.setMinimumSize(minimumSize);
 	    treeView.setMinimumSize(minimumSize);
-	    splitPane.setDividerLocation(300); 
+	    renderer.getView().setMinimumSize(minimumSize);
+	    splitPane.setDividerLocation(200); 
 	    splitPane.setPreferredSize(new Dimension(800, 600));
-		
+	    splitPaneEditor.setDividerLocation(400);
+	    splitPaneEditor.setPreferredSize(new Dimension(600, 600));
+	    
 		add(splitPane);
 		
 		menu.add(fileMenu);
@@ -146,10 +158,10 @@ public class BamporterFrame extends JFrame{
 	private void selectTreeNode(TreeSelectionEvent event) {
 		Object node = tree.getLastSelectedPathComponent();
 		if(node instanceof TreeNodeEditor){
-			this.outputView.setViewportView(((TreeNodeEditor)node).getEditorPanel());
-			this.outputView.setEnabled(true);
+			this.editorView.setViewportView(((TreeNodeEditor)node).getEditorPanel());
+			this.editorView.setEnabled(true);
 		} else {
-			this.outputView.setEnabled(false);
+			this.editorView.setEnabled(false);
 		}
 	}
 	
@@ -163,18 +175,21 @@ public class BamporterFrame extends JFrame{
 				return;
 			}
 			root.removeAllChildren();
+			this.renderer.clearTimeUpdates();
 			if(bamboo.getSceneGraph() != null){
 				DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
 				sceneGraph.add(new NodeEditor(bamboo.getSceneGraph()));
 				root.add(sceneGraph);
 				saveNodeButton.setEnabled(true);
 				saveAllButton.setEnabled(true);
+				this.renderer.setSceneGraph(bamboo.getSceneGraph());
 			} else {
+				this.renderer.setSceneGraph(null);
 				saveNodeButton.setEnabled(false);
 				saveAllButton.setEnabled(false);
 			}
 			if(bamboo.getAnimation() != null){
-				
+				this.renderer.addTimeUpdate(bamboo.getAnimation());
 				root.add(new AnimationEditor(bamboo.getAnimation()));
 				saveAnimationButton.setEnabled(true);
 				saveAllButton.setEnabled(true);

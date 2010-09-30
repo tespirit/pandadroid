@@ -43,6 +43,8 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 							   GL10.GL_LINES,
 							   GL10.GL_LINE_STRIP,
 							   GL10.GL_POINTS);
+		
+		this.createRenderers();
 	}
 
 	@Override
@@ -77,7 +79,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		this.mGl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 		this.mGl.glCullFace(GL10.GL_BACK);
 		
-		this.createRenderers();
+		
 		
 		this.setupRender();
 	}
