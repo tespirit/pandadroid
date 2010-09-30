@@ -1,12 +1,6 @@
 package com.tespirit.bamboo.primitives;
 
 public class Plane extends TriangleIndices{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6902879558888631757L;
-
 	public Plane(){
 		super(6, 4, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
 		

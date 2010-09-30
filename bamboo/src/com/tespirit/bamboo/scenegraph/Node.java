@@ -2,20 +2,16 @@ package com.tespirit.bamboo.scenegraph;
 
 import com.tespirit.bamboo.vectors.*;
 
-import java.io.Serializable;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
-public abstract class Node implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3573004398153804039L;
-	private String name;
-	private int uid;
+public abstract class Node {
+
+	private String mName;
+	private int mUid;
 		
-	static private Hashtable<String, Node> nameLookup = new Hashtable<String, Node>();
+	static private Map<String, Node> nameLookup = new HashMap<String, Node>();
 	static private Vector<Node> nodes = new Vector<Node>(); 
 	
 	public Node(){
@@ -23,16 +19,32 @@ public abstract class Node implements Serializable{
 	}
 	
 	public Node(String name){
-		this.name = name;
-		if(this.name != null){
-			Node.nameLookup.put(this.name, this);
+		this.mName = name;
+		this.init();
+	}
+	
+	protected void init(){
+		if(this.mName != null){
+			Node.nameLookup.put(this.mName, this);
 		}
-		this.uid = Node.nodes.size();
+		this.mUid = Node.nodes.size();
 		Node.nodes.add(this);
 	}
 	
 	public int getUid(){
-		return this.uid;
+		return this.mUid;
+	}
+	
+	public String getName() {
+		return this.mName;
+	}
+	
+	public void setName(String n){
+		if(this.mName != null){
+			Node.nameLookup.remove(this.mName);
+		}
+		this.mName = n;
+		Node.nameLookup.put(this.mName, this);
 	}
 	
 	public abstract Node getChild(int i);
@@ -45,23 +57,12 @@ public abstract class Node implements Serializable{
 	
 	public abstract AxisAlignedBox getBoundingBox();
 	
-	public String getName() {
-		return this.name;
-	}
-	
 	/**
 	 * this updates the nodes with the new tranformation
 	 * @param m
 	 */
 	public abstract void update(Matrix3d transform);
 	
-	public void setName(String n){
-		if(this.name != null){
-			Node.nameLookup.remove(this.name);
-		}
-		this.name = n;
-		Node.nameLookup.put(this.name, this);
-	}
 	
 	public static Node getNode(String name){
 		return Node.nameLookup.get(name);
@@ -72,7 +73,8 @@ public abstract class Node implements Serializable{
 	}
 	
 	//for debugging
-	public String nodeInfo(){
+	public String toString(){
+	public String getNodeInfo(){
 		String className = super.toString();
 		int i = className.lastIndexOf('.');
 		if(i != -1){
@@ -82,7 +84,7 @@ public abstract class Node implements Serializable{
 		if(i != -1){
 			className = className.substring(0, i);
 		}
-		String name = this.name;
+		String name = this.mName;
 		if(name == null){
 			name = "<no name>";
 		}

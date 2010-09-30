@@ -9,10 +9,6 @@ import com.tespirit.bamboo.vectors.Vector3d;
 
 
 public class Light extends Node implements RenderableNode{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5881632972281117310L;
 	private Color4 ambient;
 	private Color4 diffuse;
 	private Color4 specular;

@@ -1,12 +1,6 @@
 package com.tespirit.bamboo.vectors;
 
-import java.io.Serializable;
-
-public class AxisAlignedBox implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class AxisAlignedBox{
 	private Vector3d min;
 	private Vector3d max;
 	

@@ -1,15 +1,8 @@
 package com.tespirit.bamboo.modifiers;
 
-import java.io.Serializable;
-
 import com.tespirit.bamboo.primitives.VertexBuffer;
 
-public abstract class VertexModifier implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 189440987112291791L;
-	
+public abstract class VertexModifier {
 	protected VertexBuffer mOriginalBuffer;
 	protected VertexBuffer mModifiedBuffer;
 	

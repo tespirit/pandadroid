@@ -1,13 +1,8 @@
 package com.tespirit.bamboo.vectors;
 
-import java.io.Serializable;
 import java.lang.Math;
 
-public class Vector3d implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6533081068678353038L;
+public class Vector3d {
 	private float[] v;
 	private int offset;
 		

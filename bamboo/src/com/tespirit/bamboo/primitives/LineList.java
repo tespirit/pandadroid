@@ -4,10 +4,6 @@ import com.tespirit.bamboo.render.ComponentRenderer;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
 public class LineList extends Primitive{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6185393619324065362L;
 	protected VertexBuffer vertexBuffer;
 	
 	public LineList(int vertexCount, int[] vertexTypes){
@@ -37,5 +33,11 @@ public class LineList extends Primitive{
 		}
 		
 		public abstract void render(LineList lines);
+	}
+
+	@Override
+	public void updateModifiers() {
+		// TODO Auto-generated method stub
+		
 	}
 }

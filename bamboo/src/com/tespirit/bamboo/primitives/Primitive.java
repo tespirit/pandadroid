@@ -1,15 +1,8 @@
 package com.tespirit.bamboo.primitives;
 
-import java.io.Serializable;
-
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
-public abstract class Primitive implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7735764148071638696L;
+public abstract class Primitive{
 
 	protected int type;
 	
@@ -66,4 +59,6 @@ public abstract class Primitive implements Serializable{
 	abstract public void computeBoundingBox(AxisAlignedBox boundingBox);
 	
 	abstract public void render();
+	
+	abstract public void updateModifiers();
 }
