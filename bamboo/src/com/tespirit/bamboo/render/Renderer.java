@@ -19,7 +19,6 @@ public abstract class Renderer {
 	/* basic attributes */
 	protected Color4 backgroundColor;
 	
-	
 	private Node root;
 	private Camera camera;
 	private LightGroup lights;
@@ -64,6 +63,8 @@ public abstract class Renderer {
 	
 	public void setSceneGraph(Node root){
 		this.root = root;
+		this.renderableNodes.clear();
+		this.gatherRenderables(root);
 	}
 	
 	public Node getSceneGraph(){
@@ -112,17 +113,17 @@ public abstract class Renderer {
 		}
 		
 		this.camera.update(Matrix3d.IDENTITY);
-		Matrix3d view = this.camera.getWorldTransform();
 		if(this.lights != null){
-			this.lights.update(view);
+			this.lights.update(Matrix3d.IDENTITY);
 		}
 		if(this.root != null){
-			this.root.update(view);
+			this.root.update(Matrix3d.IDENTITY);
 			Collections.sort(this.renderableNodes, Renderer.renderableSort);
 		}
 	}
 	
 	public void renderScene(){
+		this.camera.render();
 		if(this.lights != null){
 			for(int i = 0; i < this.lights.getChildCount(); i++){
 				((Light)this.lights.getChild(i)).render();

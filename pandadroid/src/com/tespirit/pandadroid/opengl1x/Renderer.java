@@ -156,8 +156,8 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	protected class CameraRenderer extends Camera.Renderer{
 		@Override
 		public void render(Camera camera) {
-			mGl.glMultMatrixf(camera.getTransform().getBuffer(),camera.getTransform().getBufferOffset());
-			mGl.glMultMatrixf(camera.getPivotTransform().getBuffer(),camera.getPivotTransform().getBufferOffset());
+			mGl.glMultMatrixf(camera.getWorldTransform().getBuffer(),
+							  camera.getWorldTransform().getBufferOffset());
 		}
 		
 		@Override

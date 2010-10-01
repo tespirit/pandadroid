@@ -12,8 +12,8 @@ public abstract class VertexModifier {
 	}
 	
 	public VertexBuffer getModifiedBuffer(){
-		//return this.mModifiedBuffer;
-		return this.mOriginalBuffer;
+		return this.mModifiedBuffer;
+		//return this.mOriginalBuffer;
 	}
 	
 	public abstract void update();

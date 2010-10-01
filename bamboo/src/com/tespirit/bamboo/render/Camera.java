@@ -181,6 +181,7 @@ public class Camera extends Node implements RenderableNode{
 						 yUnit*this.nearHeight, 
 						 this.near);
 		ray.setPostion(0.0f, 0.0f, 0.0f);
+		ray.transformBy(this.worldTransform);
 		return ray;
 	}
 	

@@ -169,6 +169,7 @@ public class BamporterFrame extends JFrame{
 		if(this.showOpenDialog() == JFileChooser.APPROVE_OPTION){
 			try{
 				bamboo = IOManager.open(fileDialog.getSelectedFile());
+				setTitle(TITLE+" - "+fileDialog.getSelectedFile().getName());
 			} catch (Exception e){
 				e.printStackTrace();
 				this.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");

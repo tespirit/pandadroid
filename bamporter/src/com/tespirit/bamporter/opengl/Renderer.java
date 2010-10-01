@@ -125,7 +125,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	@Override
 	public void pushMatrix(Matrix3d transform) {
 		this.mGl.glPushMatrix();
-		this.mGl.glLoadMatrixf(transform.getBuffer(), transform.getBufferOffset());
+		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
 
 	@Override
@@ -188,8 +188,8 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	protected class CameraRenderer extends Camera.Renderer{
 		@Override
 		public void render(Camera camera) {
-			mGl.glMultMatrixf(camera.getTransform().getBuffer(),camera.getTransform().getBufferOffset());
-			mGl.glMultMatrixf(camera.getPivotTransform().getBuffer(),camera.getPivotTransform().getBufferOffset());
+			mGl.glMultMatrixf(camera.getWorldTransform().getBuffer(),
+							  camera.getWorldTransform().getBufferOffset());
 		}
 		
 		@Override
@@ -246,10 +246,10 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	protected class TextureRenderer extends Texture.Renderer{
 		@Override
 		public void render(Texture texture) {
-			mGl.glEnable(GL2.GL_TEXTURE_2D);
-			mGl.glEnable(GL2.GL_COLOR_MATERIAL);
+			//mGl.glEnable(GL2.GL_TEXTURE_2D);
+			//mGl.glEnable(GL2.GL_COLOR_MATERIAL);
 			mGl.glColor4f(1,1,1,1);
-			mGl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getDiffuseTextureId());
+			//mGl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getDiffuseTextureId());
 		}
 		
 		@Override

@@ -413,6 +413,7 @@ public class Collada implements BambooAsset{
 			for(int j = 0; j < skeletonMapTemp.get(i).size(); j++){
 				skeletonMap[current] = skeletonMapTemp.get(i).get(j);
 				weights[current] = weightsTemp.get(i).get(j);
+				current++;
 			}
 		}
 		
@@ -1040,6 +1041,7 @@ public class Collada implements BambooAsset{
 		this.mSkinRemaps.put(name, skinRemap);
 		
 		int nextIndex = 0;
+		//expand vertices!
 		for(int i = 0; i < indices.size()/count; i++){
 			String id = "";
 			int positionIndex = 0;
@@ -1056,9 +1058,9 @@ public class Collada implements BambooAsset{
 				continue;
 			}
 
-			skinRemap.add(positionIndex);
 			remap.put(id, nextIndex);
 			indicesRemap.add(nextIndex);
+			skinRemap.add(positionIndex);
 			nextIndex++;
 			
 			int index;
