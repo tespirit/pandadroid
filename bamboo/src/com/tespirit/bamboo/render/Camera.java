@@ -177,11 +177,13 @@ public class Camera extends Node implements RenderableNode{
 		float yUnit = (y - halfHeight)/halfHeight;
 		
 		Ray ray = new Ray();
+		Matrix3d inverse = new Matrix3d(); 
 		ray.setDirection(xUnit*this.nearHeight*this.aspectRatio, 
 						 yUnit*this.nearHeight, 
 						 this.near);
 		ray.setPostion(0.0f, 0.0f, 0.0f);
-		ray.transformBy(this.worldTransform);
+		inverse.invert(this.worldTransform);
+		ray.transformBy(inverse);
 		return ray;
 	}
 	
