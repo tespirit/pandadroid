@@ -175,31 +175,35 @@ public class BamporterFrame extends JFrame{
 				this.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
 				return;
 			}
-			root.removeAllChildren();
-			this.renderer.clearTimeUpdates();
-			if(bamboo.getSceneGraph() != null){
-				DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
-				sceneGraph.add(new NodeEditor(bamboo.getSceneGraph()));
-				root.add(sceneGraph);
-				saveNodeButton.setEnabled(true);
-				saveAllButton.setEnabled(true);
-				this.renderer.setSceneGraph(bamboo.getSceneGraph());
-			} else {
-				this.renderer.setSceneGraph(null);
-				saveNodeButton.setEnabled(false);
-				saveAllButton.setEnabled(false);
-			}
-			if(bamboo.getAnimation() != null){
-				this.renderer.addTimeUpdate(bamboo.getAnimation());
-				root.add(new AnimationEditor(bamboo.getAnimation()));
-				saveAnimationButton.setEnabled(true);
-				saveAllButton.setEnabled(true);
-			} else {
-				saveAnimationButton.setEnabled(false);
-			}
-
-			treeModel.reload();
+			this.loadBamboo();
 		}
+	}
+	
+	private void loadBamboo(){
+		root.removeAllChildren();
+		this.renderer.clearTimeUpdates();
+		if(bamboo.getSceneGraph() != null){
+			DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
+			sceneGraph.add(new NodeEditor(bamboo.getSceneGraph()));
+			root.add(sceneGraph);
+			saveNodeButton.setEnabled(true);
+			saveAllButton.setEnabled(true);
+			this.renderer.setSceneGraph(bamboo.getSceneGraph());
+		} else {
+			this.renderer.setSceneGraph(null);
+			saveNodeButton.setEnabled(false);
+			saveAllButton.setEnabled(false);
+		}
+		if(bamboo.getAnimation() != null){
+			this.renderer.addTimeUpdate(bamboo.getAnimation());
+			root.add(new AnimationEditor(bamboo.getAnimation()));
+			saveAnimationButton.setEnabled(true);
+			saveAllButton.setEnabled(true);
+		} else {
+			saveAnimationButton.setEnabled(false);
+		}
+
+		treeModel.reload();
 	}
 	
 	private void saveAllButtonAction(ActionEvent event) {
@@ -271,5 +275,4 @@ public class BamporterFrame extends JFrame{
 		}
 		return fileDialog.showOpenDialog(this);
 	}
-	
 }

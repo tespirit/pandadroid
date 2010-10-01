@@ -763,9 +763,14 @@ public class Collada implements BambooAsset{
 	
 	private void parseMatrix(Matrix3d current) throws Exception{
 		float[] vals = this.parseFloatArray(NameId.matrix);
+		this.flipMatrix(current, vals, 0);
+		current.getTranslation().scale(this.mScale);
+	}
+	
+	private void flipMatrix(Matrix3d current, float[] source, int offset){
 		for(int row = 0; row < Matrix3d.SIZEROW; row++){
 			for(int col = 0; col < Matrix3d.SIZEROW; col++){
-				current.setValue(vals[col+Matrix3d.SIZEROW*row], row, col);
+				current.setValue(source[offset+row+Matrix3d.SIZEROW*col], row, col);
 			}
 		}
 	}
@@ -1322,10 +1327,18 @@ public class Collada implements BambooAsset{
 	
 	private void convertSkinData(SkinData skinData, String source, SkinInputs input) throws Exception{
 		//convert the bind matrix!
-		float[] matrixBuffer = this.mSources.get(input.mBindMatrix).mFloatSource;
+		float[] matrixSource = this.mSources.get(input.mBindMatrix).mFloatSource;
+		float[] matrixBuffer = new float[matrixSource.length];
 		Matrix3d[] bindMatrixInv = new Matrix3d[matrixBuffer.length/Matrix3d.SIZE];
 		for(int i = 0; i < bindMatrixInv.length; i++){
-			bindMatrixInv[i] = new Matrix3d(matrixBuffer, Matrix3d.SIZE*i);
+			int offset = Matrix3d.SIZE*i;
+			Matrix3d current = new Matrix3d(matrixBuffer, offset);
+			bindMatrixInv[i] = current;
+			this.flipMatrix(current, matrixSource, offset);
+			//adjust for the scale
+			//TODO: compute this in a better way that doesn't require inverting the data
+			bindMatrixInv[i].invert().getTranslation().scale(this.mScale);
+			bindMatrixInv[i].invert();
 		}
 		skinData.mBindMatricesInv = bindMatrixInv;
 		skinData.mSource = source;

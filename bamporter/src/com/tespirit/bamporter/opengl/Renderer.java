@@ -62,7 +62,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		
 		//create a default camera!
 		Camera camera = new Camera();
-		camera.zoom(-3);
+		camera.zoom(-2);
 		camera.getPivotTransform().rotateX(45);
 		this.setCamera(camera);
 		
@@ -177,7 +177,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mGl.glLoadIdentity();
 		
 		this.updateScene(Calendar.getInstance().getTimeInMillis());
-		this.renderDebug();
+		//this.renderDebug();
 		this.renderScene();
 	}
 

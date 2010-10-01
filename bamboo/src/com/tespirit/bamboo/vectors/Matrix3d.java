@@ -346,7 +346,6 @@ public class Matrix3d {
 		this.yAxis.set(b1, b2, b3);
 		this.zAxis.set(c1, c2, c3);
 		
-		//Matrix.rotateM(this.m, this.offset, t, x, y, z);
 		return this;
 	}
 	

@@ -56,7 +56,7 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 		//compute transform matrices
 		for(int i = 0; i < this.mSkeleton.length; i++){
 			Joint joint = (Joint)Node.getNode(this.mSkeleton[i]);
-			this.mTransformMatrices[i].multiply(this.mBindMatricesInv[i],joint.getWorldTransform());
+			this.mTransformMatrices[i].multiply(joint.getWorldTransform(), this.mBindMatricesInv[i]);
 		}
 		
 		int weightIndex = 0;
@@ -71,13 +71,11 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 				Matrix3d transform = this.mTransformMatrices[this.mSkeletonMap[weightIndex+j]];
 				//compute position
 				this.mWeight.copy(mPositionOriginal);
-				this.mWeight.scale(this.mWeights[weightIndex+j]);
-				this.mPosition.add(transform.transform(this.mWeight));
+				this.mPosition.add(transform.transform(this.mWeight).scale(this.mWeights[weightIndex+j]));
 				
 				//compute normal
 				this.mWeight.copy(mNormalOriginal);
-				this.mWeight.scale(this.mWeights[weightIndex+j]);
-				this.mNormal.add(transform.transform(this.mWeight));
+				this.mNormal.add(transform.transform(this.mWeight).scale(this.mWeights[weightIndex+j]));
 			}
 			this.mNormal.normalize();
 			this.mModifiedBuffer.addPosition(this.mPosition);
