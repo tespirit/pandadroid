@@ -11,6 +11,7 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 
 import com.jogamp.opengl.util.FPSAnimator;
+import com.tespirit.bamboo.primitives.Axis;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.LineIndices;
 import com.tespirit.bamboo.primitives.LineList;
@@ -19,9 +20,11 @@ import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.TriangleIndices;
 import com.tespirit.bamboo.primitives.TriangleList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
+import com.tespirit.bamboo.primitives.WireBox;
 import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.render.LightGroup;
+import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
 import com.tespirit.bamboo.surfaces.Texture;
@@ -128,6 +131,44 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
 
+	public void renderDebug(){
+		if(this.getSceneGraph() != null){
+			boundingBoxColor.setColor(1, 1, 0);
+			this.mGl.glDisable(GL2.GL_LIGHTING);
+			this.mGl.glDisable(GL2.GL_TEXTURE_2D);
+			this.pushMatrix(this.getCamera().getWorldTransform());
+			this.drawNodeInfo(this.getSceneGraph());
+			this.popMatrix();
+			if(this.lightsEnabled()){
+				this.mGl.glEnable(GL2.GL_LIGHTING);
+			}
+		}
+	}
+	
+	WireBox boundingBox = new WireBox();
+	Axis axis = new Axis();
+	Color boundingBoxColor = new Color();
+	public void drawNodeInfo(Node node){
+		if(node.getWorldTransform() != null){
+			this.pushMatrix(node.getWorldTransform());
+		}
+		if(node.getBoundingBox() != null){
+			this.boundingBox.setBox(node.getBoundingBox());
+			this.boundingBoxColor.render();
+			this.boundingBox.render();
+		}
+		
+		this.axis.render();
+		
+		if(node.getWorldTransform() != null){
+			this.popMatrix();
+		}
+		
+		for(int i = 0; i < node.getChildCount(); i++){
+			drawNodeInfo(node.getChild(i));
+		}
+	}
+	
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		this.mGl = drawable.getGL().getGL2();
@@ -136,6 +177,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mGl.glLoadIdentity();
 		
 		this.updateScene(Calendar.getInstance().getTimeInMillis());
+		this.renderDebug();
 		this.renderScene();
 	}
 

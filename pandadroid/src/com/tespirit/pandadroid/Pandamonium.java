@@ -48,13 +48,13 @@ public class Pandamonium extends Activity {
     	lights.createBasic();
     	view.setLightGroup(lights);
     	
-    	try{
-    		BambooAsset b = view.loadBamboo("candy.bam");
-    		setupAnimation(b, "d_root1");
-    	} catch(Exception e){
-    		Debug.print(e);
+//    	try{
+    		//BambooAsset b = view.loadBamboo("candy.bam");
+    		//setupAnimation(b, "d_root1");
+  //  	} catch(Exception e){
+    //		Debug.print(e);
     		view.setSceneGraph(this.createTestSG());
-    	}
+    	//}
     }
     
     public void setupAnimation(BambooAsset b, String skeletonName){

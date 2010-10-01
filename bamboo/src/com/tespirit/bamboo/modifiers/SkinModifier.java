@@ -56,7 +56,7 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 		//compute transform matrices
 		for(int i = 0; i < this.mSkeleton.length; i++){
 			Joint joint = (Joint)Node.getNode(this.mSkeleton[i]);
-			this.mTransformMatrices[i].multiply(joint.getWorldTransform(),this.mBindMatricesInv[i]);
+			this.mTransformMatrices[i].multiply(this.mBindMatricesInv[i],joint.getWorldTransform());
 		}
 		
 		int weightIndex = 0;
