@@ -8,6 +8,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamporter.app.Assets;
 
 public class ColladaHandler extends FileHandler{
 	private static ColladaHandler mFileHandler;
@@ -44,6 +45,9 @@ public class ColladaHandler extends FileHandler{
 			this.init(parser);
 			parser = null;
 			input.close();
+			for(String texturePath : this.mTexturePaths){
+				Assets.getInstance().addTexturePath(texturePath);
+			}
 		}
 	}
 }

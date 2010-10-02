@@ -3,6 +3,7 @@ package com.tespirit.bamporter.opengl;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.media.opengl.GL2;
@@ -13,6 +14,8 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 
 import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.texture.TextureData;
+import com.jogamp.opengl.util.texture.TextureIO;
 import com.tespirit.bamboo.primitives.Axis;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.LineIndices;
@@ -32,6 +35,7 @@ import com.tespirit.bamboo.surfaces.Material;
 import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
+import com.tespirit.bamporter.app.Assets;
 
 public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLEventListener{
 	private GLCanvas mCanvas;
@@ -45,12 +49,15 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	Axis mAxis = new Axis();
 	Color mBoundingBoxColor = new Color();
 	
+	private ArrayList<com.jogamp.opengl.util.texture.Texture> mTextures;
+	
 	private static GLCapabilities mGlCapabilities;
+	private static GLProfile mGlProfile;
 	
 	public static void initGl(){
 		GLProfile.initSingleton();
-		GLProfile glp = GLProfile.getDefault();
-		mGlCapabilities = new GLCapabilities(glp);
+		mGlProfile = GLProfile.getDefault();
+		mGlCapabilities = new GLCapabilities(mGlProfile);
 	}
 	
 	public Renderer(){
@@ -68,6 +75,9 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 							   GL2.GL_LINE_STRIP,
 							   GL2.GL_POINTS);
 		this.createRenderers();
+		
+		this.mTextures = new ArrayList<com.jogamp.opengl.util.texture.Texture>();
+		this.mTextures.add(null); // this makes it easier to deal with textures that have not been initialized.
 		
 		//create a default camera!
 		Camera camera = new Camera();
@@ -329,15 +339,27 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	protected class TextureRenderer extends Texture.Renderer{
 		@Override
 		public void render(Texture texture) {
-			//mGl.glEnable(GL2.GL_TEXTURE_2D);
-			//mGl.glEnable(GL2.GL_COLOR_MATERIAL);
-			mGl.glColor4f(1,1,1,1);
-			//mGl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getDiffuseTextureId());
+			int id = texture.getDiffuseTextureId();
+			if(id > 0){
+				com.jogamp.opengl.util.texture.Texture t = mTextures.get(id);				mGl.glColor4f(1,1,1,1);
+				t.enable();
+				t.bind();
+			} else if(id == 0){
+				this.setup(texture);
+				this.render(texture);
+			}
 		}
 		
 		@Override
 		public void setup(Texture texture) {
-
+			try{
+				TextureData textureData = Assets.getInstance().openTexture(texture.getDiffuseTextureName());
+				mTextures.add(TextureIO.newTexture(textureData));
+				texture.setDiffuseTextureId(mTextures.size()-1);
+			} catch(Exception e){
+				texture.setDiffuseTextureId(-1);
+			}
+			
 		}
 	}
 	

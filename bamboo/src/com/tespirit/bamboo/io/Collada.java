@@ -298,6 +298,7 @@ public class Collada implements BambooAsset{
 		this.mEffects = new Hashtable<String, Effect>();
 		this.mSkinRemaps = new Hashtable<String, Vector<Integer>>();
 		this.mSkinDatas = new Hashtable<String, SkinData>();
+		this.mTexturePaths = new ArrayList<String>();
 		
 		this.mParser = input;
 
