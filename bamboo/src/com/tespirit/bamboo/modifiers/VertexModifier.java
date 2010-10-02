@@ -2,7 +2,7 @@ package com.tespirit.bamboo.modifiers;
 
 import com.tespirit.bamboo.primitives.VertexBuffer;
 
-public abstract class VertexModifier {
+public abstract class VertexModifier implements Modifier{
 	protected VertexBuffer mOriginalBuffer;
 	protected VertexBuffer mModifiedBuffer;
 	
@@ -15,6 +15,4 @@ public abstract class VertexModifier {
 		return this.mModifiedBuffer;
 		//return this.mOriginalBuffer;
 	}
-	
-	public abstract void update();
 }

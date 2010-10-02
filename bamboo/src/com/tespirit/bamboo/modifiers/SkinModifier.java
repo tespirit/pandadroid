@@ -59,6 +59,10 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 			this.mTransformMatrices[i].multiply(joint.getWorldTransform(), this.mBindMatricesInv[i]);
 		}
 		
+
+		this.mOriginalBuffer.lock();
+		this.mModifiedBuffer.lock();
+		
 		int weightIndex = 0;
 		for(int i = 0; i < this.mWeightStrides.length; i++){
 			float stride = this.mWeightStrides[i];
@@ -82,8 +86,8 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 			this.mModifiedBuffer.addNormal(this.mNormal);
 			weightIndex += stride;
 		}
-		this.mOriginalBuffer.resetBufferPosition();
-		this.mModifiedBuffer.resetBufferPosition();
+		this.mOriginalBuffer.unlock();
+		this.mModifiedBuffer.unlock();
 	}
 	
 	public void attachRig(String[] skeleton, Matrix3d[] bindMatricesInv){

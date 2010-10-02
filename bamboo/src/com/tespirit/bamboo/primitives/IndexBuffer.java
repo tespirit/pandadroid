@@ -11,53 +11,47 @@ import java.nio.ShortBuffer;
 import java.nio.Buffer;
 
 public class IndexBuffer implements Externalizable{
-	private IntBuffer buffer32;
-	private ShortBuffer buffer16;
-	private ByteBuffer buffer8;
-	private Buffer buffer;
-	private int count;
-	private int type;
+	private IntBuffer mBuffer32;
+	private ShortBuffer mBuffer16;
+	private ByteBuffer mBuffer8;
+	private Buffer mBuffer;
+	private int mCount;
+	private int mType;
 	
-	public static void setTypeEnum(int int32, int short16, int byte8){
-		IndexBuffer.types[BUFFER32] = int32;
-		IndexBuffer.types[BUFFER16] = short16;
-		IndexBuffer.types[BUFFER8] = byte8;
-	}
+	public static final int BUFFER32 = 0;
+	public static final int BUFFER16 = 1;
+	public static final int BUFFER8 = 2;
 	
-	private static final int BUFFER32 = 0;
-	private static final int BUFFER16 = 1;
-	private static final int BUFFER8 = 2;
-	
-	private static int[] types = {0,1,2};
+	public static final int TYPE_COUNT = 3;
 	
 	public IndexBuffer(int count){
-		this.count = count;
+		this.mCount = count;
 		ByteBuffer temp = ByteBuffer.allocateDirect(count * 4);
 		temp.order(ByteOrder.nativeOrder());
-		this.buffer16 = temp.asShortBuffer();
-		this.buffer = this.buffer16;
-		this.type = BUFFER16;
+		this.mBuffer16 = temp.asShortBuffer();
+		this.mBuffer = this.mBuffer16;
+		this.mType = BUFFER16;
 	}
 	
 	public IndexBuffer(int count, int maxValue){
-		this.count = count;
+		this.mCount = count;
 		if(maxValue > Short.MAX_VALUE - Short.MIN_VALUE){
 			ByteBuffer temp = ByteBuffer.allocateDirect(count * 4);
 			temp.order(ByteOrder.nativeOrder());
-			this.buffer32 = temp.asIntBuffer();
-			this.buffer = this.buffer32;
-			this.type = BUFFER32;
+			this.mBuffer32 = temp.asIntBuffer();
+			this.mBuffer = this.mBuffer32;
+			this.mType = BUFFER32;
 		} else if(maxValue > Byte.MAX_VALUE - Byte.MIN_VALUE){
 			ByteBuffer temp = ByteBuffer.allocateDirect(count * 2);
 			temp.order(ByteOrder.nativeOrder());
-			this.buffer16 = temp.asShortBuffer();
-			this.buffer = this.buffer16;
-			this.type = BUFFER16;
+			this.mBuffer16 = temp.asShortBuffer();
+			this.mBuffer = this.mBuffer16;
+			this.mType = BUFFER16;
 		} else {
-			this.buffer8 = ByteBuffer.allocateDirect(count * 2);
-			this.buffer8.order(ByteOrder.nativeOrder());
-			this.buffer = this.buffer8;
-			this.type = BUFFER8;
+			this.mBuffer8 = ByteBuffer.allocateDirect(count * 2);
+			this.mBuffer8.order(ByteOrder.nativeOrder());
+			this.mBuffer = this.mBuffer8;
+			this.mType = BUFFER8;
 		}
 	}
 	
@@ -65,49 +59,53 @@ public class IndexBuffer implements Externalizable{
 		
 	}
 	
+	public void lock(){
+		
+	}
+	
+	public void unlock(){
+		this.mBuffer.position(0);
+	}
+	
 	public int getCount(){
-		return this.count;
+		return this.mCount;
 	}
 	
 	public void addTriangle(int v1, int v2, int v3){
-		if(this.buffer8 != null){
-			this.buffer8.put((byte)v1);
-			this.buffer8.put((byte)v2);
-			this.buffer8.put((byte)v3);
-		} else if(this.buffer16 != null){
-			this.buffer16.put((short)v1);
-			this.buffer16.put((short)v2);
-			this.buffer16.put((short)v3);
+		if(this.mBuffer8 != null){
+			this.mBuffer8.put((byte)v1);
+			this.mBuffer8.put((byte)v2);
+			this.mBuffer8.put((byte)v3);
+		} else if(this.mBuffer16 != null){
+			this.mBuffer16.put((short)v1);
+			this.mBuffer16.put((short)v2);
+			this.mBuffer16.put((short)v3);
 		} else {
-			this.buffer32.put(v1);
-			this.buffer32.put(v2);
-			this.buffer32.put(v3);
+			this.mBuffer32.put(v1);
+			this.mBuffer32.put(v2);
+			this.mBuffer32.put(v3);
 		}
 	}
 	
 	public void addLine(int v1, int v2){
-		if(this.buffer8 != null){
-			this.buffer8.put((byte)v1);
-			this.buffer8.put((byte)v2);
-		} else if(this.buffer16 != null){
-			this.buffer16.put((short)v1);
-			this.buffer16.put((short)v2);
+		if(this.mBuffer8 != null){
+			this.mBuffer8.put((byte)v1);
+			this.mBuffer8.put((byte)v2);
+		} else if(this.mBuffer16 != null){
+			this.mBuffer16.put((short)v1);
+			this.mBuffer16.put((short)v2);
 		} else {
-			this.buffer32.put(v1);
-			this.buffer32.put(v2);
+			this.mBuffer32.put(v1);
+			this.mBuffer32.put(v2);
 		}
 	}
 	
-	public int getTypeEnum(){
-		return IndexBuffer.types[this.type];
+	public int getType(){
+		return this.mType;
 	}
 	
 	public Buffer getBuffer(){
-		return this.buffer;
-	}
-	
-	public void resetBufferPosition(){
-		this.buffer.position(0);
+		return this.mBuffer;
 	}
 	
 	//IO
@@ -116,53 +114,52 @@ public class IndexBuffer implements Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		this.type = in.readInt();
-    	this.count = in.readInt();
+		this.mType = in.readInt();
+    	this.mCount = in.readInt();
     	
-    	ByteBuffer temp = ByteBuffer.allocateDirect(count * 4);
+    	ByteBuffer temp = ByteBuffer.allocateDirect(mCount * 4);
 		temp.order(ByteOrder.nativeOrder());
-    	switch(this.type){
+    	switch(this.mType){
 		case BUFFER32:
-			
-			this.buffer32 = temp.asIntBuffer();
-			this.buffer32.put((int[])in.readObject());
-			this.buffer = buffer32;
+			this.mBuffer32 = temp.asIntBuffer();
+			this.mBuffer32.put((int[])in.readObject());
+			this.mBuffer = mBuffer32;
 			break;
 		case BUFFER16:
-			this.buffer16 = temp.asShortBuffer();
-			this.buffer16.put((short[])in.readObject());
-			this.buffer = buffer16;
+			this.mBuffer16 = temp.asShortBuffer();
+			this.mBuffer16.put((short[])in.readObject());
+			this.mBuffer = mBuffer16;
 			break;
 		case BUFFER8:
-			this.buffer8 = temp;
-			this.buffer8.put((byte[])in.readObject());
-			this.buffer = buffer8;
+			this.mBuffer8 = temp;
+			this.mBuffer8.put((byte[])in.readObject());
+			this.mBuffer = mBuffer8;
 			break;
 		}
-    	this.buffer.position(0);
+    	this.mBuffer.position(0);
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeInt(this.type);
-		out.writeInt(this.count);
-		switch(this.type){
+		out.writeInt(this.mType);
+		out.writeInt(this.mCount);
+		switch(this.mType){
 		case BUFFER32:
-			int[] output32 = new int[this.count];
-			this.buffer32.get(output32);
+			int[] output32 = new int[this.mCount];
+			this.mBuffer32.get(output32);
 			out.writeObject(output32);
 			break;
 		case BUFFER16:
-			short[] output16 = new short[this.count];
-			this.buffer16.get(output16);
+			short[] output16 = new short[this.mCount];
+			this.mBuffer16.get(output16);
 			out.writeObject(output16);
 			break;
 		case BUFFER8:
-			byte[] output8 = new byte[this.count];
-			this.buffer8.get(output8);
+			byte[] output8 = new byte[this.mCount];
+			this.mBuffer8.get(output8);
 			out.writeObject(output8);
 			break;
 		}
-		this.buffer.position(0);
+		this.mBuffer.position(0);
 	}
 }

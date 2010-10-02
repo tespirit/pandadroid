@@ -69,7 +69,11 @@ public class VertexBuffer implements Externalizable{
 		return temp.asFloatBuffer();
 	}
 	
-	public void resetBufferPosition(){
+	public void lock(){
+		
+	}
+	
+	public void unlock(){
 		for(int i = 0; i < this.buffers.length; i++){
 			if(this.buffers[i] != null){
 				this.buffers[i].position(0);
@@ -185,10 +189,11 @@ public class VertexBuffer implements Externalizable{
 	
 	public void computeBoundingBox(AxisAlignedBox boundingBox){
 		Vector3d position = new Vector3d();
+		this.lock();
 		while(this.nextVector3d(position, VertexBuffer.POSITION)){
 			boundingBox.grow(position);
 		}
-		this.resetBufferPosition();
+		this.unlock();
 	}
 
 	//IO

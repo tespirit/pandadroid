@@ -15,7 +15,7 @@ import com.tespirit.bamboo.animation.JointTranslate;
 import com.tespirit.bamboo.modifiers.SkinModifier;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.Primitive;
-import com.tespirit.bamboo.primitives.TriangleIndices;
+import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.scenegraph.Group;
@@ -371,7 +371,7 @@ public class Collada implements BambooAsset{
 			return;
 		}
 		SkinData skinData = this.mSkinDatas.get(skinId);
-		TriangleIndices source = (TriangleIndices)this.mPrimitives.get(skinData.mSource);
+		VertexIndices source = (VertexIndices)this.mPrimitives.get(skinData.mSource);
 		
 		SkinModifier skin = new SkinModifier();
 		skin.attachRig(skinData.mJoints, skinData.mBindMatricesInv);
@@ -1101,8 +1101,9 @@ public class Collada implements BambooAsset{
 		for(int i = 0; i < types.size(); i++){
 			typesArray[i] = types.get(i);
 		}
-		TriangleIndices mesh = new TriangleIndices(indicesRemap.size(), nextIndex, typesArray);
+		VertexIndices mesh = new VertexIndices(indicesRemap.size(), nextIndex, typesArray);
 		VertexBuffer vb = mesh.getVertexBuffer();
+		vb.lock();
 		for(int i = 0; i < nextIndex; i++){
 			if(positionRemap != null){
 				vb.addPosition(positionRemap.get(i*3),
@@ -1125,15 +1126,16 @@ public class Collada implements BambooAsset{
 							colorRemap.get(i*4+4));
 			}
 		}
-		vb.resetBufferPosition();
+		vb.unlock();
 		
 		IndexBuffer ib = mesh.getIndexBuffer();
+		ib.lock();
 		for(int i = 0; i < indicesRemap.size(); i+=3){
 			ib.addTriangle(indicesRemap.get(i),
 						   indicesRemap.get(i+1),
 						   indicesRemap.get(i+2));
 		}
-		ib.resetBufferPosition();
+		ib.unlock();
 		
 		this.mPrimitives.put(name, mesh);
 		
