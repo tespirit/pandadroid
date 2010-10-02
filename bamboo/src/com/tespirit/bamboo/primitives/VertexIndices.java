@@ -25,6 +25,10 @@ public class VertexIndices extends VertexList implements Externalizable{
 		this.mIndexBuffer = ib;
 	}
 	
+	public VertexIndices(){
+		super();
+	}
+	
 	public IndexBuffer getIndexBuffer(){
 		return this.mIndexBuffer;
 	}

@@ -189,14 +189,16 @@ public class BamporterFrame extends JFrame{
 		this.renderer.clearTimeUpdates();
 		this.renderer.addNode(this.bamboo.getRootSceneNodes());
 		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
+		DefaultMutableTreeNode animations = new DefaultMutableTreeNode("Animations");
 		for(Node node : this.bamboo.getRootSceneNodes()){
 			sceneGraph.add(new NodeEditor(node));
 		}
 		for(Animation animation : this.bamboo.getAnimations()){
-			root.add(new AnimationEditor(animation, this.renderer));
+			animations.add(new AnimationEditor(animation, this.renderer));
 		}
 		
 		if(this.bamboo.getRootSceneNodes().size() > 0){
+			this.root.add(sceneGraph);
 			this.saveNodeButton.setEnabled(true);
 			this.saveAllButton.setEnabled(true);
 		} else {
@@ -204,6 +206,7 @@ public class BamporterFrame extends JFrame{
 			this.saveAllButton.setEnabled(false);
 		}
 		if(this.bamboo.getAnimations().size() > 0){
+			this.root.add(animations);
 			saveAnimationButton.setEnabled(true);
 			saveAllButton.setEnabled(true);
 		} else {
