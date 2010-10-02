@@ -1,4 +1,4 @@
-package com.tespirit.bamporter.io;
+package com.tespirit.bamporter.app;
 
 public class Assets {
 	//use this to add a path, either absolute name for a texture or a directory.
