@@ -1,6 +1,10 @@
 package com.tespirit.pandadroid.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.controllers.AccelerationController3d;
 import com.tespirit.bamboo.controllers.Controller2d;
 import com.tespirit.bamboo.controllers.ControllerDummy;
@@ -8,14 +12,13 @@ import com.tespirit.bamboo.controllers.Dof3;
 import com.tespirit.bamboo.controllers.EulerController3d;
 import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
+import com.tespirit.bamboo.creation.Lights;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.LightGroup;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.pandadroid.R;
 import com.tespirit.pandadroid.debug.Debug;
-import com.tespirit.pandadroid.io.Bamboo;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -247,22 +250,6 @@ public class PandadroidView extends GLSurfaceView {
 		return camera;
 	}
 	
-	public Node getSceneGraph(){
-		return this.renderer.getSceneGraph();
-	}
-	
-	public void setSceneGraph(Node sceneGraph){
-		this.renderer.setSceneGraph(sceneGraph);
-	}
-	
-	public LightGroup getLightGroup(){
-		return this.renderer.getLightGroup();
-	}
-	
-	public void setLightGroup(LightGroup lights){
-		this.renderer.setLightGroup(lights);
-	}
-	
 	public Camera getCamera(){
 		return this.renderer.getCamera();
 	}
@@ -271,25 +258,42 @@ public class PandadroidView extends GLSurfaceView {
 		this.renderer.setCamera(camera);
 	}
 	
-	public void addAnimation(Animation animation){
-		this.renderer.addTimeUpdate(animation);
+	public Player addAnimation(Animation animation){
+		Player player = new Player();
+		player.setAnimation(animation);
+		this.renderer.addTimeUpdate(player);
+		return player;
 	}
 	
-	public BambooAsset loadBamboo(String name) throws Exception{
-		Bamboo bamboo = new Bamboo(name);
-		this.addBamboo(bamboo);
-		return bamboo;
+	public void addSceneNode(Node node){
+		this.renderer.addNode(node);
 	}
 	
-	public void addBamboo(BambooAsset bamboo){
-		if(bamboo.getSceneGraph() != null){
-			this.renderer.setSceneGraph(bamboo.getSceneGraph());
+	/**
+	 * This assumes there is 1 animation to load.
+	 * @param bamboo
+	 * @return
+	 */
+	public Player addBambooSingleAnimation(BambooAsset bamboo){
+		this.renderer.addNode(bamboo.getRootSceneNodes());
+		return this.addAnimation(bamboo.getAnimations().get(0));
+	}
+	
+	/**
+	 * This will conveniently return an array of players linked up to any animations
+	 * that were imported.
+	 * @param bamboo
+	 * @return
+	 */
+	public List<Player> addBamboo(BambooAsset bamboo){
+		ArrayList<Player> players = new ArrayList<Player>(bamboo.getAnimations().size());
+		for(Animation a : bamboo.getAnimations()){
+			players.add(this.addAnimation(a));
 		}
-		if(bamboo.getAnimation() != null){
-			this.renderer.addTimeUpdate(bamboo.getAnimation());
-		}
-		if(bamboo.getLightGroup() != null){
-			this.renderer.setLightGroup(bamboo.getLightGroup());
-		}
+		return players;
+	}
+	
+	public void createDefaultLight(){
+		Lights.addDefaultLight(this.renderer);
 	}
 }

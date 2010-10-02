@@ -6,17 +6,15 @@ import android.os.Bundle;
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.animation.Clip;
-import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointRotate;
+import com.tespirit.bamboo.animation.Player;
+import com.tespirit.bamboo.creation.Primitives;
+import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.modifiers.SkinModifier;
-import com.tespirit.bamboo.primitives.Box;
 import com.tespirit.bamboo.primitives.IndexBuffer;
-import com.tespirit.bamboo.primitives.Plane;
-import com.tespirit.bamboo.primitives.TriangleIndices;
+import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.LightGroup;
 import com.tespirit.bamboo.scenegraph.Group;
 import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -25,6 +23,7 @@ import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Matrix3d;
 
 import com.tespirit.pandadroid.R;
+import com.tespirit.pandadroid.app.Assets;
 import com.tespirit.pandadroid.app.PandadroidView;
 import com.tespirit.pandadroid.app.TranslateAbsolute;
 import com.tespirit.pandadroid.debug.Debug;
@@ -54,22 +53,16 @@ public class Pandamonium extends Activity {
     	
     	view.setTouchDownController(new TranslateAbsolute(view));
     	
-    	LightGroup lights = new LightGroup();
-    	lights.createBasic();
-    	view.setLightGroup(lights);
+    	view.createDefaultLight();
     	
     	try{
-    		BambooAsset b = view.loadBamboo("candy.bam");
-    		setupAnimation(b, "d_root1");
+    		Player player = view.addBambooSingleAnimation(Assets.getManager().loadBamboo("candy.bam"));
+    		player.setSkeleton("d_root1");
+    		Debug.addTestAnimation(player);
     	} catch(Exception e){
     		Debug.print(e);
-    		view.setSceneGraph(this.createTestSG());
+    		view.addSceneNode(this.createTestSG());
     	}
-    }
-    
-    public void setupAnimation(BambooAsset b, String skeletonName){
-		Debug.addTestAnimation(b.getAnimation());
-		b.getAnimation().attachSkeleton((Joint)Node.getNode(skeletonName));
     }
     
     public Node createTestSG(){
@@ -82,7 +75,7 @@ public class Pandamonium extends Activity {
     	mat1.setColor(0.8f, 0.3f, 0.5f);
     	
     	Model m1 = new Model("plane");
-    	m1.setPrimative(new Plane());
+    	m1.setPrimative(new Primitives.Plane());
     	m1.setSurface(t1);
 
     	//adjust matrices
@@ -91,7 +84,7 @@ public class Pandamonium extends Activity {
     	g.appendChild(m1);
 
     	Model m2 = new Model("box");
-    	m2.setPrimative(new Box());
+    	m2.setPrimative(new Primitives.Cube());
     	
     	//adjust matrix
     	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
@@ -100,7 +93,7 @@ public class Pandamonium extends Activity {
     	g.appendChild(m2);
     	
     	Model m3 = new Model("box_material");
-    	m3.setPrimative(new Box());
+    	m3.setPrimative(new Primitives.Cube());
     	m3.setSurface(mat1);
     	
     	m3.getTransform().translate(-1.5f, 1.0f, 0.0f);
@@ -115,9 +108,10 @@ public class Pandamonium extends Activity {
     }
     
     private BambooAsset createDemoSkin(){
-		TriangleIndices mesh = new TriangleIndices(18, 8, new int[]{VertexBuffer.POSITION,VertexBuffer.NORMAL});
+		VertexIndices mesh = new VertexIndices(18, 8, new int[]{VertexBuffer.POSITION,VertexBuffer.NORMAL});
 		
 		VertexBuffer vb = mesh.getVertexBuffer();
+		vb.lock();
 		
 		vb.addPosition(-0.5f,0,0);
 		vb.addNormal(0,0,1);
@@ -142,9 +136,11 @@ public class Pandamonium extends Activity {
 		
 		vb.addPosition(0.5f,3,0);
 		vb.addNormal(0,0,1);
-		vb.resetBufferPosition();
+		
+		vb.unlock();
 		
 		IndexBuffer ib = mesh.getIndexBuffer();
+		ib.lock();
 		
 		ib.addTriangle(0, 1, 2);
 		ib.addTriangle(1, 3, 2);
@@ -154,7 +150,8 @@ public class Pandamonium extends Activity {
 		
 		ib.addTriangle(4, 5, 6);
 		ib.addTriangle(5, 7, 6);
-		ib.resetBufferPosition();
+		
+		ib.unlock();
 		
 		Model model = new Model();
 		
@@ -221,10 +218,6 @@ public class Pandamonium extends Activity {
 		
 		joint1.createAllBones(0.1f);
 		
-		Group g = new Group();
-		g.appendChild(joint1);
-		g.appendChild(model);
-		
 		Channel c = new Channel();
 		for(int i = 0; i < 30; i++){
 			c.addKeyFrame(new Channel.KeyFrame(i*0.75f, i*100));
@@ -237,41 +230,13 @@ public class Pandamonium extends Activity {
 			animation.addChannel(c);
 			animation.addChannel(blank);
 		}
-		animation.addClip(new Clip(0,3000));
-		animation.attachSkeleton(joint1);
-		animation.play(0);
+		animation.addClip(new Clip("bob", 0, 3000));
 		
-		return new SimpleAsset(g, animation);
-	}
-    
-    class SimpleAsset implements BambooAsset{
-		Animation a;
-		Node s;
+		Bamboo asset = new Bamboo();
+		asset.getRootSceneNodes().add(joint1);
+		asset.getRootSceneNodes().add(model);
+		asset.getAnimations().add(animation);
 		
-		public SimpleAsset(Node s, Animation a){
-			this.s = s;
-			this.a = a;
-		}
-
-		@Override
-		public Animation getAnimation() {
-			return a;
-		}
-
-		@Override
-		public Camera[] getCameras() {
-			return null;
-		}
-
-		@Override
-		public LightGroup getLightGroup() {
-			return null;
-		}
-
-		@Override
-		public Node getSceneGraph() {
-			return s;
-		}
-		
+		return asset;
 	}
 }

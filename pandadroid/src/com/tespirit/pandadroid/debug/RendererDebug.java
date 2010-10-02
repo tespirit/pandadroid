@@ -7,13 +7,10 @@ import java.util.Hashtable;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.os.SystemClock;
-
-import com.tespirit.bamboo.primitives.Axis;
-import com.tespirit.bamboo.primitives.TriangleIndices;
-import com.tespirit.bamboo.primitives.TriangleList;
+import com.tespirit.bamboo.creation.Primitives;
+import com.tespirit.bamboo.primitives.VertexIndices;
+import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.primitives.WireBox;
 import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
@@ -51,10 +48,10 @@ public class RendererDebug extends Renderer{
 	
 	public Hashtable<Integer, FloatBuffer> normalBuffers;
 
-	private WireBox boundingBox;
+	private Primitives.WireCube boundingBox;
 	private Color boundingBoxColor;
 	private Color selectedColor;
-	private Axis axis;
+	private Primitives.Axis axis;
 	private FloatBuffer point;
 	
 	public RendererDebug(){
@@ -66,7 +63,7 @@ public class RendererDebug extends Renderer{
 		this.renderLightPoint = false;
 		this.lightsOn = true;
 		
-		this.boundingBox = new WireBox();
+		this.boundingBox = new Primitives.WireCube();
 		this.boundingBoxColor = new Color();
 		this.boundingBoxColor.setColor(1, 1, 0);
 		this.selectedColor = new Color();
@@ -74,7 +71,7 @@ public class RendererDebug extends Renderer{
 		
 		this.normalBuffers = new Hashtable<Integer, FloatBuffer>();
 		
-		this.axis = new Axis();
+		this.axis = new Primitives.Axis();
 				
 		ByteBuffer temp = ByteBuffer.allocateDirect(4*3);
 		temp.order(ByteOrder.nativeOrder());
@@ -87,15 +84,13 @@ public class RendererDebug extends Renderer{
 	
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glLoadIdentity();
-		
-		gl.glEnable(GL10.GL_POINT_SIZE);
-		gl.glPointSize(3);
-		
 		this.mGl = gl;
+		this.mGl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		this.mGl.glLoadIdentity();
+		this.mGl.glEnable(GL10.GL_POINT_SIZE);
+		this.mGl.glPointSize(3);
 
-		this.updateScene(SystemClock.uptimeMillis());
+		this.updateScene();
 		
 		
 		if(this.pointBuffer != null){
@@ -108,8 +103,9 @@ public class RendererDebug extends Renderer{
 		//render node info!
 		this.mGl.glDisable(GL10.GL_LIGHTING);
 		this.mGl.glDisable(GL10.GL_TEXTURE_2D);
-		
-		this.drawNodeInfo(this.getSceneGraph());
+		while(this.getRootIterator().hasNext()){
+			this.drawNodeInfo(this.getRootIterator().next());
+		}
 		if(this.lightsEnabled() && this.lightsOn){
 			this.mGl.glEnable(GL10.GL_LIGHTING);
 		}
@@ -201,7 +197,7 @@ public class RendererDebug extends Renderer{
 			
 			Vector3d position = new Vector3d();
 			Vector3d normalOffset = new Vector3d();
-			
+			vb.lock();
 			while(vb.nextVector3d(position, VertexBuffer.POSITION) && 
 				  vb.nextVector3d(normalOffset, VertexBuffer.NORMAL)){
 				normals.put(position.getX());
@@ -213,7 +209,7 @@ public class RendererDebug extends Renderer{
 				normals.put(normalOffset.getY());
 				normals.put(normalOffset.getZ());
 			}
-			vb.resetBufferPosition();
+			vb.unlock();
 			normals.position(0);
 			
 			//draw position!
@@ -240,9 +236,9 @@ public class RendererDebug extends Renderer{
 	 * @author Todd Espiritu Santo
 	 *
 	 */
-	protected class TriangleIndicesDebugRenderer extends TriangleIndicesRenderer{
+	protected class TriangleIndicesDebugRenderer extends VertexIndicesRenderer{
 		@Override
-		public void render(TriangleIndices triangles){
+		public void render(VertexIndices triangles){
 			if(renderRenderables ){
 				super.render(triangles);
 			}
@@ -255,9 +251,9 @@ public class RendererDebug extends Renderer{
 	 * @author Todd Espiritu Santo
 	 *
 	 */
-	protected class TriangleListDebugRenderer extends TriangleListRenderer{
+	protected class TriangleListDebugRenderer extends VertexListRenderer{
 		@Override
-		public void render(TriangleList triangles) {
+		public void render(VertexList triangles) {
 			if(renderRenderables ){
 				super.render(triangles);
 			}

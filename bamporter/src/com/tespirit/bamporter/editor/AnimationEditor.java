@@ -3,7 +3,6 @@ package com.tespirit.bamporter.editor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Calendar;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -11,17 +10,22 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import com.tespirit.bamboo.animation.Animation;
-import com.tespirit.bamboo.animation.Joint;
-import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamboo.animation.Player;
+import com.tespirit.bamboo.render.Renderer;
 
 public class AnimationEditor extends TreeNodeEditor{
 	
 	private Animation mAnimation;
+	private Player mPlayer;
 	private JTextField mSkeleton;
 	private Box mPanel;
 	
-	public AnimationEditor(Animation animation){
+	public AnimationEditor(Animation animation, Renderer renderer){
 		this.mAnimation = animation;
+		this.mPlayer = new Player();
+		this.mPlayer.setAnimation(this.mAnimation);
+		renderer.addTimeUpdate(this.mPlayer);
+		
 		for(int i = 0; i < animation.getChannelCount(); i++){
 			this.add(new ChannelEditor(animation.getChannel(i)));
 		}
@@ -40,10 +44,7 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mSkeleton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				Node node = Node.getNode(mSkeleton.getText());
-				if(node != null && node instanceof Joint){
-					mAnimation.attachSkeleton((Joint)node);
-				}
+				mPlayer.setSkeleton(mSkeleton.getText());
 			}
 		});
 		skeletonLabel.setLabelFor(this.mSkeleton);
@@ -53,16 +54,34 @@ public class AnimationEditor extends TreeNodeEditor{
 		play.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				mAnimation.play(Calendar.getInstance().getTimeInMillis());
+				mPlayer.play();
 			}
 		});
 		
-		JButton stop = new JButton();
-		stop.setText("Stop");
-		stop.addActionListener(new ActionListener(){
+		JButton pause = new JButton();
+		pause.setText("Pause");
+		pause.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				mAnimation.stop();
+				mPlayer.pause();
+			}
+		});
+		
+		JButton reverse = new JButton();
+		reverse.setText("Play Reverse");
+		reverse.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				mPlayer.playReverse();
+			}
+		});
+		
+		JButton restart = new JButton();
+		restart.setText("Restart");
+		restart.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				mPlayer.restart();
 			}
 		});
 		
@@ -71,7 +90,9 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mPanel.add(skeletonLabel);
 		this.mPanel.add(this.mSkeleton);
 		this.mPanel.add(play);
-		this.mPanel.add(stop);
+		this.mPanel.add(pause);
+		this.mPanel.add(reverse);
+		this.mPanel.add(restart);
 	}
 
 	@Override

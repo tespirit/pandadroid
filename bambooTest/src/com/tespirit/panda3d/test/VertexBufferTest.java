@@ -19,13 +19,17 @@ public class VertexBufferTest extends TestCase {
 	public void testManupulation(){
 		VertexBuffer v = new VertexBuffer(2);
 		
+		v.lock();
+		
 		v.addPosition(1.0f, 2.0f, 3.0f);
 		v.addPosition(4.0f, 5.0f, 6.0f);
 		
-		v.resetBufferPosition();
+		v.unlock();
 		
 		Vector3d p1 = new Vector3d();
 		Vector3d p2 = new Vector3d(1.0f, 2.0f, 3.0f);
+		
+		v.lock();
 		
 		v.nextVector3d(p1, VertexBuffer.POSITION);
 		Assert.assertTrue(p1.equals(p2));
@@ -34,7 +38,7 @@ public class VertexBufferTest extends TestCase {
 		p2.set(4.0f, 5.0f, 6.0f);
 		Assert.assertTrue(p1.equals(p2));
 		
-		v.resetBufferPosition();
+		v.unlock();
 		
 		Assert.assertEquals(6, v.getCount(VertexBuffer.POSITION));
 		Assert.assertEquals(2, v.getCount());

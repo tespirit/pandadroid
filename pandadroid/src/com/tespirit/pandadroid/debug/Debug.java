@@ -1,6 +1,7 @@
 package com.tespirit.pandadroid.debug;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.tespirit.bamboo.animation.*;
@@ -20,7 +21,7 @@ import android.widget.TextView;
 
 public class Debug {
 	private static RendererDebug renderer;
-	private static ArrayList<Animation> animations = new ArrayList<Animation>();
+	private static ArrayList<Player> animations = new ArrayList<Player>();
 	private static int currentAnimation = -1;
 	private static TextView console;
 	private static ArrayBlockingQueue<String> printBuffer = new ArrayBlockingQueue<String>(1000);
@@ -47,6 +48,12 @@ public class Debug {
 			while(!Debug.printBuffer.isEmpty()){
 				Debug.console.append("\n"+Debug.printBuffer.poll());
 			}
+		}
+	}
+	
+	public static void print(Iterator<Node> nodes){
+		while(nodes.hasNext()){
+			Debug.print(nodes.next());
 		}
 	}
 	
@@ -139,9 +146,9 @@ public class Debug {
 		}
 	}
 	
-	public static void addTestAnimation(Animation a){
+	public static void addTestAnimation(Player player){
 		Debug.currentAnimation = 0;
-		Debug.animations.add(a);
+		Debug.animations.add(player);
 	}
 	
 	public static void selectNode(Node node){
@@ -188,17 +195,17 @@ public class Debug {
 					Debug.print("Lights on: "+Debug.renderer.lightsOn);
 					break;
 				case KeyEvent.KEYCODE_TAB:
-					Debug.print(Debug.renderer.getSceneGraph());
+					Debug.print(Debug.renderer.getRootIterator());
 					break;
 				case KeyEvent.KEYCODE_N:
 					if(currentAnimation != -1){
-						animations.get(currentAnimation).play(android.os.SystemClock.uptimeMillis());
+						animations.get(currentAnimation).play();
 						Debug.print("Playing animation " + currentAnimation);
 					}
 					break;
 				case KeyEvent.KEYCODE_M:
 					if(currentAnimation != -1){
-						animations.get(currentAnimation).stop();
+						animations.get(currentAnimation).pause();
 						Debug.print("Stopping animation " + currentAnimation);
 					}
 					break;

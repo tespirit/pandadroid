@@ -22,15 +22,23 @@ public class BambooHandler extends FileHandler{
 		super("Bamboo Asset", "bam");
 		IOManager.registerFileHandler(this);
 	}
-
-	private class Bamboo extends com.tespirit.bamboo.io.Bamboo{
-		public Bamboo(File file) throws Exception{
-			super(new FileInputStream(file));
+	
+	@Override
+	public BambooAsset open(File file) throws Exception {
+		FileInputStream stream = new FileInputStream(file);
+		try{
+			BambooAsset asset = new Bamboo(stream);
+			stream.close();
+			return asset;
+		} catch(Exception e){
+			stream.close();
+			throw e;
 		}
 	}
 
-	@Override
-	public BambooAsset open(File file) throws Exception {
-		return new Bamboo(file);
+	private class Bamboo extends com.tespirit.bamboo.io.Bamboo{
+		public Bamboo(FileInputStream stream) throws Exception{
+			super(stream);
+		}
 	}
 }

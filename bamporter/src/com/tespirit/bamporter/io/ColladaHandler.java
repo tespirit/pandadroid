@@ -2,7 +2,6 @@ package com.tespirit.bamporter.io;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -22,7 +21,17 @@ public class ColladaHandler extends FileHandler{
 	private static XmlPullParserFactory mXmlParserFactory;
 	
 	public BambooAsset open(File file) throws Exception{
-		return new Collada(file);
+		FileInputStream stream = new FileInputStream(file);
+		try{
+			XmlPullParser parser = mXmlParserFactory.newPullParser();
+			parser.setInput(stream, null);
+			BambooAsset asset = new Collada(parser);
+			stream.close();
+			return asset;
+		} catch(Exception e){
+			stream.close();
+			throw e;
+		}
 	}
 	
 	private ColladaHandler() {
@@ -37,14 +46,8 @@ public class ColladaHandler extends FileHandler{
 	}
 	
 	private class Collada extends com.tespirit.bamboo.io.Collada{
-		public Collada(File file) throws Exception{			
-			InputStreamReader input = new InputStreamReader(new FileInputStream(file)); 
-			
-			XmlPullParser parser = mXmlParserFactory.newPullParser();
-			parser.setInput(input);
-			this.init(parser);
-			parser = null;
-			input.close();
+		public Collada(XmlPullParser input) throws Exception{			
+			super(input);
 			for(String texturePath : this.mTexturePaths){
 				Assets.getInstance().addTexturePath(texturePath);
 			}

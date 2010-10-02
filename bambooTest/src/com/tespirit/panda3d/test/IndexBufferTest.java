@@ -16,10 +16,12 @@ public class IndexBufferTest extends TestCase {
 	public void testManupulation(){
 		IndexBuffer i = new IndexBuffer(6);
 		
+		i.lock();
+		
 		i.addTriangle(1, 2, 3);
 		i.addTriangle(4, 5, 6);
 		
-		i.resetBufferPosition();
+		i.unlock();
 		
 		Assert.assertEquals(6, i.getCount());
 	}

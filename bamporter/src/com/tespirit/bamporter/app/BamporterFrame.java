@@ -5,7 +5,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileOutputStream;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,8 +21,9 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.tespirit.bamboo.io.Bamboo;
+import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.editor.AnimationEditor;
 import com.tespirit.bamporter.editor.NodeEditor;
 import com.tespirit.bamporter.editor.TreeNodeEditor;
@@ -184,23 +184,26 @@ public class BamporterFrame extends JFrame{
 	}
 	
 	private void loadBamboo(){
-		root.removeAllChildren();
+		this.root.removeAllChildren();
+		this.renderer.clearScene(true);
 		this.renderer.clearTimeUpdates();
-		if(bamboo.getSceneGraph() != null){
-			DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
-			sceneGraph.add(new NodeEditor(bamboo.getSceneGraph()));
-			root.add(sceneGraph);
-			saveNodeButton.setEnabled(true);
-			saveAllButton.setEnabled(true);
-			this.renderer.setSceneGraph(bamboo.getSceneGraph());
-		} else {
-			this.renderer.setSceneGraph(null);
-			saveNodeButton.setEnabled(false);
-			saveAllButton.setEnabled(false);
+		this.renderer.addNode(this.bamboo.getRootSceneNodes());
+		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
+		for(Node node : this.bamboo.getRootSceneNodes()){
+			sceneGraph.add(new NodeEditor(node));
 		}
-		if(bamboo.getAnimation() != null){
-			this.renderer.addTimeUpdate(bamboo.getAnimation());
-			root.add(new AnimationEditor(bamboo.getAnimation()));
+		for(Animation animation : this.bamboo.getAnimations()){
+			root.add(new AnimationEditor(animation, this.renderer));
+		}
+		
+		if(this.bamboo.getRootSceneNodes().size() > 0){
+			this.saveNodeButton.setEnabled(true);
+			this.saveAllButton.setEnabled(true);
+		} else {
+			this.saveNodeButton.setEnabled(false);
+			this.saveAllButton.setEnabled(false);
+		}
+		if(this.bamboo.getAnimations().size() > 0){
 			saveAnimationButton.setEnabled(true);
 			saveAllButton.setEnabled(true);
 		} else {
@@ -211,14 +214,9 @@ public class BamporterFrame extends JFrame{
 	}
 	
 	private void saveAllButtonAction(ActionEvent event) {
-		if(bamboo == null){
-			return;
-		}
-		
 		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				FileOutputStream stream = new FileOutputStream(fileDialog.getSelectedFile());
-				Bamboo.save(bamboo, stream);
+				IOManager.saveBamboo(this.bamboo, fileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
 				this.alertError("An error happened while saving. Please contact support :(");
@@ -227,14 +225,9 @@ public class BamporterFrame extends JFrame{
 	}
 
 	private void saveNodeButtonAction(ActionEvent event) {
-		if(bamboo == null){
-			return;
-		}
-		
 		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				FileOutputStream stream = new FileOutputStream(fileDialog.getSelectedFile());
-				Bamboo.save(bamboo.getSceneGraph(), stream);
+				IOManager.saveSceneGraph(this.bamboo, fileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
 				this.alertError("An error happened while saving. Please contact support :(");
@@ -243,14 +236,9 @@ public class BamporterFrame extends JFrame{
 	}
 
 	private void saveAnimationButtonAction(ActionEvent event) {
-		if(bamboo == null){
-			return;
-		}
-		
 		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				FileOutputStream stream = new FileOutputStream(fileDialog.getSelectedFile());
-				Bamboo.save(bamboo.getAnimation(), stream);
+				IOManager.saveAnimation(this.bamboo, fileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
 				this.alertError("An error happened while saving. Please contact support :(");

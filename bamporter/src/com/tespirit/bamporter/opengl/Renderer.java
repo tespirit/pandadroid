@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -16,19 +15,16 @@ import javax.media.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
-import com.tespirit.bamboo.primitives.Axis;
+import com.tespirit.bamboo.creation.Lights;
+import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.primitives.IndexBuffer;
-import com.tespirit.bamboo.primitives.LineIndices;
-import com.tespirit.bamboo.primitives.LineList;
-import com.tespirit.bamboo.primitives.Points;
 import com.tespirit.bamboo.primitives.Primitive;
-import com.tespirit.bamboo.primitives.TriangleIndices;
-import com.tespirit.bamboo.primitives.TriangleList;
+import com.tespirit.bamboo.primitives.VertexIndices;
+import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.primitives.WireBox;
 import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.Light;
-import com.tespirit.bamboo.render.LightGroup;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
@@ -45,9 +41,12 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	
 	private boolean mRenderBoundingBox;
 	private boolean mRenderAxis;
-	WireBox mBoundingBox = new WireBox();
-	Axis mAxis = new Axis();
+	Primitives.WireCube mBoundingBox = new Primitives.WireCube();
+	Primitives.Axis mAxis = new Primitives.Axis();
 	Color mBoundingBoxColor = new Color();
+	
+	private int[] mIndexTypes;
+	private int[] mPrimitiveTypes;
 	
 	private ArrayList<com.jogamp.opengl.util.texture.Texture> mTextures;
 	
@@ -65,16 +64,19 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		super();
 		this.mCurrentLightId = 0;
 		
-		IndexBuffer.setTypeEnum(GL2.GL_UNSIGNED_INT, 
-								GL2.GL_UNSIGNED_SHORT, 
-								GL2.GL_UNSIGNED_BYTE);
+		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
+		this.mIndexTypes[IndexBuffer.BUFFER32] = GL2.GL_UNSIGNED_INT;
+		this.mIndexTypes[IndexBuffer.BUFFER16] = GL2.GL_UNSIGNED_SHORT;
+		this.mIndexTypes[IndexBuffer.BUFFER8]  = GL2.GL_UNSIGNED_BYTE;
 		
-		Primitive.setTypeEnums(GL2.GL_TRIANGLES, 
-							   GL2.GL_TRIANGLE_STRIP, 
-							   GL2.GL_TRIANGLE_FAN, 
-							   GL2.GL_LINES,
-							   GL2.GL_LINE_STRIP,
-							   GL2.GL_POINTS);
+		this.mPrimitiveTypes = new int[Primitive.TYPE_COUNT];
+		this.mPrimitiveTypes[Primitive.TRIANGLES] = GL2.GL_TRIANGLES;
+		this.mPrimitiveTypes[Primitive.TRIANGLE_STRIP] = GL2.GL_TRIANGLE_STRIP;
+		this.mPrimitiveTypes[Primitive.TRIANGLE_FAN] = GL2.GL_TRIANGLE_FAN;
+		this.mPrimitiveTypes[Primitive.LINES] = GL2.GL_LINES;
+		this.mPrimitiveTypes[Primitive.LINE_STRIP] = GL2.GL_LINE_STRIP;
+		this.mPrimitiveTypes[Primitive.POINTS] = GL2.GL_POINTS;
+		
 		this.createRenderers();
 		
 		this.mTextures = new ArrayList<com.jogamp.opengl.util.texture.Texture>();
@@ -87,9 +89,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		camera.getPivotTransform().rotateX(45);
 		this.setCamera(camera);
 		
-		LightGroup lights = new LightGroup();
-		lights.createBasic();
-		this.setLightGroup(lights);
+		Lights.addDefaultLight(this);
 		
 		this.mCanvas = new GLCanvas(mGlCapabilities);
 		this.mCanvas.addGLEventListener(this);
@@ -127,6 +127,9 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mAnimator = new FPSAnimator(this.mCanvas, 30);
 		this.mAnimator.add(this.mCanvas);
 		this.mAnimator.start();
+		
+		//debug stuff
+		this.mBoundingBoxColor.setColor(1, 1, 0);
 	}
 	
 	public Component getView(){
@@ -135,16 +138,13 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 
 	public void createRenderers(){
 		//create renderers!
-		this.addComponentRenderer(new TriangleIndicesRenderer());
-		this.addComponentRenderer(new TriangleListRenderer());
+		this.addComponentRenderer(new VertexIndicesRenderer());
+		this.addComponentRenderer(new VertexListRenderer());
 		this.addComponentRenderer(new MaterialRenderer());
 		this.addComponentRenderer(new LightRenderer());
 		this.addComponentRenderer(new CameraRenderer());
 		this.addComponentRenderer(new TextureRenderer());
 		this.addComponentRenderer(new ColorRenderer());
-		this.addComponentRenderer(new LineIndicesRenderer());
-		this.addComponentRenderer(new LineListRenderer());
-		this.addComponentRenderer(new PointsRenderer());
 	}
 
 	@Override
@@ -181,18 +181,22 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mGl.glPushMatrix();
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
+	
+	@Override
+	public Clock createClock() {
+		return new CalendarClock();
+	}
 
 	public void renderDebug(){
-		if(this.getSceneGraph() != null){
-			mBoundingBoxColor.setColor(1, 1, 0);
-			this.mGl.glDisable(GL2.GL_LIGHTING);
-			this.mGl.glDisable(GL2.GL_TEXTURE_2D);
-			this.pushMatrix(this.getCamera().getWorldTransform());
-			this.drawNodeInfo(this.getSceneGraph());
-			this.popMatrix();
-			if(this.lightsEnabled()){
-				this.mGl.glEnable(GL2.GL_LIGHTING);
-			}
+		this.mGl.glDisable(GL2.GL_LIGHTING);
+		this.mGl.glDisable(GL2.GL_TEXTURE_2D);
+		this.pushMatrix(this.getCamera().getWorldTransform());
+		for(int i = 0; i < this.getRootCount(); i++){
+			this.drawNodeInfo(this.getRoot(i));
+		}
+		this.popMatrix();
+		if(this.lightsEnabled()){
+			this.mGl.glEnable(GL2.GL_LIGHTING);
 		}
 	}
 	
@@ -228,7 +232,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mGl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		this.mGl.glLoadIdentity();
 		
-		this.updateScene(Calendar.getInstance().getTimeInMillis());
+		this.updateScene();
 		this.renderDebug();
 		this.renderScene();
 	}
@@ -396,20 +400,20 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		}
 	}
 	
-	protected class TriangleIndicesRenderer extends TriangleIndices.Renderer {
+	protected class VertexIndicesRenderer extends VertexIndices.Renderer {
 
 		@Override
-		public void render(TriangleIndices triangles) {
+		public void render(VertexIndices vi) {
 			mGl.glFrontFace(GL2.GL_CCW);
 			mGl.glEnable(GL2.GL_CULL_FACE);
 			
-			renderVertexBuffer(triangles.getVertexBuffer());
+			renderVertexBuffer(vi.getVertexBuffer());
 			
-			IndexBuffer indexBuffer = triangles.getIndexBuffer();
+			IndexBuffer indexBuffer = vi.getIndexBuffer();
 			
-			mGl.glDrawElements(triangles.getTypeEnum(), 
+			mGl.glDrawElements(mPrimitiveTypes[vi.getType()], 
 							  indexBuffer.getCount(), 
-							  indexBuffer.getTypeEnum(), 
+							  mIndexTypes[indexBuffer.getType()], 
 							  indexBuffer.getBuffer());
 			
 			mGl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
@@ -420,62 +424,14 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		}
 	}
 
-	protected class TriangleListRenderer extends TriangleList.Renderer{
+	protected class VertexListRenderer extends VertexList.Renderer{
 		@Override
-		public void render(TriangleList triangles) {
+		public void render(VertexList vl) {
 			mGl.glFrontFace(GL2.GL_CCW);
 			mGl.glEnable(GL2.GL_CULL_FACE);
 			
-			renderVertexBuffer(triangles.getVertexBuffer());
-			mGl.glDrawArrays(triangles.getTypeEnum(), 0, triangles.getVertexBuffer().getCount());
-			
-			mGl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			mGl.glDisable(GL2.GL_CULL_FACE);
-		}
-	}
-	
-	protected class LineIndicesRenderer extends LineIndices.Renderer{
-		@Override
-		public void render(LineIndices lines) {
-			
-			renderVertexBuffer(lines.getVertexBuffer());
-			
-			IndexBuffer indexBuffer = lines.getIndexBuffer();
-			mGl.glDrawElements(lines.getTypeEnum(), 
-					  indexBuffer.getCount(), 
-					  indexBuffer.getTypeEnum(), 
-					  indexBuffer.getBuffer());
-			
-			mGl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			mGl.glDisable(GL2.GL_CULL_FACE);
-		}
-	}
-	
-	protected class LineListRenderer extends LineList.Renderer{
-		@Override
-		public void render(LineList lines) {
-			renderVertexBuffer(lines.getVertexBuffer());
-			mGl.glDrawArrays(lines.getTypeEnum(), 0, lines.getVertexBuffer().getCount());
-			
-			mGl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			mGl.glDisable(GL2.GL_CULL_FACE);
-		}
-	}
-	
-	protected class PointsRenderer extends Points.Renderer{
-		@Override
-		public void render(Points points) {
-			renderVertexBuffer(points.getVertexBuffer());
-			mGl.glDrawArrays(points.getTypeEnum(), 0, points.getVertexBuffer().getCount());
+			renderVertexBuffer(vl.getVertexBuffer());
+			mGl.glDrawArrays(mPrimitiveTypes[vl.getType()], 0, vl.getVertexBuffer().getCount());
 			
 			mGl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
 			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);

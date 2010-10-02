@@ -5,14 +5,12 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.tespirit.bamboo.primitives.IndexBuffer;
-import com.tespirit.bamboo.primitives.LineIndices;
-import com.tespirit.bamboo.primitives.LineList;
-import com.tespirit.bamboo.primitives.Points;
 import com.tespirit.bamboo.primitives.Primitive;
-import com.tespirit.bamboo.primitives.TriangleIndices;
-import com.tespirit.bamboo.primitives.TriangleList;
+import com.tespirit.bamboo.primitives.VertexIndices;
+import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
@@ -23,26 +21,29 @@ import com.tespirit.pandadroid.app.Assets;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
-import android.os.SystemClock;
 
 public class Renderer extends com.tespirit.bamboo.render.Renderer implements android.opengl.GLSurfaceView.Renderer{
 	protected GL10 mGl;
 	protected int mCurrentLightId;
 	
+	private int[] mIndexTypes;
+	private int[] mPrimitiveTypes;
+	
 	public Renderer() {
 		super();
 		this.mCurrentLightId = 0;
 		
-		IndexBuffer.setTypeEnum(0, 
-								GL10.GL_UNSIGNED_SHORT, 
-								GL10.GL_UNSIGNED_BYTE);
+		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
+		this.mIndexTypes[IndexBuffer.BUFFER16] = GL10.GL_UNSIGNED_SHORT;
+		this.mIndexTypes[IndexBuffer.BUFFER8]  = GL10.GL_UNSIGNED_BYTE;
 		
-		Primitive.setTypeEnums(GL10.GL_TRIANGLES, 
-							   GL10.GL_TRIANGLE_STRIP, 
-							   GL10.GL_TRIANGLE_FAN, 
-							   GL10.GL_LINES,
-							   GL10.GL_LINE_STRIP,
-							   GL10.GL_POINTS);
+		this.mPrimitiveTypes = new int[Primitive.TYPE_COUNT];
+		this.mPrimitiveTypes[Primitive.TRIANGLES] = GL10.GL_TRIANGLES;
+		this.mPrimitiveTypes[Primitive.TRIANGLE_STRIP] = GL10.GL_TRIANGLE_STRIP;
+		this.mPrimitiveTypes[Primitive.TRIANGLE_FAN] = GL10.GL_TRIANGLE_FAN;
+		this.mPrimitiveTypes[Primitive.LINES] = GL10.GL_LINES;
+		this.mPrimitiveTypes[Primitive.LINE_STRIP] = GL10.GL_LINE_STRIP;
+		this.mPrimitiveTypes[Primitive.POINTS] = GL10.GL_POINTS;
 		
 		this.createRenderers();
 	}
@@ -53,7 +54,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		this.mGl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		this.mGl.glLoadIdentity();
 		
-		this.updateScene(SystemClock.uptimeMillis());
+		this.updateScene();
 		this.renderScene();
 	}
 
@@ -86,16 +87,13 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	
 	public void createRenderers(){
 		//create renderers!
-		this.addComponentRenderer(new TriangleIndicesRenderer());
-		this.addComponentRenderer(new TriangleListRenderer());
+		this.addComponentRenderer(new VertexIndicesRenderer());
+		this.addComponentRenderer(new VertexListRenderer());
 		this.addComponentRenderer(new MaterialRenderer());
 		this.addComponentRenderer(new LightRenderer());
 		this.addComponentRenderer(new CameraRenderer());
 		this.addComponentRenderer(new TextureRenderer());
 		this.addComponentRenderer(new ColorRenderer());
-		this.addComponentRenderer(new LineIndicesRenderer());
-		this.addComponentRenderer(new LineListRenderer());
-		this.addComponentRenderer(new PointsRenderer());
 	}
 
 	@Override
@@ -131,6 +129,11 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	public void pushMatrix(Matrix3d transform) {
 		this.mGl.glPushMatrix();
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
+	}
+	
+	@Override
+	public Clock createClock(){
+		return new AndroidClock();
 	}
 	
 	protected class LightRenderer extends Light.Renderer{
@@ -316,20 +319,20 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		}
 	}
 	
-	protected class TriangleIndicesRenderer extends TriangleIndices.Renderer {
+	protected class VertexIndicesRenderer extends VertexIndices.Renderer {
 
 		@Override
-		public void render(TriangleIndices triangles) {
+		public void render(VertexIndices vi) {
 			mGl.glFrontFace(GL10.GL_CCW);
 			mGl.glEnable(GL10.GL_CULL_FACE);
 			
-			renderVertexBuffer(triangles.getVertexBuffer());
+			renderVertexBuffer(vi.getVertexBuffer());
 			
-			IndexBuffer indexBuffer = triangles.getIndexBuffer();
+			IndexBuffer indexBuffer = vi.getIndexBuffer();
 			
-			mGl.glDrawElements(triangles.getTypeEnum(), 
+			mGl.glDrawElements(mPrimitiveTypes[vi.getType()], 
 							  indexBuffer.getCount(), 
-							  indexBuffer.getTypeEnum(), 
+							  mIndexTypes[indexBuffer.getType()], 
 							  indexBuffer.getBuffer());
 			
 			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
@@ -340,62 +343,14 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		}
 	}
 
-	protected class TriangleListRenderer extends TriangleList.Renderer{
+	protected class VertexListRenderer extends VertexList.Renderer{
 		@Override
-		public void render(TriangleList triangles) {
+		public void render(VertexList vl) {
 			mGl.glFrontFace(GL10.GL_CCW);
 			mGl.glEnable(GL10.GL_CULL_FACE);
 			
-			renderVertexBuffer(triangles.getVertexBuffer());
-			mGl.glDrawArrays(triangles.getTypeEnum(), 0, triangles.getVertexBuffer().getCount());
-			
-			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-			mGl.glDisable(GL10.GL_CULL_FACE);
-		}
-	}
-	
-	protected class LineIndicesRenderer extends LineIndices.Renderer{
-		@Override
-		public void render(LineIndices lines) {
-			
-			renderVertexBuffer(lines.getVertexBuffer());
-			
-			IndexBuffer indexBuffer = lines.getIndexBuffer();
-			mGl.glDrawElements(lines.getTypeEnum(), 
-					  indexBuffer.getCount(), 
-					  indexBuffer.getTypeEnum(), 
-					  indexBuffer.getBuffer());
-			
-			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-			mGl.glDisable(GL10.GL_CULL_FACE);
-		}
-	}
-	
-	protected class LineListRenderer extends LineList.Renderer{
-		@Override
-		public void render(LineList lines) {
-			renderVertexBuffer(lines.getVertexBuffer());
-			mGl.glDrawArrays(lines.getTypeEnum(), 0, lines.getVertexBuffer().getCount());
-			
-			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-			mGl.glDisable(GL10.GL_CULL_FACE);
-		}
-	}
-	
-	protected class PointsRenderer extends Points.Renderer{
-		@Override
-		public void render(Points points) {
-			renderVertexBuffer(points.getVertexBuffer());
-			mGl.glDrawArrays(points.getTypeEnum(), 0, points.getVertexBuffer().getCount());
+			renderVertexBuffer(vl.getVertexBuffer());
+			mGl.glDrawArrays(mPrimitiveTypes[vl.getType()], 0, vl.getVertexBuffer().getCount());
 			
 			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
