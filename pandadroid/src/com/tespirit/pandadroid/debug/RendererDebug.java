@@ -19,6 +19,7 @@ import com.tespirit.bamboo.vectors.Vector3d;
 import com.tespirit.pandadroid.opengl1x.Renderer;
 
 public class RendererDebug extends Renderer{
+	public boolean renderDebug;
 	public boolean renderNormals;
 	public boolean renderBoundingBox;
 	public boolean renderRenderables;
@@ -92,22 +93,28 @@ public class RendererDebug extends Renderer{
 
 		this.updateScene();
 		
-		
-		if(this.pointBuffer != null){
-			this.pushMatrix(this.pointBuffer.m);
-			this.mGl.glColor4f(1, 1, 1, 1);
-			this.renderPoint(this.pointBuffer.v);
+		if(this.renderDebug){
+			this.pushMatrix(this.getCamera().getWorldTransform());
+			//render node info!
+			this.mGl.glDisable(GL10.GL_LIGHTING);
+			this.mGl.glDisable(GL10.GL_TEXTURE_2D);
+			
+			if(this.pointBuffer != null){
+				this.pushMatrix(this.pointBuffer.m);
+				this.mGl.glColor4f(1, 1, 1, 1);
+				this.renderPoint(this.pointBuffer.v);
+				this.popMatrix();
+			}
+			
+			
+			while(this.getRootIterator().hasNext()){
+				this.drawNodeInfo(this.getRootIterator().next());
+			}
+			
 			this.popMatrix();
-		}
-		
-		//render node info!
-		this.mGl.glDisable(GL10.GL_LIGHTING);
-		this.mGl.glDisable(GL10.GL_TEXTURE_2D);
-		while(this.getRootIterator().hasNext()){
-			this.drawNodeInfo(this.getRootIterator().next());
-		}
-		if(this.lightsEnabled() && this.lightsOn){
-			this.mGl.glEnable(GL10.GL_LIGHTING);
+			if(this.lightsEnabled() && this.lightsOn){
+				this.mGl.glEnable(GL10.GL_LIGHTING);
+			}
 		}
 		
 		this.renderScene();

@@ -94,6 +94,7 @@ public class BamporterFrame extends JFrame{
 		splitPaneEditor.setBottomComponent(editorView);
 		
 		renderer = new Renderer();
+		
 		splitPaneEditor.setTopComponent(renderer.getView());
 		
 		Dimension minimumSize = new Dimension(50, 100);

@@ -62,7 +62,21 @@ public class Debug {
 	}
 	
 	private static void printNode(Node node, String spacing, int depth){
-		String type = "- " + node.getNodeInfo();
+		String className = node.toString();
+		int index = className.lastIndexOf('.');
+		if(index != -1){
+			className = className.substring(index+1);
+		}
+		index = className.indexOf('@');
+		if(index != -1){
+			className = className.substring(0, index);
+		}
+		String name = node.getName();
+		if(name == null){
+			name = "<no name>";
+		}
+		
+		String type = "- " + className + ": " + name;
 
 		Debug.print(spacing+depth+type);
 		
@@ -170,6 +184,9 @@ public class Debug {
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
 			if(event.getAction() == KeyEvent.ACTION_UP){
 				switch(keyCode){
+				case KeyEvent.KEYCODE_D:
+					Debug.renderer.renderDebug = !Debug.renderer.renderDebug;
+					break;
 				case KeyEvent.KEYCODE_1:
 					Debug.renderer.renderAxis = !Debug.renderer.renderAxis;
 					Debug.print("Show axis: "+Debug.renderer.renderAxis);

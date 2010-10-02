@@ -90,24 +90,6 @@ public abstract class Node {
 		Node.newNodes.clear();
 	}
 	
-	//for debugging
-	public String getNodeInfo(){
-		String className = super.toString();
-		int i = className.lastIndexOf('.');
-		if(i != -1){
-			className = className.substring(i+1);
-		}
-		i = className.indexOf('@');
-		if(i != -1){
-			className = className.substring(0, i);
-		}
-		String name = this.mName;
-		if(name == null){
-			name = "<no name>";
-		}
-		return className+": " + name; 
-	}
-	
 	//IO
 	protected void write(ObjectOutput out) throws IOException{
 		out.writeUTF(this.mName);
