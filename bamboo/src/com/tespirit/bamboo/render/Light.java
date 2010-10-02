@@ -118,13 +118,8 @@ public class Light extends Node implements RenderableNode{
 	}
 	
 	@Override
-	public void setup(){
+	public void init(){
 		Light.renderer.setup(this);
-	}
-	
-	@Override
-	public void setDisplay(int width, int height) {
-		//VOID for now
 	}
 	
 	private static Renderer renderer;

@@ -54,12 +54,19 @@ public class VertexList extends Primitive implements Externalizable{
 	}
 
 	@Override
-	public void updateModifiers() {
-		for(int i = 0; i < this.mModifierStack.size(); i++){
-			this.mModifierStack.get(i).update();
+	public void update() {
+		for(Modifier m : this.mModifierStack){
+			m.update();
 		}
 	}
 
+	@Override
+	public void init(){
+		for(Modifier m : this.mModifierStack){
+			m.init();
+		}
+	}
+	
 	@Override
 	public void render() {
 		RENDERER.render(this);

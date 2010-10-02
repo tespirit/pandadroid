@@ -30,14 +30,15 @@ public class Group extends Node implements Externalizable{
 	public Group(String n, List<Node> children){
 		super(n);
 		this.mChildren = children;
-	}
-	
-	@Override
-	protected void init(){
 		float[] m = new float[Matrix3d.SIZE*2];
 		this.mTransform = new Matrix3d(m);
 		this.mTransform.identity();
 		this.mWorldTransform = new Matrix3d(m, Matrix3d.SIZE);
+	}
+	
+	@Override
+	public void init(){
+		//VOID
 	}
 	
 	public void appendChild(Node node){
@@ -85,8 +86,7 @@ public class Group extends Node implements Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		this.init();
-    	this.setName(in.readUTF());
+		super.read(in);
     	for(int i = 0; i < Matrix3d.SIZE; i++){
     		this.mTransform.setValue(in.readFloat(), i);
     	}
@@ -99,7 +99,7 @@ public class Group extends Node implements Externalizable{
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeUTF(this.getName());
+		super.write(out);
 		for(int i = 0; i < Matrix3d.SIZE; i++){
 			out.writeFloat(this.mTransform.getValue(i));
 		}

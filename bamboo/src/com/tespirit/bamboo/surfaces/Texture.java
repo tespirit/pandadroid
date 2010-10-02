@@ -10,42 +10,41 @@ import com.tespirit.bamboo.render.ComponentRenderer;
 
 public class Texture extends Surface implements Externalizable{
 
-	private String diffuseTextureName;
+	private String mDiffuseTextureName;
+	private boolean mInitialized;
 	
-	private int diffuseTextureId;
+	private int mDiffuseTextureId;
 	
 	public Texture(){
-		this.init();
+		this.mInitialized = false;
 	}
 	
 	public void init(){
-		TextureManager.getInstance().addTexture(this);
+		if(!this.mInitialized){
+			Texture.renderer.init(this);
+			this.mInitialized = true;
+		}
 	}
 	
 	public void setDiffuseTextureName(String textureName){
-		this.diffuseTextureName = textureName;
+		this.mDiffuseTextureName = textureName;
 	}
 	
 	public void setDiffuseTextureId(int id){
-		this.diffuseTextureId = id;
+		this.mDiffuseTextureId = id;
 	}
 	
 	public String getDiffuseTextureName(){
-		return this.diffuseTextureName;
+		return this.mDiffuseTextureName;
 	}
 	
 	public int getDiffuseTextureId(){
-		return this.diffuseTextureId;
+		return this.mDiffuseTextureId;
 	}
 	
 	@Override
 	public void render() {
 		Texture.renderer.render(this);
-	}
-
-	@Override
-	public void setup() {
-		Texture.renderer.setup(this);
 	}
 	
 	private static Renderer renderer;
@@ -55,7 +54,7 @@ public class Texture extends Surface implements Externalizable{
 			Texture.renderer = this;
 		}
 		public abstract void render(Texture material);
-		public abstract void setup(Texture material);
+		public abstract void init(Texture material);
 	}
 	
 	//IO
@@ -64,12 +63,11 @@ public class Texture extends Surface implements Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		this.init();
-    	this.diffuseTextureName = in.readUTF();
+    	this.mDiffuseTextureName = in.readUTF();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeUTF(this.diffuseTextureName);
+		out.writeUTF(this.mDiffuseTextureName);
 	}
 }

@@ -73,4 +73,9 @@ public class LOD extends Node{
 	public Matrix3d getTransform() {
 		return null;
 	}
+
+	@Override
+	public void init(){
+		//VOID
+	}
 }

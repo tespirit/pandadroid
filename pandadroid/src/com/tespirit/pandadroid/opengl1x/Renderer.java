@@ -209,7 +209,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		}
 
 		@Override
-		public void setup(Material material) {
+		public void init(Material material) {
 			//VOID
 		}
 	}
@@ -224,7 +224,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		}
 		
 		@Override
-		public void setup(Texture texture) {
+		public void init(Texture texture) {
 			Bitmap bitmap = Assets.getManager().openBitmap(texture.getDiffuseTextureName());
 			if(bitmap == null){
 				texture.setDiffuseTextureId(0);

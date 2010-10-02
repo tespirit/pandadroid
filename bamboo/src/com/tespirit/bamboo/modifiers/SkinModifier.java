@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
@@ -19,6 +18,7 @@ import com.tespirit.bamboo.vectors.Vector3d;
  */
 public class SkinModifier extends VertexModifier implements Externalizable{
 	private String[] mSkeleton;
+	private Matrix3d[] mSkeletonMatrices;
 	private Matrix3d[] mBindMatricesInv;
 	private float[] mWeights;
 	private byte[] mSkeletonMap;
@@ -33,30 +33,33 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 	
 	
 	public SkinModifier(){
-	}
-	
-	protected void init(){
-		//create buffers!
-		this.mTransformMatrices = new Matrix3d[this.mBindMatricesInv.length];
-		float[] buffer = Matrix3d.createBuffer(this.mBindMatricesInv.length);
-		for(int i = 0; i < this.mTransformMatrices.length; i++){
-			this.mTransformMatrices[i] = new Matrix3d(buffer, Matrix3d.SIZE*i);
-		}
-		
-		buffer = Vector3d.createBuffer(5);
+		float[] buffer = Vector3d.createBuffer(5);
 		this.mPosition = new Vector3d(buffer);
 		this.mPositionOriginal = new Vector3d(buffer, Vector3d.SIZE);
 		this.mNormal = new Vector3d(buffer, Vector3d.SIZE*2);
 		this.mNormalOriginal = new Vector3d(buffer, Vector3d.SIZE*3);
 		this.mWeight = new Vector3d(buffer, Vector3d.SIZE*4);
 	}
+	
+	@Override
+	public void init() {
+		//create buffers!
+		this.mSkeletonMatrices = new Matrix3d[this.mBindMatricesInv.length];
+		
+		this.mTransformMatrices = new Matrix3d[this.mBindMatricesInv.length];
+		float[] buffer = Matrix3d.createBuffer(this.mBindMatricesInv.length);
+		for(int i = 0; i < this.mTransformMatrices.length; i++){
+			this.mTransformMatrices[i] = new Matrix3d(buffer, Matrix3d.SIZE*i);
+			this.mSkeletonMatrices[i] = Node.getNode(this.mSkeleton[i]).getWorldTransform();
+		}
+	}
 
 	@Override
 	public void update() {
 		//compute transform matrices
 		for(int i = 0; i < this.mSkeleton.length; i++){
-			Joint joint = (Joint)Node.getNode(this.mSkeleton[i]);
-			this.mTransformMatrices[i].multiply(joint.getWorldTransform(), this.mBindMatricesInv[i]);
+			this.mTransformMatrices[i].multiply(this.mSkeletonMatrices[i], 
+												this.mBindMatricesInv[i]);
 		}
 		
 
@@ -93,7 +96,6 @@ public class SkinModifier extends VertexModifier implements Externalizable{
 	public void attachRig(String[] skeleton, Matrix3d[] bindMatricesInv){
 		this.mSkeleton = skeleton;
 		this.mBindMatricesInv = bindMatricesInv;
-		this.init();
 	}
 	
 	public void setWeights(float[] weights){
@@ -123,7 +125,6 @@ public class SkinModifier extends VertexModifier implements Externalizable{
     	this.mWeights = (float[])in.readObject();
     	this.mSkeletonMap = (byte[])in.readObject();
     	this.mWeightStrides = (byte[])in.readObject();
-    	this.init();
 	}
 
 	@Override

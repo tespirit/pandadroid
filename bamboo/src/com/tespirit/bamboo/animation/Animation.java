@@ -13,19 +13,56 @@ public class Animation implements Externalizable{
 	private List<Channel> mChannels;
 	private List<Clip> mClips;
 	private Map<String, Integer> mClipLookup;
+	private String mName;
 	
-	public Animation(){
-		
+	private static Map<String, Animation> mLoadedAnimations = new HashMap<String, Animation>();
+	
+	public static Animation getAnimation(String name){
+		return Animation.mLoadedAnimations.get(name);
 	}
 	
-	public Animation(int channelCount){
+	public Animation(String name, int channelCount){
+		this(name);
 		this.init(channelCount);
 	}
 	
+	public Animation(int channelCount){
+		this(null);
+		this.init(channelCount);
+	}
+	
+	public Animation(String name){
+		this.setName(name);
+	}
+	
+	public Animation(){
+		this(null);
+	}
+	
+	public void setName(String name){
+		if(this.getName() != null){
+			Animation.mLoadedAnimations.remove(this.mName);
+		}
+		this.mName = name;
+		if(name != null && name.length() > 0){
+			Animation.mLoadedAnimations.put(this.mName, this);
+		} else {
+			this.mName = "";
+		}
+	}
+	
+	public String getName(){
+		if(this.mName != null && this.mName.length() > 0){
+			return this.mName;
+		} else {
+			return null;
+		}
+	}
+	
 	public void init(int channelCount){
-		this.mChannels = new ArrayList<Channel>();
-		this.mClips = new ArrayList<Clip>();
-		this.mClipLookup = new HashMap<String, Integer>();
+		this.mChannels = new ArrayList<Channel>(channelCount);
+		this.mClips = new ArrayList<Clip>(channelCount);
+		this.mClipLookup = new HashMap<String, Integer>(channelCount);
 	}
 	
 	public Channel getChannel(int i){
@@ -64,6 +101,7 @@ public class Animation implements Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		this.setName(in.readUTF());
 		int count = in.readInt();
     	this.init(count);
     	for(int i = 0; i < count; i++){
@@ -78,6 +116,7 @@ public class Animation implements Externalizable{
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeUTF(this.mName);
 		out.writeInt(this.mChannels.size());
 		for(Channel c : this.mChannels){
 			out.writeObject(c);

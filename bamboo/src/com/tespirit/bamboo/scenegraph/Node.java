@@ -2,7 +2,11 @@ package com.tespirit.bamboo.scenegraph;
 
 import com.tespirit.bamboo.vectors.*;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -12,7 +16,8 @@ public abstract class Node {
 	private int mUid;
 		
 	static private Map<String, Node> nameLookup = new HashMap<String, Node>();
-	static private Vector<Node> nodes = new Vector<Node>(); 
+	static private List<Node> nodes = new Vector<Node>(); 
+	static private List<Node> newNodes = new Vector<Node>();
 	
 	public Node(){
 		this(null);
@@ -20,15 +25,12 @@ public abstract class Node {
 	
 	public Node(String name){
 		this.mName = name;
-		this.init();
-	}
-	
-	protected void init(){
 		if(this.mName != null){
 			Node.nameLookup.put(this.mName, this);
 		}
 		this.mUid = Node.nodes.size();
 		Node.nodes.add(this);
+		Node.newNodes.add(this);
 	}
 	
 	public int getUid(){
@@ -36,15 +38,22 @@ public abstract class Node {
 	}
 	
 	public String getName() {
-		return this.mName;
+		if(this.mName != null && this.mName.length() > 0)
+			return this.mName;
+		else 
+			return null;
 	}
 	
 	public void setName(String n){
-		if(this.mName != null){
+		if(this.getName() != null){
 			Node.nameLookup.remove(this.mName);
 		}
-		this.mName = n;
-		Node.nameLookup.put(this.mName, this);
+		if(n != null && n.length() > 0){
+			this.mName = n;
+			Node.nameLookup.put(this.mName, this);
+		} else {
+			this.mName = "";
+		}
 	}
 	
 	public abstract Node getChild(int i);
@@ -63,6 +72,7 @@ public abstract class Node {
 	 */
 	public abstract void update(Matrix3d transform);
 	
+	public abstract void init();
 	
 	public static Node getNode(String name){
 		return Node.nameLookup.get(name);
@@ -70,6 +80,14 @@ public abstract class Node {
 	
 	public static Node getNode(int uid){
 		return Node.nodes.get(uid);
+	}
+	
+	public static void initNewNodes(){
+		for(int i = 0; i < Node.newNodes.size(); i++){
+			Node.newNodes.get(i).init();
+			Node.newNodes.set(i, null);
+		}
+		Node.newNodes.clear();
 	}
 	
 	//for debugging
@@ -89,4 +107,14 @@ public abstract class Node {
 		}
 		return className+": " + name; 
 	}
+	
+	//IO
+	protected void write(ObjectOutput out) throws IOException{
+		out.writeUTF(this.mName);
+	}
+	
+	protected void read(ObjectInput in) throws IOException, ClassNotFoundException{
+		this.setName(in.readUTF());
+	}
+	
 }

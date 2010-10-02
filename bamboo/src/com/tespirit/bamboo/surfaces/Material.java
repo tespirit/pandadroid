@@ -101,8 +101,8 @@ public class Material extends Surface{
 	}
 
 	@Override
-	public void setup() {
-		Material.renderer.setup(this);
+	public void init() {
+		Material.renderer.init(this);
 	}
 	
 	private static Renderer renderer;
@@ -112,6 +112,6 @@ public class Material extends Surface{
 			Material.renderer = this;
 		}
 		public abstract void render(Material material);
-		public abstract void setup(Material material);
+		public abstract void init(Material material);
 	}
 }

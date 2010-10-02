@@ -40,7 +40,7 @@ public class Color extends Surface implements Externalizable{
 	}
 
 	@Override
-	public void setup() {
+	public void init() {
 		// Void
 	}
 	

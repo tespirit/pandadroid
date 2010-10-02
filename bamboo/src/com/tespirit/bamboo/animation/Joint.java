@@ -39,14 +39,15 @@ public abstract class Joint extends Node{
 	public Joint(String name){
 		super(name);
 		this.mChildren = new ArrayList<Joint>();
-	}
-	
-	@Override
-	protected void init(){
-		super.init();
+
 		float[] buffer = Matrix3d.createBuffer(2);
 		this.mLocalTransform = new Matrix3d(buffer);
 		this.mWorldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
+	}
+	
+	@Override
+	public void init(){
+		//VOID
 	}
 	
 	/**
@@ -140,7 +141,7 @@ public abstract class Joint extends Node{
 	}
 	
 	protected void write(ObjectOutput out) throws IOException{
-		out.writeObject(this.getName());
+		super.write(out);
 		if(this.mBone != null){
 			out.writeBoolean(true);
     		out.writeFloat(this.mBone.getMin().getX());
@@ -161,9 +162,9 @@ public abstract class Joint extends Node{
 		}
 	}
 	
+	@Override
 	protected void read(ObjectInput in) throws IOException, ClassNotFoundException{
-		this.init();
-    	this.setName((String)in.readObject());
+		super.read(in);
     	if(in.readBoolean()){
     		this.mBone = new AxisAlignedBox();
     		this.mBone.setMin(in.readFloat(), in.readFloat(), in.readFloat());

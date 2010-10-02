@@ -140,11 +140,10 @@ public class Camera extends Node implements RenderableNode{
 	}
 	
 	@Override
-	public void setup() {
+	public void init() {
 		//VOID for now		
 	}
 
-	@Override
 	public void setDisplay(int width, int height) {
 		this.width = width;
 		this.height = height;

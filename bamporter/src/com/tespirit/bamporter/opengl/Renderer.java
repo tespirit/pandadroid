@@ -336,7 +336,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		}
 
 		@Override
-		public void setup(Material material) {
+		public void init(Material material) {
 			//VOID
 		}
 	}
@@ -345,18 +345,15 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		@Override
 		public void render(Texture texture) {
 			int id = texture.getDiffuseTextureId();
-			if(id > 0){
+			if(id != -1){
 				com.jogamp.opengl.util.texture.Texture t = mTextures.get(id);				mGl.glColor4f(1,1,1,1);
 				t.enable();
 				t.bind();
-			} else if(id == 0){
-				this.setup(texture);
-				this.render(texture);
 			}
 		}
 		
 		@Override
-		public void setup(Texture texture) {
+		public void init(Texture texture) {
 			try{
 				TextureData textureData = Assets.getInstance().openTexture(texture.getDiffuseTextureName());
 				mTextures.add(TextureIO.newTexture(textureData));

@@ -58,5 +58,7 @@ public abstract class Primitive{
 	
 	abstract public void render();
 	
-	abstract public void updateModifiers();
+	abstract public void update();
+	
+	abstract public void init();
 }

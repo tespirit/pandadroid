@@ -18,23 +18,30 @@ public class Model extends Node implements RenderableNode, Externalizable{
 	private Matrix3d mTransform;
 	private Matrix3d mWorldTransform;
 	
+	private boolean mInitialized;
+	
 	public Model(){
 		this(null);
 	}
 	
 	public Model(String name){
 		super(name);
-		this.mSurface = Surface.getDefaultSurface();
-	}
-	
-	@Override
-	protected void init(){
-		super.init();
 		this.mBoundingBox = new AxisAlignedBox();
 		float[] m = new float[Matrix3d.SIZE*2];
 		this.mTransform = new Matrix3d(m);
 		this.mTransform.identity();
 		this.mWorldTransform = new Matrix3d(m, Matrix3d.SIZE);
+		this.mSurface = Surface.getDefaultSurface();
+		this.mInitialized = false;
+	}
+	
+	@Override
+	public void init(){
+		if(!this.mInitialized){
+			this.mSurface.init();
+			this.mPrimitive.init();
+			this.mInitialized = true;
+		}
 	}
 	
 	@Override
@@ -61,7 +68,9 @@ public class Model extends Node implements RenderableNode, Externalizable{
 	@Override
 	public void update(Matrix3d transform) {
 		this.mWorldTransform.multiply(transform,this.mTransform);
-		this.mPrimitive.updateModifiers();
+		if(this.mInitialized){
+			this.mPrimitive.update();
+		}
 	}
 
 	@Override
@@ -96,18 +105,10 @@ public class Model extends Node implements RenderableNode, Externalizable{
 
 	@Override
 	public void render() {
-		this.mSurface.render();
-		this.mPrimitive.render();
-	}
-
-	@Override
-	public void setDisplay(int width, int height) {
-		//VOID for now
-	}
-
-	@Override
-	public void setup() {
-		//VOID for now
+		if(this.mInitialized){
+			this.mSurface.render();
+			this.mPrimitive.render();
+		}
 	}
 	
 	//IO
@@ -116,8 +117,7 @@ public class Model extends Node implements RenderableNode, Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		this.init();
-    	this.setName(in.readUTF());
+		super.read(in);
     	this.mBoundingBox.getMin().set(in.readFloat(), in.readFloat(), in.readFloat());
     	this.mBoundingBox.getMax().set(in.readFloat(), in.readFloat(), in.readFloat());
     	for(int i = 0; i < Matrix3d.SIZE; i++){
@@ -129,7 +129,7 @@ public class Model extends Node implements RenderableNode, Externalizable{
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeUTF(this.getName());
+		super.write(out);
 		out.writeFloat(this.mBoundingBox.getMin().getX());
 		out.writeFloat(this.mBoundingBox.getMin().getY());
 		out.writeFloat(this.mBoundingBox.getMin().getZ());

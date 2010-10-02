@@ -10,5 +10,5 @@ public abstract class Surface{
 	
 	public abstract void render();
 	
-	public abstract void setup();
+	public abstract void init();
 }
