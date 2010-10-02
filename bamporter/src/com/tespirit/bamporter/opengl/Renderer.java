@@ -1,6 +1,8 @@
 package com.tespirit.bamporter.opengl;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Calendar;
 
 import javax.media.opengl.GL2;
@@ -32,9 +34,16 @@ import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
 
 public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLEventListener{
-	GLCanvas mCanvas;
-	FPSAnimator mAnimator;
+	private GLCanvas mCanvas;
+	private FPSAnimator mAnimator;
 	private GL2 mGl;
+	private CameraControl mCameraControl;
+	
+	private boolean mRenderBoundingBox;
+	private boolean mRenderAxis;
+	WireBox mBoundingBox = new WireBox();
+	Axis mAxis = new Axis();
+	Color mBoundingBoxColor = new Color();
 	
 	private static GLCapabilities mGlCapabilities;
 	
@@ -63,6 +72,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		//create a default camera!
 		Camera camera = new Camera();
 		camera.zoom(-2);
+		
 		camera.getPivotTransform().rotateX(45);
 		this.setCamera(camera);
 		
@@ -72,6 +82,36 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		
 		this.mCanvas = new GLCanvas(mGlCapabilities);
 		this.mCanvas.addGLEventListener(this);
+		this.mCanvas.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent event) {
+				// VOID
+			}
+
+			@Override
+			public void keyReleased(KeyEvent event) {
+				// VOID
+			}
+
+			@Override
+			public void keyTyped(KeyEvent event) {
+				switch(event.getKeyChar()){
+				case '1':
+					mRenderBoundingBox = !mRenderBoundingBox;
+					break;
+				case '2':
+					mRenderAxis = !mRenderAxis;
+					break;
+				}
+			}
+			
+		});
+		
+		//add a camera listener!
+		this.mCameraControl = new CameraControl(camera);
+		this.mCanvas.addMouseMotionListener(this.mCameraControl);
+		this.mCanvas.addMouseListener(this.mCameraControl);
 		
 		this.mAnimator = new FPSAnimator(this.mCanvas, 30);
 		this.mAnimator.add(this.mCanvas);
@@ -133,7 +173,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 
 	public void renderDebug(){
 		if(this.getSceneGraph() != null){
-			boundingBoxColor.setColor(1, 1, 0);
+			mBoundingBoxColor.setColor(1, 1, 0);
 			this.mGl.glDisable(GL2.GL_LIGHTING);
 			this.mGl.glDisable(GL2.GL_TEXTURE_2D);
 			this.pushMatrix(this.getCamera().getWorldTransform());
@@ -145,20 +185,21 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		}
 	}
 	
-	WireBox boundingBox = new WireBox();
-	Axis axis = new Axis();
-	Color boundingBoxColor = new Color();
+	
 	public void drawNodeInfo(Node node){
 		if(node.getWorldTransform() != null){
 			this.pushMatrix(node.getWorldTransform());
 		}
-		if(node.getBoundingBox() != null){
-			this.boundingBox.setBox(node.getBoundingBox());
-			this.boundingBoxColor.render();
-			this.boundingBox.render();
+		
+		if(node.getBoundingBox() != null && this.mRenderBoundingBox){
+			this.mBoundingBox.setBox(node.getBoundingBox());
+			this.mBoundingBoxColor.render();
+			this.mBoundingBox.render();
 		}
 		
-		this.axis.render();
+		if(this.mRenderAxis){
+			this.mAxis.render();
+		}
 		
 		if(node.getWorldTransform() != null){
 			this.popMatrix();
@@ -177,7 +218,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		this.mGl.glLoadIdentity();
 		
 		this.updateScene(Calendar.getInstance().getTimeInMillis());
-		//this.renderDebug();
+		this.renderDebug();
 		this.renderScene();
 	}
 

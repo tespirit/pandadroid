@@ -53,6 +53,7 @@ public class Collada implements BambooAsset{
 	private LightGroup mLights;
 	private Camera[] mCameras;
 	private Animation mAnimation;
+	protected ArrayList<String> mTexturePaths;
 	
 	private float mScale;
 	
@@ -1256,6 +1257,7 @@ public class Collada implements BambooAsset{
 			if(this.moveToChildNode(NameId.init_from, NameId.image)){
 				String texture = this.parseString(NameId.init_from);
 				if(texture != null){
+					this.mTexturePaths.add(texture);
 					int lastIndex = texture.lastIndexOf('/');
 					if(lastIndex != -1){
 						texture = texture.substring(lastIndex+1);
