@@ -58,6 +58,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		GLProfile.initSingleton();
 		mGlProfile = GLProfile.getDefault();
 		mGlCapabilities = new GLCapabilities(mGlProfile);
+		Assets.getInstance().setGlProfile(mGlProfile);
 	}
 	
 	public Renderer(){

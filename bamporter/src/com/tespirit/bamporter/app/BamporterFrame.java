@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileOutputStream;
 
 import javax.swing.JFileChooser;
@@ -168,8 +169,11 @@ public class BamporterFrame extends JFrame{
 	private void openButtonAction(ActionEvent event) {
 		if(this.showOpenDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				bamboo = IOManager.open(fileDialog.getSelectedFile());
-				setTitle(TITLE+" - "+fileDialog.getSelectedFile().getName());
+				File file = fileDialog.getSelectedFile();
+				bamboo = IOManager.open(file);
+				setTitle(TITLE + " - " + file.getName());
+				
+				Assets.getInstance().addTexturePath(file.getParent());
 			} catch (Exception e){
 				e.printStackTrace();
 				this.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");

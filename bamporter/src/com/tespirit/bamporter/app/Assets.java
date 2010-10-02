@@ -59,7 +59,7 @@ public class Assets {
 		return TextureIO.newTextureData(this.mGlProfile, stream, false, this.getExtension(file));
 	}
 	
-	private String getExtension(File file){
+	public String getExtension(File file){
 		int index = file.getName().lastIndexOf('.');
 		if(index != -1 && index < file.getName().length()){
 			return file.getName().substring(index+1);
