@@ -1,61 +1,88 @@
 package com.tespirit.bamboo.io;
 
-import java.io.EOFException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.LightGroup;
+import com.tespirit.bamboo.render.Compare;
 import com.tespirit.bamboo.scenegraph.Node;
 
 
 /**
  * A simple io class for loading objects. This way the io can change without
- * having to adjust higher level code.
+ * having to adjust higher level code. 
+ * This class should be inherited to provide stream access correctly so that
+ * a user doesn't have to worry about how to get a stream.
  * @author Todd Espiritu Santo
  *
  */
 public class Bamboo implements BambooAsset{
 	
-	public static BambooAsset loadAsset(InputStream stream) throws Exception{
+	public static BambooAsset loadBamboo(InputStream stream) throws Exception{
 		return new Bamboo(stream);
 	}
-
-	public static Node loadNode(InputStream stream) throws Exception{
-		ObjectInputStream o = new ObjectInputStream(stream);
-		Object obj = o.readObject();
-		o.close();
-		if(obj instanceof Node){
-			return (Node)obj;
-		} else {
-			throw new Exception("This is not a valid scene graph file.");
+	
+	public static List<Node> loadNodes(InputStream stream) throws Exception{
+		ObjectInputStream input = new ObjectInputStream(stream);
+		BambooHeader header = new BambooHeader(input, BambooHeader.NODE);
+		ArrayList<Node> nodes = new ArrayList<Node>(header.mNodeCount);
+		for(int i = 0; i < header.mNodeCount; i++){
+			nodes.add((Node)input.readObject());
+		}
+		return nodes;
+	}
+	
+	public static List<Animation> loadAnimations(InputStream stream) throws Exception{
+		ObjectInputStream input = new ObjectInputStream(stream);
+		BambooHeader header = new BambooHeader(input, BambooHeader.ANIMATION);
+		ArrayList<Animation> nodes = new ArrayList<Animation>(header.mAnimationCount);
+		for(int i = 0; i < header.mAnimationCount; i++){
+			nodes.add((Animation)input.readObject());
+		}
+		return nodes;
+	}
+	
+	/**
+	 * Nodes will be sorted by priority after this function is called.
+	 * @param nodes
+	 * @param stream
+	 * @throws Exception
+	 */
+	public static void saveNodes(List<Node> nodes, OutputStream stream) throws Exception{
+		Collections.sort(nodes, Compare.nodePrioritySort);
+		BambooHeader header = new BambooHeader(BambooHeader.NODE);
+		header.mNodeCount = nodes.size();
+		ObjectOutputStream output = new ObjectOutputStream(stream);
+		header.write(output);
+		for(Node node : nodes){
+			output.writeObject(node);
 		}
 	}
 	
-	public static Animation loadAnimation(InputStream stream) throws Exception{
-		ObjectInputStream o = new ObjectInputStream(stream);
-		Object obj = o.readObject();
-		o.close();
-		if(obj instanceof Animation){
-			return (Animation)obj;
-		} else {
-			throw new Exception("This is not a valid animation file.");
+	public static void saveAnimations(List<Animation> animations, OutputStream stream) throws Exception{
+		BambooHeader header = new BambooHeader(BambooHeader.ANIMATION);
+		header.mAnimationCount = animations.size();
+		ObjectOutputStream output = new ObjectOutputStream(stream);
+		header.write(output);
+		for(Animation animation : animations){
+			output.writeObject(animation);
 		}
 	}
 	
-	public static void save(Node root, OutputStream stream) throws Exception{
-		ObjectOutputStream o = new ObjectOutputStream(stream);
-		o.writeObject(root);
-		o.close();
-	}
-	
-	public static void save(Animation animation, OutputStream stream) throws Exception{
-		ObjectOutputStream o = new ObjectOutputStream(stream);
-		o.writeObject(animation);
-		o.close();
+	public static void saveCameras(List<Camera> cameras, OutputStream stream) throws Exception{
+		BambooHeader header = new BambooHeader(BambooHeader.CAMERA);
+		header.mCameraCount = cameras.size();
+		ObjectOutputStream output = new ObjectOutputStream(stream);
+		header.write(output);
+		for(Camera camera : cameras){
+			output.writeObject(camera);
+		}
 	}
 	
 	/**
@@ -64,62 +91,110 @@ public class Bamboo implements BambooAsset{
 	 * @param stream
 	 * @throws Exception
 	 */
-	public static void save(BambooAsset asset, OutputStream stream) throws Exception{
-		ObjectOutputStream o = new ObjectOutputStream(stream);
-		if(asset.getSceneGraph() != null){
-			o.writeObject(asset.getSceneGraph());
-		}
-		if(asset.getAnimation() != null){
-			o.writeObject(asset.getAnimation());
-		}
-		o.close();
-	}
-	
-	private Node mRoot;
-	private Animation mAnimation;
-	private Camera[] mCameras;
-	private LightGroup mLights;
-	
-	protected Bamboo(InputStream stream) throws Exception{
-		ObjectInputStream o = new ObjectInputStream(stream);
+	public static void saveBamboo(BambooAsset asset, OutputStream stream) throws Exception{
+		Collections.sort(asset.getRootSceneNodes(), Compare.nodePrioritySort);
+		BambooHeader header = new BambooHeader(BambooHeader.BAMBOO);
+		header.mNodeCount = asset.getRootSceneNodes().size();
+		header.mAnimationCount = asset.getAnimations().size();
+		header.mCameraCount = asset.getRootCameras().size();
 		
-		try{
-			Object obj = o.readObject();
-			while(obj != null){
-				if(obj instanceof Node){
-					this.mRoot = (Node)obj;
-				} else if(obj instanceof Animation){
-					this.mAnimation = (Animation)obj;
-				} else if(obj instanceof LightGroup){
-					this.mLights = (LightGroup)obj;
-				} else if(obj instanceof Camera[]){
-					this.mCameras = (Camera[])obj;
-				}
-				obj = o.readObject();
-			}
-		} catch(EOFException e){
-			//end the input.
+		ObjectOutputStream output = new ObjectOutputStream(stream);
+		header.write(output);
+		for(Node node : asset.getRootSceneNodes()){
+			output.writeObject(node);
 		}
-		o.close();
+		for(Animation animation : asset.getAnimations()){
+			output.writeObject(animation);
+		}
+		for(Camera camera : asset.getRootCameras()){
+			output.writeObject(camera);
+		}
+	}
+	
+	private static class BambooHeader {
+		private static final long serialVersionUID = 2547871559135917340L;
+		private static final byte NODE = 0;
+		private static final byte ANIMATION = 1;
+		private static final byte CAMERA = 2;
+		private static final byte BAMBOO = 3;
+		
+		private static final String[] NAMES = new String[]{
+			"Node",
+			"Animation",
+			"Camera",
+			"Bamboo"
+		};
+		
+		private byte mType;
+		private int mNodeCount;
+		private int mAnimationCount;
+		private int mCameraCount;
+		
+		private BambooHeader(byte type){
+			this.mType = type;
+		}
+		
+		private BambooHeader(ObjectInputStream stream, byte type) throws Exception{
+			if(BambooHeader.serialVersionUID != stream.readLong()){
+				throw new Exception("Incompatible Header Version");
+			}
+			this.mType = stream.readByte();
+			if(this.mType != BAMBOO && this.mType != type){
+				throw new Exception("File type incompatible: "+ NAMES[type] + " " + NAMES[this.mType]);
+			}
+			this.mNodeCount = stream.readInt();
+			this.mAnimationCount = stream.readInt();
+			this.mCameraCount = stream.readInt();
+		}
+		
+		private void write(ObjectOutputStream stream) throws Exception{
+			stream.writeLong(BambooHeader.serialVersionUID);
+			stream.writeByte(this.mType);
+			stream.writeInt(this.mNodeCount);
+			stream.writeInt(this.mAnimationCount);
+			stream.writeInt(this.mCameraCount);
+		}
+	}
+	
+	private List<Node> mSceneRoots;
+	private List<Animation> mAnimations;
+	private List<Camera> mCameras;
+	
+	public Bamboo(){
+		this.mSceneRoots = new ArrayList<Node>();
+		this.mAnimations = new ArrayList<Animation>();
+		this.mCameras = new ArrayList<Camera>();
+	}
+	
+	public Bamboo(InputStream stream) throws Exception{
+		this();
+		
+		ObjectInputStream output = new ObjectInputStream(stream);
+		BambooHeader header = new BambooHeader(output, BambooHeader.BAMBOO);
+		
+		for(int i = 0; i < header.mNodeCount; i++){
+			this.mSceneRoots.add((Node)output.readObject());
+		}
+		for(int i = 0; i < header.mAnimationCount; i++){
+			this.mAnimations.add((Animation)output.readObject());
+		}
+		for(int i = 0; i < header.mCameraCount; i++){
+			this.mCameras.add((Camera)output.readObject());
+		}
 	}
 
 	@Override
-	public Animation getAnimation() {
-		return this.mAnimation;
+	public List<Animation> getAnimations() {
+		return this.mAnimations;
 	}
 
 	@Override
-	public Camera[] getCameras() {
+	public List<Camera> getRootCameras() {
 		return this.mCameras;
 	}
 
 	@Override
-	public LightGroup getLightGroup() {
-		return this.mLights;
-	}
-
-	@Override
-	public Node getSceneGraph() {
-		return this.mRoot;
+	public List<Node> getRootSceneNodes() {
+		return this.mSceneRoots;
 	}
 }

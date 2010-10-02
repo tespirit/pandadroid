@@ -2,21 +2,26 @@ package com.tespirit.bamboo.animation;
 
 public class Clip {
 
-	private long mInitialTime;
+	private String mName;
 	private long mStart;
 	private long mEnd;
 	
-	public Clip(long start, long end){
+	public Clip(String name, long start, long end){
+		this.mName = name;
 		this.mStart = start;
 		this.mEnd = end;
 	}
 	
-	public void setInitialTime(long initialTime){
-		this.mInitialTime = initialTime;
+	public String getName(){
+		return this.mName;
+	}
+	
+	public void setName(String name){
+		this.mName = name;
 	}
 	
 	public long getClipTime(long currentTime){
-		return ((currentTime - this.mInitialTime)-this.mStart)%this.mEnd + this.mStart;
+		return (currentTime -this.mStart)%this.mEnd + this.mStart;
 	}
 	
 	public long getStart(){

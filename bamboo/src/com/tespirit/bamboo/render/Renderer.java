@@ -2,7 +2,8 @@ package com.tespirit.bamboo.render;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 import com.tespirit.bamboo.scenegraph.*;
 import com.tespirit.bamboo.surfaces.TextureManager;
@@ -19,60 +20,77 @@ public abstract class Renderer {
 	/* basic attributes */
 	protected Color4 backgroundColor;
 	
-	private Node root;
 	private Camera camera;
-	private LightGroup lights;
-	private TextureManager textures;
-	private ArrayList<ComponentRenderer> renderers;
-	
-	protected long currentTime;
-	
+	private List<Node> mScene;
+	private List<Light> mLights; 
 	private ArrayList<RenderableNode> renderableNodes;
 	
 	private ArrayList<TimeUpdate> timeUpdates;
 	
-	private static final RenderableSort renderableSort = new RenderableSort();
+	private TextureManager textures;
+	private ArrayList<ComponentRenderer> renderers;
 	
-	private static class RenderableSort implements Comparator<RenderableNode>{
-
-		@Override
-		public int compare(RenderableNode object1, RenderableNode object2) {
-			float z1 = object1.getWorldTransform().getTranslation().getZ();
-			float z2 = object2.getWorldTransform().getTranslation().getZ();
-			if(z1 < z2) return 1;
-			else if(z1 > z2) return -1;
-			else return 0;
-		}
-		
-	}
+	private Clock mClock;
 	
 	public Renderer(){
-		super();
-		this.root = null;
-		//change this later.
-		this.textures = TextureManager.getInstance();
+		this.mScene = new ArrayList<Node>();
+		this.mLights = new ArrayList<Light>();
+		this.timeUpdates = new ArrayList<TimeUpdate>();
+		
+		this.backgroundColor = new Color4();
+		
 		this.renderers = new ArrayList<ComponentRenderer>();
 		this.renderableNodes = new ArrayList<RenderableNode>();
-		this.timeUpdates = new ArrayList<TimeUpdate>();
-		this.backgroundColor = new Color4();
 	}
 	
 	public void setBackgroundColor(Color4 color){
 		this.backgroundColor.copy(color);
 	}
 	
-	public void setSceneGraph(Node root){
-		this.root = root;
+	public void clearScene(boolean keepLights){
+		this.mScene.clear();
 		this.renderableNodes.clear();
-		this.gatherRenderables(root);
+		if(keepLights){
+			this.mScene.addAll(this.mLights);
+		} else {
+			this.mLights.clear();
+		}
 	}
 	
-	public Node getSceneGraph(){
-		return this.root;
+	public void addNode(Node node){
+		Node prev = null;
+		if(this.mScene.size() > 0){
+			prev = this.mScene.get(this.mScene.size()-1);
+		}
+		this.mScene.add(node);
+		this.gatherRenderables(node);
+		//only sort if there is a need. in most cases new scene nodes will be inserted.
+		if(prev != null && Compare.nodePrioritySort.compare(node, prev)>0){
+			Collections.sort(this.mScene, Compare.nodePrioritySort);
+		}
+	}
+	
+	public void addNode(List<Node> nodes){
+		for(Node node : nodes){
+			this.addNode(node);
+		}
+	}
+	
+	public int getRootCount(){
+		return this.mScene.size();
+	}
+	
+	public Node getRoot(int i){
+		return this.mScene.get(i);
+	}
+	
+	public Iterator<Node> getRootIterator(){
+		return this.mScene.iterator();
 	}
 	
 	public void addTimeUpdate(TimeUpdate tu){
 		if(tu != null){
+			tu.setClock(this.mClock);
 			this.timeUpdates.add(tu);
 		}
 	}
@@ -83,6 +101,10 @@ public abstract class Renderer {
 	
 	public int getTimeUpdateCount(){
 		return this.timeUpdates.size();
+	}
+	
+	public Iterator<TimeUpdate> getTimeUpdateIterator(){
+		return this.timeUpdates.iterator();
 	}
 	
 	public TimeUpdate getTimeUpdate(int i){
@@ -97,49 +119,32 @@ public abstract class Renderer {
 		return this.camera;
 	}
 	
-	public void setLightGroup(LightGroup lights){
-		this.lights = lights;
-	}
-	
-	public LightGroup getLightGroup(){
-		return this.lights;
-	}
-	
-	public void updateScene(long time){
-		//update all animations!
-		this.currentTime = time;
+	public void updateScene(){
+		this.mClock.update();
 		for(TimeUpdate timeUpdate : this.timeUpdates){
-			timeUpdate.update(this.currentTime);
+			timeUpdate.update();
 		}
-		
 		this.camera.update(Matrix3d.IDENTITY);
-		if(this.lights != null){
-			this.lights.update(Matrix3d.IDENTITY);
+		for(Node node : this.mScene){
+			node.update(Matrix3d.IDENTITY);
 		}
-		if(this.root != null){
-			this.root.update(Matrix3d.IDENTITY);
-			Collections.sort(this.renderableNodes, Renderer.renderableSort);
-		}
+		Collections.sort(this.renderableNodes, Compare.renderableSort);
 	}
 	
 	public void renderScene(){
 		this.camera.render();
-		if(this.lights != null){
-			for(int i = 0; i < this.lights.getChildCount(); i++){
-				((Light)this.lights.getChild(i)).render();
-			}
+		for(Light light : this.mLights){
+			light.render();
 		}
-		if(this.root != null){
-			for(RenderableNode node : this.renderableNodes){
-				this.pushMatrix(node.getWorldTransform());
-				node.render();
-				this.popMatrix();
-			}
+		for(RenderableNode node : this.renderableNodes){
+			this.pushMatrix(node.getWorldTransform());
+			node.render();
+			this.popMatrix();
 		}
 	}
 	
 	public boolean lightsEnabled(){
-		return this.lights != null;
+		return this.mLights.size() > 0;
 	}
 	
 	public void traverseSetup(Node node){
@@ -167,10 +172,18 @@ public abstract class Renderer {
 	 * takes place.
 	 */
 	public void setupRender(){
+		this.mClock = this.createClock();
+		for(TimeUpdate t : this.timeUpdates){
+			t.setClock(this.mClock);
+		}
 		this.reactivateComponentRenderers();
-		if(this.lights != null){
-			this.enableLights();
-			this.traverseSetup(this.lights);
+		
+		for(Node node : this.mScene){
+			this.gatherRenderables(node);
+		}
+		
+		for(Light light : this.mLights){
+			this.traverseSetup(light);
 		}
 		if(this.textures != null){
 			this.enableTextures();
@@ -178,14 +191,13 @@ public abstract class Renderer {
 				this.textures.getTexture(i).setup();
 			}
 		}
-		if(this.root != null){
-			this.gatherRenderables(this.root);
-		}
 	}
 	
 	private void gatherRenderables(Node node){
 		if(node instanceof RenderableNode){
 			this.renderableNodes.add((RenderableNode)node);
+		} else if (node instanceof Light){
+			this.mLights.add((Light)node);
 		}
 		for(int i = 0; i < node.getChildCount(); i++){
 			this.gatherRenderables(node.getChild(i));
@@ -202,16 +214,6 @@ public abstract class Renderer {
 			this.traverseSetDisplay(this.camera, width, height);
 		}
 	}
-	
-	/* scenegraph manipulation */
-	public abstract void popMatrix();
-	public abstract void pushMatrix(Matrix3d transform);
-	
-	/* render settings */
-	public abstract void enableTextures();
-	public abstract void enableLights();
-	public abstract void disableLights();
-	public abstract void disableTextures();
 	
 	public void addComponentRenderer(ComponentRenderer r){
 		this.renderers.add(r);
@@ -250,4 +252,15 @@ public abstract class Renderer {
 		}
 		return null;
 	}
+	
+	/* scenegraph manipulation */
+	public abstract void popMatrix();
+	public abstract void pushMatrix(Matrix3d transform);
+	
+	/* render settings */
+	public abstract void enableTextures();
+	public abstract void enableLights();
+	public abstract void disableLights();
+	public abstract void disableTextures();
+	public abstract Clock createClock();
 }

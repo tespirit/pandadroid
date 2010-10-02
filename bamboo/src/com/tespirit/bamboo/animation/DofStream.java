@@ -22,4 +22,8 @@ public class DofStream{
 	public void reset(){
 		this.position = 0;
 	}
+	
+	public int getCount(){
+		return dofs.length;
+	}
 }

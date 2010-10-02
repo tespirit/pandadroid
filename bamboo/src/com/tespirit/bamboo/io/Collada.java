@@ -2,6 +2,7 @@ package com.tespirit.bamboo.io;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import com.tespirit.bamboo.animation.Animation;
@@ -17,7 +18,6 @@ import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.TriangleIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.LightGroup;
 import com.tespirit.bamboo.scenegraph.Group;
 import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -49,10 +49,10 @@ import org.xmlpull.v1.XmlPullParser;
  *
  */
 public class Collada implements BambooAsset{
-	private Node mRoot;
-	private LightGroup mLights;
-	private Camera[] mCameras;
-	private Animation mAnimation;
+	private List<Node> mSceneRoots;
+	private List<Animation> mAnimations;
+	private List<Camera> mCameras;
+	
 	protected ArrayList<String> mTexturePaths;
 	
 	private float mScale;
@@ -212,27 +212,21 @@ public class Collada implements BambooAsset{
 	 * @param normals
 	 * @throws Exception
 	 */
-	protected Collada(XmlPullParser input, boolean flipYTexcoord, boolean normals)throws Exception{
+	public Collada(XmlPullParser input, boolean flipYTexcoord, boolean normals)throws Exception{
+		this.mAnimations = new ArrayList<Animation>();
+		this.mSceneRoots = new ArrayList<Node>();
+		this.mCameras = new ArrayList<Camera>();
 		this.mImportNormals = normals;
 		this.mFlipYTexCoord = flipYTexcoord;
 		this.init(input);
 	}
 	
-	protected Collada(XmlPullParser input, boolean flipYTexcoord)throws Exception{
+	public Collada(XmlPullParser input, boolean flipYTexcoord)throws Exception{
 		this(input, flipYTexcoord, true);
 	}
 	
-	protected Collada(XmlPullParser input)throws Exception{
+	public Collada(XmlPullParser input)throws Exception{
 		this(input, true, true);
-	}
-	
-	protected Collada(){
-		this.mImportNormals = true;
-		this.mFlipYTexCoord = true;
-	}
-	
-	protected Collada(boolean normals){
-		this.mImportNormals = normals;
 	}
 	
 	private NameId getNameId(String name){
@@ -357,15 +351,17 @@ public class Collada implements BambooAsset{
         }
         
         if(this.mChannelOrder.size() > 0 && this.mMaxAnimationTime >= this.mMinAnimationTime){
-        	this.mAnimation = new Animation(this.mChannelOrder.size());
+        	
+        	Animation animation = new Animation(this.mChannelOrder.size());
         	for(int i = 0; i < this.mChannelOrder.size(); i++){
         		Channel c = this.mChannels.get(this.mChannelOrder.get(i));
         		if(c == null){
         			c = new Channel();
         		}
-        		this.mAnimation.addChannel(c);
+        		animation.addChannel(c);
         	}
-        	this.mAnimation.addClip(new Clip(this.mMinAnimationTime, this.mMaxAnimationTime));
+        	animation.addClip(new Clip("default", this.mMinAnimationTime, this.mMaxAnimationTime));
+        	this.mAnimations.add(animation);
         }
         this.mParser = null;
 	}
@@ -664,7 +660,6 @@ public class Collada implements BambooAsset{
 	}
 		
 	private void parseLibraryVisualScenes() throws Exception{
-		ArrayList<Node> nodes = new ArrayList<Node>();
 		
 		if(this.moveToChildNode(NameId.visual_scene, NameId.library_visual_scenes)){
 			while(this.moveToChildNode(NameId.node, NameId.visual_scene)){
@@ -675,14 +670,8 @@ public class Collada implements BambooAsset{
 					node = this.parseNode();
 				}
 				if(node != null){
-					nodes.add(node);
+					this.mSceneRoots.add(node);
 				}
-			}
-			if(nodes.size() > 1){
-				Group group = new Group("/root", nodes);
-				this.mRoot = group;
-			} else if(nodes.size() == 1){
-				this.mRoot = nodes.get(0);
 			}
 		}
 	}
@@ -1429,20 +1418,19 @@ public class Collada implements BambooAsset{
 			break;
 		}
 	}
-	
-	public Node getSceneGraph(){
-		return this.mRoot;
+
+	@Override
+	public List<Animation> getAnimations() {
+		return this.mAnimations;
 	}
-	
-	public LightGroup getLightGroup(){
-		return this.mLights;
-	}
-	
-	public Camera[] getCameras(){
+
+	@Override
+	public List<Camera> getRootCameras() {
 		return this.mCameras;
 	}
-	
-	public Animation getAnimation(){
-		return this.mAnimation;
+
+	@Override
+	public List<Node> getRootSceneNodes() {
+		return this.mSceneRoots;
 	}
 }
