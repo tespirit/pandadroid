@@ -421,59 +421,70 @@ public class Matrix3d {
 		//TODO: Optimize by using direct matrix access.
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3;
 		
-		a1 = m2.getValue(0, 0) * m1.getValue(0,0) +
-			 m2.getValue(0, 1) * m1.getValue(1,0) +
-			 m2.getValue(0, 2) * m1.getValue(2,0);
+		a1 = m2.m[m2.offset] * m1.m[m1.offset] +
+		 	 m2.m[m2.offset+1] * m1.m[m1.offset+4] +
+		 	 m2.m[m2.offset+2] * m1.m[m1.offset+8];
 		
-		a2 = m2.getValue(0, 0) * m1.getValue(0,1) +
-		 	 m2.getValue(0, 1) * m1.getValue(1,1) +
-		 	 m2.getValue(0, 2) * m1.getValue(2,1);
+		a2 = m2.m[m2.offset] * m1.m[m1.offset+1] +
+	 	 	 m2.m[m2.offset+1] * m1.m[m1.offset+5] +
+	 	 	 m2.m[m2.offset+2] * m1.m[m1.offset+9];
 		
-		a3 = m2.getValue(0, 0) * m1.getValue(0,2) +
-		 	 m2.getValue(0, 1) * m1.getValue(1,2) +
-		 	 m2.getValue(0, 2) * m1.getValue(2,2);
+		a3 = m2.m[m2.offset] * m1.m[m1.offset+2] +
+	 	 	 m2.m[m2.offset+1] * m1.m[m1.offset+6] +
+	 	 	 m2.m[m2.offset+2] * m1.m[m1.offset+10];
 		
-		b1 = m2.getValue(1, 0) * m1.getValue(0,0) +
-		 	 m2.getValue(1, 1) * m1.getValue(1,0) +
-		 	 m2.getValue(1, 2) * m1.getValue(2,0);
-	
-		b2 = m2.getValue(1, 0) * m1.getValue(0,1) +
-	 	 	 m2.getValue(1, 1) * m1.getValue(1,1) +
-	 	 	 m2.getValue(1, 2) * m1.getValue(2,1);
-	
-		b3 = m2.getValue(1, 0) * m1.getValue(0,2) +
-	 	 	 m2.getValue(1, 1) * m1.getValue(1,2) +
-	 	 	 m2.getValue(1, 2) * m1.getValue(2,2);
+		b1 = m2.m[m2.offset+4] * m1.m[m1.offset] +
+		 	 m2.m[m2.offset+5] * m1.m[m1.offset+4] +
+		 	 m2.m[m2.offset+6] * m1.m[m1.offset+8];
 		
-		c1 = m2.getValue(2, 0) * m1.getValue(0,0) +
-	 	 	 m2.getValue(2, 1) * m1.getValue(1,0) +
-	 	 	 m2.getValue(2, 2) * m1.getValue(2,0);
-
-		c2 = m2.getValue(2, 0) * m1.getValue(0,1) +
-		 	 m2.getValue(2, 1) * m1.getValue(1,1) +
-		 	 m2.getValue(2, 2) * m1.getValue(2,1);
-	
-		c3 = m2.getValue(2, 0) * m1.getValue(0,2) +
-		 	 m2.getValue(2, 1) * m1.getValue(1,2) +
-		 	 m2.getValue(2, 2) * m1.getValue(2,2);
-	
-		d1 = m2.getValue(3, 0) * m1.getValue(0,0) +
-		 	 m2.getValue(3, 1) * m1.getValue(1,0) +
-		 	 m2.getValue(3, 2) * m1.getValue(2,0) + m1.getValue(3, 0);
-	
-		d2 = m2.getValue(3, 0) * m1.getValue(0,1) +
-		 	 m2.getValue(3, 1) * m1.getValue(1,1) +
-		 	 m2.getValue(3, 2) * m1.getValue(2,1) + m1.getValue(3, 1);
-	
-		d3 = m2.getValue(3, 0) * m1.getValue(0,2) +
-		 	 m2.getValue(3, 1) * m1.getValue(1,2) +
-		 	 m2.getValue(3, 2) * m1.getValue(2,2) + m1.getValue(3, 2);
+		b2 = m2.m[m2.offset+4] * m1.m[m1.offset+1] +
+		 	 m2.m[m2.offset+5] * m1.m[m1.offset+5] +
+		 	 m2.m[m2.offset+6] * m1.m[m1.offset+9];
 		
-		this.xAxis.set(a1, a2, a3);
-		this.yAxis.set(b1, b2, b3);
-		this.zAxis.set(c1, c2, c3);
-		this.translation.set(d1, d2, d3);
-
+		b3 = m2.m[m2.offset+4] * m1.m[m1.offset+2] +
+		 	 m2.m[m2.offset+5] * m1.m[m1.offset+6] +
+		 	 m2.m[m2.offset+6] * m1.m[m1.offset+10];
+		
+		c1 = m2.m[m2.offset+8] * m1.m[m1.offset] +
+		 	 m2.m[m2.offset+9] * m1.m[m1.offset+4] +
+		 	 m2.m[m2.offset+10] * m1.m[m1.offset+8];
+		
+		c2 = m2.m[m2.offset+8] * m1.m[m1.offset+1] +
+		 	 m2.m[m2.offset+9] * m1.m[m1.offset+5] +
+		 	 m2.m[m2.offset+10] * m1.m[m1.offset+9];
+		
+		c3 = m2.m[m2.offset+8] * m1.m[m1.offset+2] +
+		 	 m2.m[m2.offset+9] * m1.m[m1.offset+6] +
+		 	 m2.m[m2.offset+10] * m1.m[m1.offset+10];
+		
+		d1 = m2.m[m2.offset+12] * m1.m[m1.offset] +
+		 	 m2.m[m2.offset+13] * m1.m[m1.offset+4] +
+		 	 m2.m[m2.offset+14] * m1.m[m1.offset+8] + m1.m[m1.offset+12];
+		
+		d2 = m2.m[m2.offset+12] * m1.m[m1.offset+1] +
+		 	 m2.m[m2.offset+13] * m1.m[m1.offset+5] +
+		 	 m2.m[m2.offset+14] * m1.m[m1.offset+9] + m1.m[m1.offset+13];
+		
+		d3 = m2.m[m2.offset+12] * m1.m[m1.offset+2] +
+		 	 m2.m[m2.offset+13] * m1.m[m1.offset+6] +
+		 	 m2.m[m2.offset+14] * m1.m[m1.offset+10] + m1.m[m1.offset+14];
+		
+		this.m[this.offset] = a1;
+		this.m[this.offset+1] = a2;
+		this.m[this.offset+2] = a3;
+		
+		this.m[this.offset+4] = b1;
+		this.m[this.offset+5] = b2;
+		this.m[this.offset+6] = b3;
+		
+		this.m[this.offset+8] = c1;
+		this.m[this.offset+9] = c2;
+		this.m[this.offset+10] = c3;
+		
+		this.m[this.offset+12] = d1;
+		this.m[this.offset+13] = d2;
+		this.m[this.offset+14] = d3;
+		
 		return this;
 	}
 	
