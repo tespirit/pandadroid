@@ -57,7 +57,8 @@ public class Collada implements BambooAsset{
 	
 	private float mScale;
 	
-	private boolean mImportNormals;
+	protected boolean mImportNormals;
+	protected boolean mFlipYTexCoord;
 	
 	private enum NameId{
 		asset,
@@ -211,18 +212,23 @@ public class Collada implements BambooAsset{
 	 * @param normals
 	 * @throws Exception
 	 */
-	protected Collada(XmlPullParser input, boolean normals)throws Exception{
+	protected Collada(XmlPullParser input, boolean flipYTexcoord, boolean normals)throws Exception{
 		this.mImportNormals = normals;
+		this.mFlipYTexCoord = flipYTexcoord;
 		this.init(input);
 	}
 	
+	protected Collada(XmlPullParser input, boolean flipYTexcoord)throws Exception{
+		this(input, flipYTexcoord, true);
+	}
+	
 	protected Collada(XmlPullParser input)throws Exception{
-		this.mImportNormals = true;
-		this.init(input);
+		this(input, true, true);
 	}
 	
 	protected Collada(){
 		this.mImportNormals = true;
+		this.mFlipYTexCoord = true;
 	}
 	
 	protected Collada(boolean normals){
@@ -1086,7 +1092,11 @@ public class Collada implements BambooAsset{
 			if(texcoord != null){
 				index = indices.get(i*count+inputs.mTexcoordOffset)*2;
 				texcoordRemap.add(texcoord[index]);
-				texcoordRemap.add(1-texcoord[index+1]);
+				if(this.mFlipYTexCoord){
+					texcoordRemap.add(1-texcoord[index+1]);
+				} else {
+					texcoordRemap.add(texcoord[index+1]);
+				}
 			}
 			if(color != null){
 				index = indices.get(i*count+inputs.mColorOffset)*4;

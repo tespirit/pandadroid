@@ -234,9 +234,9 @@ public class Vector3d {
 		if(o instanceof Vector3d){
 			Vector3d v = (Vector3d)o;
 			return Util.floatEquals(v.v[v.offset], this.v[this.offset]) && 
-				   Util.floatEquals(v.v[v.offset], this.v[this.offset]) && 
-				   Util.floatEquals(v.v[v.offset], this.v[this.offset]) &&
-				   Util.floatEquals(v.v[v.offset], this.v[this.offset]);
+				   Util.floatEquals(v.v[v.offset+1], this.v[this.offset+1]) && 
+				   Util.floatEquals(v.v[v.offset+2], this.v[this.offset+2]) &&
+				   Util.floatEquals(v.v[v.offset+3], this.v[this.offset+3]);
 		}
 		return false;
 	}
