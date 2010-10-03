@@ -5,14 +5,6 @@ import junit.framework.*;
 import com.tespirit.bamboo.vectors.*;
 
 public class Vector3dTest extends TestCase{
-
-	public void setUp() throws Exception {
-		Util.setTolerance(0.0000001f);
-	}
-
-	public void tearDown() throws Exception {
-		Util.setTolerance(0.0000001f);
-	}
 	
 	private void assertEqualsVector3d(float x, float y, float z, Vector3d v) {
 		Assert.assertEquals(x, v.getX(),0.000001);
@@ -36,14 +28,6 @@ public class Vector3dTest extends TestCase{
 		Assert.assertTrue(t.equals(u));
 		Assert.assertFalse(t.equals(v));
 		
-		Util.setTolerance(0.1f);
-		
-		u.setX(u.getX()+0.05f);
-		
-		Assert.assertTrue(t.equals(u));
-		
-		Util.setTolerance(0.01f);
-		Assert.assertFalse(t.equals(u));
 	}
 	
 	public void testMagnitude(){

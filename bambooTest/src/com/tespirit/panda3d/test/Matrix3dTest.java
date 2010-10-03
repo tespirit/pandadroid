@@ -202,7 +202,62 @@ public class Matrix3dTest extends TestCase{
 		Assert.assertTrue(cb.equals(rb));
 	}
 	
+	public void testTransform(){
+		Matrix3d m = new Matrix3d();
+		float[] buffer = Matrix3d.createBuffer(3);
+		Matrix3d m2 = new Matrix3d(buffer, Matrix3d.SIZE);
+		
+		m.getXAxis().set(1, 2, 3);
+		m.getYAxis().set(4, 5, 6);
+		m.getZAxis().set(7, 8, 9);
+		m.getTranslation().set(10, 11, 12);
+		
+		m2.copy(m);
+		
+		Vector3d v = new Vector3d();
+		buffer = Vector3d.createBuffer(3);
+		Vector3d v2 = new Vector3d(buffer, Vector3d.SIZE);
+		
+		v.set(13, 14, 15);
+		v2.copy(v);
+		
+		Vector3d v3 = new Vector3d();
+		v3.set(13+14*4+15*7+10, 13*2+14*5+15*8+11, 13*3+14*6+15*9+12);
+		m.transform(v);
+		m2.transform(v2);
+		
+		Assert.assertTrue(v.equals(v3));
+		Assert.assertTrue(v2.equals(v3));
+	}
+	
 	public void testInvert(){
-		//Matrix3d m = new Matrix3d();
+		
+		Matrix3d m = new Matrix3d();
+		m.scale(1.5f);
+		m.rotateX(23);
+		m.rotateY(56);
+		m.rotateZ(50);
+		m.translate(1, 2, 3);
+		float[] buffer = Matrix3d.createBuffer(3);
+		Matrix3d m2 = new Matrix3d(buffer, Matrix3d.SIZE);
+		
+		m2.invert(m);
+		
+		Vector3d v = new Vector3d(1,2,3);
+		
+		Vector3d r = new Vector3d();
+		m.transform(v,r);
+		m2.transform(r);
+		
+		Assert.assertTrue(v.equals(r));
+		
+		m.invert();
+		
+		m2.invert();
+		
+		m.transform(v,r);
+		m2.transform(r);
+		
+		Assert.assertTrue(v.equals(r));
 	}
 }
