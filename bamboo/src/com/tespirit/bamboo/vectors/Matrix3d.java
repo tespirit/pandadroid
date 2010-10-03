@@ -160,46 +160,56 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d invert(Matrix3d m){
-		//TODO: Optimize by using direct matrix access.
 		float subDetX, subDetY, subDetZ;
-		subDetX = m.yAxis.getY()*m.zAxis.getZ() - m.yAxis.getZ()*m.zAxis.getY();
-		subDetY = m.yAxis.getX()*m.zAxis.getZ() - m.yAxis.getZ()*m.zAxis.getX();
-		subDetZ = m.yAxis.getX()*m.zAxis.getY() - m.yAxis.getY()*m.zAxis.getX();
+		subDetX = m.m[m.offset+5]*m.m[m.offset+10] - m.m[m.offset+6]*m.m[m.offset+9];
+		subDetY = m.m[m.offset+4]*m.m[m.offset+10] - m.m[m.offset+6]*m.m[m.offset+8];
+		subDetZ = m.m[m.offset+4]*m.m[m.offset+9] - m.m[m.offset+5]*m.m[m.offset+8];
 		
-		float det = 1/(m.xAxis.getX()*subDetX - 
-					   m.xAxis.getY()*subDetY + 
-					   m.xAxis.getZ()*subDetZ);
+		float det = 1/(m.m[m.offset]*subDetX - 
+					   m.m[m.offset+1]*subDetY + 
+					   m.m[m.offset+2]*subDetZ);
 		
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2 ,d3;
 		
 		a1 = subDetX*det;
 		b1 = -subDetY*det;
 		c1 = subDetZ*det;
-		d1 = -m.translation.getX()*a1 - m.translation.getY()*b1 - m.translation.getZ()*c1;
+		d1 = -m.m[m.offset+12]*a1 - m.m[m.offset+13]*b1 - m.m[m.offset+14]*c1;
 		
-		subDetX = m.xAxis.getY()*m.zAxis.getZ() - m.xAxis.getZ()*m.zAxis.getY();
-		subDetY = m.xAxis.getX()*m.zAxis.getZ() - m.xAxis.getZ()*m.zAxis.getX();
-		subDetZ = m.xAxis.getX()*m.zAxis.getY() - m.xAxis.getY()*m.zAxis.getX();
+		subDetX = m.m[m.offset+1]*m.m[m.offset+10] - m.m[m.offset+2]*m.m[m.offset+9];
+		subDetY = m.m[m.offset]*m.m[m.offset+10] - m.m[m.offset+2]*m.m[m.offset+8];
+		subDetZ = m.m[m.offset]*m.m[m.offset+9] - m.m[m.offset+1]*m.m[m.offset+8];
 		
 		a2 = -subDetX*det;
 		b2 = subDetY*det;
 		c2 = -subDetZ*det;
-		d2 = -m.translation.getX()*a2 - m.translation.getY()*b2 - m.translation.getZ()*c2;
+		d2 = -m.m[m.offset+12]*a2 - m.m[m.offset+13]*b2 - m.m[m.offset+14]*c2;
 
-		subDetX = m.xAxis.getY()*m.yAxis.getZ() - m.xAxis.getZ()*m.yAxis.getY();
-		subDetY = m.xAxis.getX()*m.yAxis.getZ() - m.xAxis.getZ()*m.yAxis.getX();
-		subDetZ = m.xAxis.getX()*m.yAxis.getY() - m.xAxis.getY()*m.yAxis.getX();
+		subDetX = m.m[m.offset+1]*m.m[m.offset+6] - m.m[m.offset+2]*m.m[m.offset+5];
+		subDetY = m.m[m.offset]*m.m[m.offset+6] - m.m[m.offset+2]*m.m[m.offset+4];
+		subDetZ = m.m[m.offset]*m.m[m.offset+5] - m.m[m.offset+1]*m.m[m.offset+4];
 		
 		a3 = subDetX*det;
 		b3 = -subDetY*det;
 		c3 = subDetZ*det;
-		d3 = -m.translation.getX()*a3 - m.translation.getY()*b3 - m.translation.getZ()*c3;
+		d3 = -m.m[m.offset+12]*a3 - m.m[m.offset+13]*b3 - m.m[m.offset+14]*c3;
 		
-		this.xAxis.set(a1, a2, a3);
-		this.yAxis.set(b1, b2, b3);
-		this.zAxis.set(c1, c2, c3);
-		this.translation.set(d1, d2, d3);
+		this.m[this.offset] = a1;
+		this.m[this.offset+1] = a2;
+		this.m[this.offset+2] = a3;
 		
+		this.m[this.offset+4] = b1;
+		this.m[this.offset+5] = b2;
+		this.m[this.offset+6] = b3;
+		
+		this.m[this.offset+8] = c1;
+		this.m[this.offset+9] = c2;
+		this.m[this.offset+10] = c3;
+		
+		this.m[this.offset+12] = d1;
+		this.m[this.offset+13] = d2;
+		this.m[this.offset+14] = d3;
+
 		return this;
 	}
 	
