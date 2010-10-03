@@ -28,7 +28,6 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	
 	private int[] mIndexTypes;
 	private int[] mPrimitiveTypes;
-	private int[] mVertexTypes;
 	
 	public Renderer() {
 		super();
@@ -45,12 +44,6 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		this.mPrimitiveTypes[Primitive.LINES] = GL10.GL_LINES;
 		this.mPrimitiveTypes[Primitive.LINE_STRIP] = GL10.GL_LINE_STRIP;
 		this.mPrimitiveTypes[Primitive.POINTS] = GL10.GL_POINTS;
-		
-		this.mVertexTypes = new int[VertexBuffer.TYPE_COUNT];
-		this.mVertexTypes[VertexBuffer.POSITION] = GL10.GL_VERTEX_ARRAY;
-		this.mVertexTypes[VertexBuffer.NORMAL] = GL10.GL_NORMAL_ARRAY;
-		this.mVertexTypes[VertexBuffer.TEXCOORD] = GL10.GL_TEXTURE_COORD_ARRAY;
-		this.mVertexTypes[VertexBuffer.COLOR] = GL10.GL_COLOR_ARRAY;
 		
 		this.createRenderers();
 	}
@@ -344,9 +337,11 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 							  mIndexTypes[indexBuffer.getType()], 
 							  indexBuffer.getBuffer());
 			
-			for(int i = 0; i < vb.getBufferCount(); i++){
-				mGl.glDisableClientState(mVertexTypes[vb.getBufferType(i)]);
-			}
+			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			
 			mGl.glDisable(GL10.GL_CULL_FACE);
 		}
 	}
@@ -362,9 +357,10 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 			
 			mGl.glDrawArrays(mPrimitiveTypes[vl.getType()], 0, vl.getVertexBuffer().getCount());
 			
-			for(int i = 0; i < vb.getBufferCount(); i++){
-				mGl.glDisableClientState(mVertexTypes[vb.getBufferType(i)]);
-			}
+			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		}
 	}
 }
