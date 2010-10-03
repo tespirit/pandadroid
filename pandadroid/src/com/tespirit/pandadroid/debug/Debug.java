@@ -165,16 +165,6 @@ public class Debug {
 		Debug.animations.add(player);
 	}
 	
-	public static void selectNode(Node node){
-		Debug.renderer.selected = node;
-		if(node != null){
-			Debug.print(node.getName());
-			if(node.getTransform() != null){
-				Debug.print(node.getTransform());
-			}
-		}
-	}
-	
 	static class DebugKeys implements OnKeyListener{
 		
 		public DebugKeys(){

@@ -11,6 +11,7 @@ import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
+import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
@@ -26,8 +27,6 @@ public class RendererDebug extends Renderer{
 	public boolean renderAxis;
 	public boolean renderLightPoint;
 	public boolean lightsOn;
-	
-	public Node selected;
 	
 	private Point pointBuffer;
 	
@@ -126,11 +125,7 @@ public class RendererDebug extends Renderer{
 		}
 		if(this.renderBoundingBox && node.getBoundingBox() != null){
 			this.boundingBox.setBox(node.getBoundingBox());
-			if(node == this.selected){
-				this.selectedColor.render();
-			} else {
-				this.boundingBoxColor.render();
-			}
+			this.boundingBoxColor.render();
 			this.boundingBox.render();
 		}
 		
@@ -145,6 +140,11 @@ public class RendererDebug extends Renderer{
 		for(int i = 0; i < node.getChildCount(); i++){
 			drawNodeInfo(node.getChild(i));
 		}
+	}
+	
+	@Override
+	public Clock createClock(){
+		return new DebugClock();
 	}
 	
 	@Override

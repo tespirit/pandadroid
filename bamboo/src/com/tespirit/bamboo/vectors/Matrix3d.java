@@ -411,7 +411,7 @@ public class Matrix3d {
 		
 		float y = vin.v[vin.offset]*this.m[this.offset+1] + 
 				  vin.v[vin.offset+1]*this.m[this.offset+5] + 
-				  vin.v[vin.offset+2]*this.m[this.offset+8] + 
+				  vin.v[vin.offset+2]*this.m[this.offset+9] + 
 				  vin.v[vin.offset+3]*this.m[this.offset+13];
 		
 		float z = vin.v[vin.offset]*this.m[this.offset+2] + 
