@@ -7,10 +7,6 @@ public class AndroidClock implements Clock{
 	private long mCurrentTime;
 	private long mDeltaTime;
 	
-	public AndroidClock(){
-		this.mCurrentTime = android.os.SystemClock.uptimeMillis();
-	}
-
 	@Override
 	public long getCurrentTime() {
 		return mCurrentTime;
@@ -26,6 +22,11 @@ public class AndroidClock implements Clock{
 		long newTime = android.os.SystemClock.uptimeMillis();
 		this.mDeltaTime = newTime - this.mCurrentTime;
 		this.mCurrentTime = newTime;
+	}
+
+	@Override
+	public void start() {
+		this.mCurrentTime = android.os.SystemClock.uptimeMillis();
 	}
 
 }

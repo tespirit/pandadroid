@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Player;
-import com.tespirit.bamboo.render.Renderer;
+import com.tespirit.bamboo.render.RenderManager;
 
 public class AnimationEditor extends TreeNodeEditor{
 	
@@ -20,7 +20,7 @@ public class AnimationEditor extends TreeNodeEditor{
 	private JTextField mSkeleton;
 	private Box mPanel;
 	
-	public AnimationEditor(Animation animation, Renderer renderer){
+	public AnimationEditor(Animation animation, RenderManager renderer){
 		this.mAnimation = animation;
 		this.mPlayer = new Player();
 		this.mPlayer.setAnimation(this.mAnimation);

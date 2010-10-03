@@ -12,6 +12,7 @@ import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.Light;
+import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
 import com.tespirit.bamboo.surfaces.Texture;
@@ -22,7 +23,7 @@ import com.tespirit.pandadroid.app.Assets;
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
 
-public class Renderer extends com.tespirit.bamboo.render.Renderer implements android.opengl.GLSurfaceView.Renderer{
+public class Renderer extends RenderManager implements android.opengl.GLSurfaceView.Renderer{
 	protected GL10 mGl;
 	protected int mCurrentLightId;
 	
@@ -30,7 +31,11 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	private int[] mPrimitiveTypes;
 	
 	public Renderer() {
-		super();
+		this(new AndroidClock());
+	}
+	
+	public Renderer(Clock clock){
+		super(clock);
 		this.mCurrentLightId = 0;
 		
 		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
@@ -129,11 +134,6 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	public void pushMatrix(Matrix3d transform) {
 		this.mGl.glPushMatrix();
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
-	}
-	
-	@Override
-	public Clock createClock(){
-		return new AndroidClock();
 	}
 	
 	protected class LightRenderer extends Light.Renderer{

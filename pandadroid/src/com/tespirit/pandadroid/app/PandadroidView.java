@@ -30,7 +30,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 public class PandadroidView extends GLSurfaceView {
-	private com.tespirit.bamboo.render.Renderer renderer;
+	private com.tespirit.bamboo.render.RenderManager renderer;
 	private Controller2d touchUpController;
 	private Controller2d touchMoveController;
 	private Controller2d touchDownController;
@@ -91,7 +91,7 @@ public class PandadroidView extends GLSurfaceView {
 		this.setRenderer(gl1x);
 	}
 	
-	public com.tespirit.bamboo.render.Renderer getRenderer(){
+	public com.tespirit.bamboo.render.RenderManager getRenderer(){
 		return this.renderer;
 	}
 	

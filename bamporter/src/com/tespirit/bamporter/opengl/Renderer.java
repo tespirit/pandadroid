@@ -23,8 +23,8 @@ import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.Light;
+import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
@@ -33,7 +33,7 @@ import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamporter.app.Assets;
 
-public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLEventListener{
+public class Renderer extends RenderManager implements GLEventListener{
 	private GLCanvas mCanvas;
 	private FPSAnimator mAnimator;
 	private GL2 mGl;
@@ -61,7 +61,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	}
 	
 	public Renderer(){
-		super();
+		super(new CalendarClock());
 		this.mCurrentLightId = 0;
 		
 		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
@@ -180,11 +180,6 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	public void pushMatrix(Matrix3d transform) {
 		this.mGl.glPushMatrix();
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
-	}
-	
-	@Override
-	public Clock createClock() {
-		return new CalendarClock();
 	}
 
 	public void renderDebug(){

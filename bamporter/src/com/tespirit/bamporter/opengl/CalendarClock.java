@@ -7,10 +7,6 @@ import com.tespirit.bamboo.render.Clock;
 public class CalendarClock implements Clock{
 	private long mCurrentTime;
 	private long mDeltaTime;
-	
-	public CalendarClock(){
-		this.mCurrentTime = Calendar.getInstance().getTimeInMillis();
-	}
 
 	@Override
 	public long getCurrentTime() {
@@ -27,5 +23,10 @@ public class CalendarClock implements Clock{
 		long newTime = Calendar.getInstance().getTimeInMillis();
 		this.mDeltaTime = newTime - this.mCurrentTime;
 		this.mCurrentTime = newTime;
+	}
+
+	@Override
+	public void start() {
+		this.mCurrentTime = Calendar.getInstance().getTimeInMillis();
 	}
 }

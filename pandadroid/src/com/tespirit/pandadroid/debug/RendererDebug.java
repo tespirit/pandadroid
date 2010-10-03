@@ -11,7 +11,6 @@ import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
@@ -55,7 +54,7 @@ public class RendererDebug extends Renderer{
 	private FloatBuffer point;
 	
 	public RendererDebug(){
-		super();
+		super(new DebugClock());
 		this.renderBoundingBox = false;
 		this.renderRenderables = true;
 		this.renderNormals = false;
@@ -140,11 +139,6 @@ public class RendererDebug extends Renderer{
 		for(int i = 0; i < node.getChildCount(); i++){
 			drawNodeInfo(node.getChild(i));
 		}
-	}
-	
-	@Override
-	public Clock createClock(){
-		return new DebugClock();
 	}
 	
 	@Override

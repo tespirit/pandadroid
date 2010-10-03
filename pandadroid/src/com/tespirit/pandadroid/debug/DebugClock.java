@@ -20,4 +20,9 @@ public class DebugClock implements Clock{
 	public void update() {
 		this.mCurrentTime += mDeltaTime;
 	}
+
+	@Override
+	public void start() {
+		//VOID
+	}
 }

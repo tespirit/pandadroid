@@ -15,7 +15,7 @@ import com.tespirit.bamboo.vectors.Ray;
  * @author Todd Espiritu Santo
  *
  */
-public abstract class Renderer {
+public abstract class RenderManager {
 	/* basic attributes */
 	protected Color4 backgroundColor;
 	
@@ -29,7 +29,8 @@ public abstract class Renderer {
 	
 	private Clock mClock;
 	
-	public Renderer(){
+	public RenderManager(Clock clock){
+		this.mClock = clock;
 		this.mScene = new ArrayList<Node>();
 		this.mLights = new ArrayList<Light>();
 		this.timeUpdates = new ArrayList<TimeUpdate>();
@@ -157,7 +158,7 @@ public abstract class Renderer {
 	 * takes place.
 	 */
 	public void setupRender(){
-		this.mClock = this.createClock();
+		this.mClock.start();
 		for(TimeUpdate t : this.timeUpdates){
 			t.setClock(this.mClock);
 		}
@@ -232,5 +233,4 @@ public abstract class Renderer {
 	public abstract void enableLights();
 	public abstract void disableLights();
 	public abstract void disableTextures();
-	public abstract Clock createClock();
 }
