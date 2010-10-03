@@ -12,14 +12,24 @@ public class Matrix3d {
 	public static float[] createBuffer(int matrixCount){
 		float[] buffer = new float[Matrix3d.SIZE*matrixCount];
 		for(int i = 0; i < matrixCount; i++){
-			int index = Matrix3d.SIZE*i;
-			buffer[index] = 1.0f;
-			index+=Matrix3d.SIZEROW;
-			buffer[index+1] = 1.0f;
-			index+=Matrix3d.SIZEROW;
-			buffer[index+2] = 1.0f;
+			Matrix3d.setIdentity(buffer, Matrix3d.SIZE*i);
 		}
 		return buffer;
+	}
+	
+	private static void setIdentity(float[] buffer, int offset){
+		buffer[offset] = 1;
+		buffer[offset+1] = 0;
+		buffer[offset+2] = 0;
+		buffer[offset+4] = 0;
+		buffer[offset+5] = 1;
+		buffer[offset+6] = 0;
+		buffer[offset+8] = 0;
+		buffer[offset+9] = 0;
+		buffer[offset+10] = 1;
+		buffer[offset+12] = 0;
+		buffer[offset+13] = 0;
+		buffer[offset+14] = 0;
 	}
 	
 	public static final int SIZE = 16;
@@ -311,40 +321,53 @@ public class Matrix3d {
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3;
 		
 		//push 3x3 matrix onto this 3x3 matrix.
-		//TODO: Optimize by using direct matrix access.
-		a1 = this.xAxis.getX()*ta1 + 
-			 this.xAxis.getY()*tb1 +
-			 this.xAxis.getZ()*tc1;
-		a2 = this.xAxis.getX()*ta2 + 
-		 	 this.xAxis.getY()*tb2 +
-		 	 this.xAxis.getZ()*tc2;
-		a3 = this.xAxis.getX()*ta3 + 
-	 	 	 this.xAxis.getY()*tb3 +
-	 	 	 this.xAxis.getZ()*tc3;
+		a1 = this.m[this.offset]*ta1+
+			 this.m[this.offset+1]*tb1+
+			 this.m[this.offset+2]*tc1;
 		
-		b1 = this.yAxis.getX()*ta1 + 
-			 this.yAxis.getY()*tb1 +
-			 this.yAxis.getZ()*tc1;
-		b2 = this.yAxis.getX()*ta2 + 
-		 	 this.yAxis.getY()*tb2 +
-		 	 this.yAxis.getZ()*tc2;
-		b3 = this.yAxis.getX()*ta3 + 
-		 	 this.yAxis.getY()*tb3 +
-		 	 this.yAxis.getZ()*tc3;
+		a2 = this.m[this.offset]*ta2+
+			 this.m[this.offset+1]*tb2+
+			 this.m[this.offset+2]*tc2;
 		
-		c1 = this.zAxis.getX()*ta1 + 
-			 this.zAxis.getY()*tb1 +
-			 this.zAxis.getZ()*tc1;
-		c2 = this.zAxis.getX()*ta2 + 
-		 	 this.zAxis.getY()*tb2 +
-		 	 this.zAxis.getZ()*tc2;
-		c3 = this.zAxis.getX()*ta3 + 
-		 	 this.zAxis.getY()*tb3 +
-		 	 this.zAxis.getZ()*tc3;
+		a3 = this.m[this.offset]*ta3+
+			 this.m[this.offset+1]*tb3+
+			 this.m[this.offset+2]*tc3;
 		
-		this.xAxis.set(a1, a2, a3);
-		this.yAxis.set(b1, b2, b3);
-		this.zAxis.set(c1, c2, c3);
+		b1 = this.m[this.offset+4]*ta1+
+			 this.m[this.offset+5]*tb1+
+			 this.m[this.offset+6]*tc1;
+		
+		b2 = this.m[this.offset+4]*ta2+
+			 this.m[this.offset+5]*tb2+
+			 this.m[this.offset+6]*tc2;
+		
+		b3 = this.m[this.offset+4]*ta3+
+			 this.m[this.offset+5]*tb3+
+			 this.m[this.offset+6]*tc3;
+		
+		c1 = this.m[this.offset+8]*ta1+
+			 this.m[this.offset+9]*tb1+
+			 this.m[this.offset+10]*tc1;
+		
+		c2 = this.m[this.offset+8]*ta2+
+			 this.m[this.offset+9]*tb2+
+			 this.m[this.offset+10]*tc2;
+		
+		c3 = this.m[this.offset+8]*ta3+
+			 this.m[this.offset+9]*tb3+
+			 this.m[this.offset+10]*tc3;
+		
+		this.m[this.offset] = a1;
+		this.m[this.offset+1] = a2;
+		this.m[this.offset+2] = a3;
+		
+		this.m[this.offset+4] = b1;
+		this.m[this.offset+5] = b2;
+		this.m[this.offset+6] = b3;
+		
+		this.m[this.offset+8] = c1;
+		this.m[this.offset+9] = c2;
+		this.m[this.offset+10] = c3;
 		
 		return this;
 	}
@@ -381,23 +404,24 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Vector3d transform(Vector3d vin, Vector3d vout){
-		//TODO: Optimize by using direct matrix access.
-		float x = vin.getX()*this.xAxis.getX() + 
-				  vin.getY()*this.yAxis.getX() + 
-				  vin.getZ()*this.zAxis.getX() + 
-				  vin.getPositional()*this.translation.getX();
-
-		float y = vin.getX()*this.xAxis.getY() + 
-		 		  vin.getY()*this.yAxis.getY() + 
-		 		  vin.getZ()*this.zAxis.getY() + 
-		 		  vin.getPositional()*this.translation.getY();
-
-		float z = vin.getX()*this.xAxis.getZ() + 
-		 		  vin.getY()*this.yAxis.getZ() + 
-		 		  vin.getZ()*this.zAxis.getZ() + 
-		 		  vin.getPositional()*this.translation.getZ();
+		float x = vin.v[vin.offset]*this.m[this.offset] + 
+				  vin.v[vin.offset+1]*this.m[this.offset+4] + 
+				  vin.v[vin.offset+2]*this.m[this.offset+8] + 
+				  vin.v[vin.offset+3]*this.m[this.offset+12];
 		
-		vout.set(x, y, z);
+		float y = vin.v[vin.offset]*this.m[this.offset+1] + 
+				  vin.v[vin.offset+1]*this.m[this.offset+5] + 
+				  vin.v[vin.offset+2]*this.m[this.offset+8] + 
+				  vin.v[vin.offset+3]*this.m[this.offset+13];
+		
+		float z = vin.v[vin.offset]*this.m[this.offset+2] + 
+				  vin.v[vin.offset+1]*this.m[this.offset+6] + 
+				  vin.v[vin.offset+2]*this.m[this.offset+10] + 
+				  vin.v[vin.offset+3]*this.m[this.offset+14];
+		
+		vout.v[vout.offset] = x;
+		vout.v[vout.offset+1] = y;
+		vout.v[vout.offset+2] = z;
 		
 		return vout;
 	}
@@ -418,7 +442,6 @@ public class Matrix3d {
 	 * @return
 	 */
 	public Matrix3d multiply(Matrix3d m1, Matrix3d m2){
-		//TODO: Optimize by using direct matrix access.
 		float a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3;
 		
 		a1 = m2.m[m2.offset] * m1.m[m1.offset] +
@@ -489,17 +512,20 @@ public class Matrix3d {
 	}
 	
 	public Matrix3d identity(){
-		this.xAxis.set(1, 0, 0);
-		this.yAxis.set(0, 1, 0);
-		this.zAxis.set(0, 0, 1);
-		this.translation.set(0, 0, 0);
+		Matrix3d.setIdentity(this.m, this.offset);
 		return this;
 	}
 	
 	public Matrix3d identity3x3(){
-		this.xAxis.set(1, 0, 0);
-		this.yAxis.set(0, 1, 0);
-		this.zAxis.set(0, 0, 1);
+		this.m[this.offset] = 1;
+		this.m[this.offset+1] = 0;
+		this.m[this.offset+2] = 0;
+		this.m[this.offset+4] = 0;
+		this.m[this.offset+5] = 1;
+		this.m[this.offset+6] = 0;
+		this.m[this.offset+8] = 0;
+		this.m[this.offset+9] = 0;
+		this.m[this.offset+10] = 1;
 		return this;
 	}
 	

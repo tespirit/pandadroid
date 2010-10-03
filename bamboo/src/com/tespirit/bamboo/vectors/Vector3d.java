@@ -3,8 +3,8 @@ package com.tespirit.bamboo.vectors;
 import java.lang.Math;
 
 public class Vector3d {
-	private float[] v;
-	private int offset;
+	float[] v;
+	int offset;
 		
 	public final static int SIZE = 4; //generic size info, incase this changes for some reason
 	
