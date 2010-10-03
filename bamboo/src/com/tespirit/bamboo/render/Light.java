@@ -119,7 +119,7 @@ public class Light extends Node implements RenderableNode{
 	
 	@Override
 	public void init(){
-		Light.renderer.setup(this);
+		Light.renderer.init(this);
 	}
 	
 	private static Renderer renderer;
@@ -129,6 +129,6 @@ public class Light extends Node implements RenderableNode{
 			Light.renderer = this;
 		}
 		public abstract void render(Light light);
-		public abstract void setup(Light light);
+		public abstract void init(Light light);
 	}
 }

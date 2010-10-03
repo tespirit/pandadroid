@@ -69,7 +69,9 @@ public class VertexList extends Primitive implements Externalizable{
 	
 	@Override
 	public void render() {
+		this.mVertexBuffer.lock();
 		RENDERER.render(this);
+		this.mVertexBuffer.unlock();
 	}
 	
 	private static Renderer RENDERER;

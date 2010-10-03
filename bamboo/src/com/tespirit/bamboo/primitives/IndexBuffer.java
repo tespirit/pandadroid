@@ -143,6 +143,7 @@ public class IndexBuffer implements Externalizable{
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeInt(this.mType);
 		out.writeInt(this.mCount);
+		this.lock();
 		switch(this.mType){
 		case BUFFER32:
 			int[] output32 = new int[this.mCount];
@@ -160,6 +161,6 @@ public class IndexBuffer implements Externalizable{
 			out.writeObject(output8);
 			break;
 		}
-		this.mBuffer.position(0);
+		this.unlock();
 	}
 }

@@ -35,14 +35,18 @@ public class VertexIndices extends VertexList implements Externalizable{
 	
 	@Override
 	public void render() {
-		VertexIndices.renderer.render(this);
+		this.mIndexBuffer.lock();
+		this.mVertexBuffer.lock();
+		RENDERER.render(this);
+		this.mVertexBuffer.unlock();
+		this.mIndexBuffer.unlock();
 	}
 	
-	private static Renderer renderer;
+	private static Renderer RENDERER;
 	
 	public static abstract class Renderer implements ComponentRenderer{
 		public void activate(){
-			VertexIndices.renderer = this;
+			VertexIndices.RENDERER = this;
 		}
 		
 		public abstract void render(VertexIndices vi);

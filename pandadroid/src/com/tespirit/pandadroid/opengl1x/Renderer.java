@@ -28,6 +28,7 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	
 	private int[] mIndexTypes;
 	private int[] mPrimitiveTypes;
+	private int[] mVertexTypes;
 	
 	public Renderer() {
 		super();
@@ -44,6 +45,12 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		this.mPrimitiveTypes[Primitive.LINES] = GL10.GL_LINES;
 		this.mPrimitiveTypes[Primitive.LINE_STRIP] = GL10.GL_LINE_STRIP;
 		this.mPrimitiveTypes[Primitive.POINTS] = GL10.GL_POINTS;
+		
+		this.mVertexTypes = new int[VertexBuffer.TYPE_COUNT];
+		this.mVertexTypes[VertexBuffer.POSITION] = GL10.GL_VERTEX_ARRAY;
+		this.mVertexTypes[VertexBuffer.NORMAL] = GL10.GL_NORMAL_ARRAY;
+		this.mVertexTypes[VertexBuffer.TEXCOORD] = GL10.GL_TEXTURE_COORD_ARRAY;
+		this.mVertexTypes[VertexBuffer.COLOR] = GL10.GL_COLOR_ARRAY;
 		
 		this.createRenderers();
 	}
@@ -147,7 +154,8 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 		}
 		
 		@Override
-		public void setup(Light light) {
+		public void init(Light light) {
+			enableLights();
 			if(mCurrentLightId < GL10.GL_MAX_LIGHTS) {
 				light.setLightId(GL10.GL_LIGHT0+mCurrentLightId);
 				mGl.glEnable(light.getLightId());
@@ -290,32 +298,32 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 	protected void renderVertexBuffer(VertexBuffer vertexBuffer){
 		
 		this.mGl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		this.mGl.glVertexPointer(vertexBuffer.getStride(VertexBuffer.POSITION), 
+		this.mGl.glVertexPointer(vertexBuffer.getStrideByType(VertexBuffer.POSITION), 
 						   GL10.GL_FLOAT, 
 						   0, 
-						   vertexBuffer.getBuffer(VertexBuffer.POSITION));
+						   vertexBuffer.getBufferByType(VertexBuffer.POSITION));
 		
 		if(vertexBuffer.hasType(VertexBuffer.NORMAL)){
 			this.mGl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 			this.mGl.glNormalPointer(GL10.GL_FLOAT, 
 							   0, 
-							   vertexBuffer.getBuffer(VertexBuffer.NORMAL));
+							   vertexBuffer.getBufferByType(VertexBuffer.NORMAL));
 		}
 		
 		if(vertexBuffer.hasType(VertexBuffer.TEXCOORD)){
 			this.mGl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-			this.mGl.glTexCoordPointer(vertexBuffer.getStride(VertexBuffer.TEXCOORD), 
+			this.mGl.glTexCoordPointer(vertexBuffer.getStrideByType(VertexBuffer.TEXCOORD), 
 								 GL10.GL_FLOAT, 
 								 0, 
-								 vertexBuffer.getBuffer(VertexBuffer.TEXCOORD));
+								 vertexBuffer.getBufferByType(VertexBuffer.TEXCOORD));
 		}
 		
 		if(vertexBuffer.hasType(VertexBuffer.COLOR)){
 			this.mGl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-			this.mGl.glColorPointer(vertexBuffer.getStride(VertexBuffer.COLOR), 
+			this.mGl.glColorPointer(vertexBuffer.getStrideByType(VertexBuffer.COLOR), 
 						 	  	   GL10.GL_FLOAT, 
 						 	 	   0, 
-						 	 	   vertexBuffer.getBuffer(VertexBuffer.COLOR));
+						 	 	   vertexBuffer.getBufferByType(VertexBuffer.COLOR));
 		}
 	}
 	
@@ -326,7 +334,8 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 			mGl.glFrontFace(GL10.GL_CCW);
 			mGl.glEnable(GL10.GL_CULL_FACE);
 			
-			renderVertexBuffer(vi.getVertexBuffer());
+			VertexBuffer vb = vi.getVertexBuffer();
+			renderVertexBuffer(vb);
 			
 			IndexBuffer indexBuffer = vi.getIndexBuffer();
 			
@@ -335,10 +344,9 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 							  mIndexTypes[indexBuffer.getType()], 
 							  indexBuffer.getBuffer());
 			
-			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			for(int i = 0; i < vb.getBufferCount(); i++){
+				mGl.glDisableClientState(mVertexTypes[vb.getBufferType(i)]);
+			}
 			mGl.glDisable(GL10.GL_CULL_FACE);
 		}
 	}
@@ -349,14 +357,14 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements and
 			mGl.glFrontFace(GL10.GL_CCW);
 			mGl.glEnable(GL10.GL_CULL_FACE);
 			
-			renderVertexBuffer(vl.getVertexBuffer());
+			VertexBuffer vb = vl.getVertexBuffer();
+			renderVertexBuffer(vb);
+			
 			mGl.glDrawArrays(mPrimitiveTypes[vl.getType()], 0, vl.getVertexBuffer().getCount());
 			
-			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-			mGl.glDisable(GL10.GL_CULL_FACE);
+			for(int i = 0; i < vb.getBufferCount(); i++){
+				mGl.glDisableClientState(mVertexTypes[vb.getBufferType(i)]);
+			}
 		}
 	}
 }

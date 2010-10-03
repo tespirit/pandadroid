@@ -274,7 +274,8 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 		}
 		
 		@Override
-		public void setup(Light light) {
+		public void init(Light light) {
+			enableLights();
 			if(mCurrentLightId < GL2.GL_MAX_LIGHTS) {
 				light.setLightId(GL2.GL_LIGHT0+mCurrentLightId);
 				mGl.glEnable(light.getLightId());
@@ -368,32 +369,32 @@ public class Renderer extends com.tespirit.bamboo.render.Renderer implements GLE
 	protected void renderVertexBuffer(VertexBuffer vertexBuffer){
 		
 		this.mGl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-		this.mGl.glVertexPointer(vertexBuffer.getStride(VertexBuffer.POSITION), 
+		this.mGl.glVertexPointer(vertexBuffer.getStrideByType(VertexBuffer.POSITION), 
 						   GL2.GL_FLOAT, 
 						   0, 
-						   vertexBuffer.getBuffer(VertexBuffer.POSITION));
+						   vertexBuffer.getBufferByType(VertexBuffer.POSITION));
 		
 		if(vertexBuffer.hasType(VertexBuffer.NORMAL)){
 			this.mGl.glEnableClientState(GL2.GL_NORMAL_ARRAY);
 			this.mGl.glNormalPointer(GL2.GL_FLOAT, 
 							   0, 
-							   vertexBuffer.getBuffer(VertexBuffer.NORMAL));
+							   vertexBuffer.getBufferByType(VertexBuffer.NORMAL));
 		}
 		
 		if(vertexBuffer.hasType(VertexBuffer.TEXCOORD)){
 			this.mGl.glEnableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
-			this.mGl.glTexCoordPointer(vertexBuffer.getStride(VertexBuffer.TEXCOORD), 
+			this.mGl.glTexCoordPointer(vertexBuffer.getStrideByType(VertexBuffer.TEXCOORD), 
 								 GL2.GL_FLOAT, 
 								 0, 
-								 vertexBuffer.getBuffer(VertexBuffer.TEXCOORD));
+								 vertexBuffer.getBufferByType(VertexBuffer.TEXCOORD));
 		}
 		
 		if(vertexBuffer.hasType(VertexBuffer.COLOR)){
 			this.mGl.glEnableClientState(GL2.GL_COLOR_ARRAY);
-			this.mGl.glColorPointer(vertexBuffer.getStride(VertexBuffer.COLOR), 
+			this.mGl.glColorPointer(vertexBuffer.getStrideByType(VertexBuffer.COLOR), 
 						 	  	   GL2.GL_FLOAT, 
 						 	 	   0, 
-						 	 	   vertexBuffer.getBuffer(VertexBuffer.COLOR));
+						 	 	   vertexBuffer.getBufferByType(VertexBuffer.COLOR));
 		}
 	}
 	

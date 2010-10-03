@@ -222,7 +222,7 @@ public class RendererDebug extends Renderer{
 			//draw position!
 			mGl.glColor4f(0, 1, 1, 1);
 			mGl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-			mGl.glVertexPointer(3, GL10.GL_FLOAT, 0, vb.getBuffer(VertexBuffer.POSITION));
+			mGl.glVertexPointer(3, GL10.GL_FLOAT, 0, vb.getBufferByType(VertexBuffer.POSITION));
 			mGl.glDrawArrays(GL10.GL_POINTS, 0, vb.getCount());
 			mGl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			
