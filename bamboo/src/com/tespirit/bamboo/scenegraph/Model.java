@@ -9,7 +9,7 @@ import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.vectors.*;
 
-public class Model extends Node implements RenderableNode, Externalizable{
+public class Model extends RenderableNode implements Externalizable{
 	private Primitive mPrimitive;
 	private Surface mSurface;
 	

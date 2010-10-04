@@ -7,7 +7,7 @@ import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Ray;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class Camera extends Node implements RenderableNode{
+public class Camera extends RenderableNode{
 	private Matrix3d camera;
 	private Matrix3d pivot;
 	private Matrix3d worldTransform;

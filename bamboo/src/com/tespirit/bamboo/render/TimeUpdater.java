@@ -1,6 +1,5 @@
 package com.tespirit.bamboo.render;
 
-public interface TimeUpdate {
-	public void update();
+public interface TimeUpdater extends Updater{
 	public void setClock(Clock clock);
 }

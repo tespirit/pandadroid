@@ -30,7 +30,6 @@ public abstract class Joint extends Node{
 	protected Matrix3d mWorldTransform;
 	protected ArrayList<Joint> mChildren;
 	private AxisAlignedBox mBone;
-	private DofStream mDofs;
 	
 	public Joint(){
 		this(null);
@@ -89,14 +88,6 @@ public abstract class Joint extends Node{
 		}
 	}
 	
-	public void setDofs(DofStream dofs){
-		this.mDofs = dofs;
-		for(Joint j : this.mChildren){
-			j.setDofs(dofs);
-		}
-		
-	}
-	
 	@Override
 	public AxisAlignedBox getBoundingBox() {
 		return this.mBone;
@@ -104,9 +95,6 @@ public abstract class Joint extends Node{
 	
 	public void appendChild(Joint joint){
 		this.mChildren.add(joint);
-		if(this.mDofs!= null){
-			joint.setDofs(this.mDofs);
-		}
 	}
 
 	@Override
@@ -131,13 +119,18 @@ public abstract class Joint extends Node{
 
 	@Override
 	public void update(Matrix3d transform){
-		if(this.mDofs != null){
-			this.updateLocalMatrix(this.mDofs);
-		}
 		this.mWorldTransform.multiply(transform,this.mLocalTransform);
 		for(Joint joint : this.mChildren){
 			joint.update(this.mWorldTransform);
 		}
+	}
+	
+	public void update(DofStream dofs){
+		this.updateLocalMatrix(dofs);
+		for(Joint j : this.mChildren){
+			j.update(dofs);
+		}
+		
 	}
 	
 	protected void write(ObjectOutput out) throws IOException{

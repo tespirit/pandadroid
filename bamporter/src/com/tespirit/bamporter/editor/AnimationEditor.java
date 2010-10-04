@@ -15,19 +15,21 @@ import com.tespirit.bamboo.render.RenderManager;
 
 public class AnimationEditor extends TreeNodeEditor{
 	
+	private RenderManager mRenderManager;
 	private Animation mAnimation;
 	private Player mPlayer;
 	private JTextField mSkeleton;
 	private Box mPanel;
 	
-	public AnimationEditor(Animation animation, RenderManager renderer){
+	public AnimationEditor(Animation animation, RenderManager renderManager){
+		this.mRenderManager = renderManager;
 		this.mAnimation = animation;
 		this.mPlayer = new Player();
 		this.mPlayer.setAnimation(this.mAnimation);
-		renderer.addTimeUpdate(this.mPlayer);
+		this.mRenderManager.addUpdater(this.mPlayer);
 		
 		for(int i = 0; i < animation.getChannelCount(); i++){
-			this.add(new ChannelEditor(animation.getChannel(i)));
+			this.add(new ChannelEditor(animation.getChannel(i), renderManager));
 		}
 		this.mPanel = Box.createVerticalBox();
 		
@@ -99,15 +101,25 @@ public class AnimationEditor extends TreeNodeEditor{
 	public Component getEditorPanel() {
 		return this.mPanel;
 	}
-
-	@Override
-	public Component getPropertyPanel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public String toString(){
 		return Util.getClassName(this.mAnimation);
 	}
+
+	@Override
+	public void recycle() {
+		if(this.mRenderManager != null){
+			this.mRenderManager.removeUpdater(this.mPlayer);
+		}
+		this.mRenderManager = null;
+		this.mAnimation = null;
+		this.mPlayer = null;
+		this.mSkeleton = null;
+		this.mPanel = null;
+		while(this.children().hasMoreElements()){
+			this.children().nextElement().recycle();
+		}
+	}
+
 }

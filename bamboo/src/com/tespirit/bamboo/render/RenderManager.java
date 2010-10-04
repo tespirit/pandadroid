@@ -3,6 +3,7 @@ package com.tespirit.bamboo.render;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.tespirit.bamboo.scenegraph.*;
@@ -24,7 +25,7 @@ public abstract class RenderManager {
 	private List<Light> mLights; 
 	private List<RenderableNode> mRenderableNodes;
 	
-	private List<TimeUpdate> timeUpdates;
+	private List<Updater> mUpdates;
 	private List<ComponentRenderer> mRenderers;
 	
 	private Clock mClock;
@@ -33,7 +34,7 @@ public abstract class RenderManager {
 		this.mClock = clock;
 		this.mScene = new ArrayList<Node>();
 		this.mLights = new ArrayList<Light>();
-		this.timeUpdates = new ArrayList<TimeUpdate>();
+		this.mUpdates = new LinkedList<Updater>();
 		
 		this.backgroundColor = new Color4();
 		
@@ -45,14 +46,10 @@ public abstract class RenderManager {
 		this.backgroundColor.copy(color);
 	}
 	
-	public void clearScene(boolean keepLights){
+	public void clearScene(){
 		this.mScene.clear();
 		this.mRenderableNodes.clear();
-		if(keepLights){
-			this.mScene.addAll(this.mLights);
-		} else {
-			this.mLights.clear();
-		}
+		this.mLights.clear();
 	}
 	
 	public void addNode(Node node){
@@ -80,6 +77,12 @@ public abstract class RenderManager {
 		this.mLights.remove(node);
 	}
 	
+	public void removeNode(List<Node> nodes){
+		this.mScene.removeAll(nodes);
+		this.mRenderableNodes.removeAll(nodes);
+		this.mLights.removeAll(nodes);
+	}
+	
 	public int getRootCount(){
 		return this.mScene.size();
 	}
@@ -92,27 +95,27 @@ public abstract class RenderManager {
 		return this.mScene.iterator();
 	}
 	
-	public void addTimeUpdate(TimeUpdate tu){
-		if(tu != null){
-			tu.setClock(this.mClock);
-			this.timeUpdates.add(tu);
+	public void addUpdater(Updater updater){
+		if(updater instanceof TimeUpdater){
+			((TimeUpdater)updater).setClock(this.mClock);
 		}
+		this.mUpdates.add(updater);
 	}
 	
-	public void clearTimeUpdates(){
-		this.timeUpdates.clear();
+	public void removeUpdater(Updater updater){
+		this.mUpdates.remove(updater);
 	}
 	
-	public int getTimeUpdateCount(){
-		return this.timeUpdates.size();
+	public void removeUpdater(List<Updater> updaters){
+		this.mUpdates.removeAll(updaters);
 	}
 	
-	public Iterator<TimeUpdate> getTimeUpdateIterator(){
-		return this.timeUpdates.iterator();
+	public void clearUpdaters(){
+		this.mUpdates.clear();
 	}
 	
-	public TimeUpdate getTimeUpdate(int i){
-		return this.timeUpdates.get(i);
+	public Iterator<Updater> getUpdateIterator(){
+		return this.mUpdates.iterator();
 	}
 	
 	public void setCamera(Camera camera){
@@ -125,8 +128,8 @@ public abstract class RenderManager {
 	
 	public void updateScene(){
 		this.mClock.update();
-		for(TimeUpdate timeUpdate : this.timeUpdates){
-			timeUpdate.update();
+		for(Updater updater : this.mUpdates){
+			updater.update();
 		}
 		this.mCamera.update(Matrix3d.IDENTITY);
 		for(Node node : this.mScene){
@@ -159,9 +162,6 @@ public abstract class RenderManager {
 	 */
 	public void setupRender(){
 		this.mClock.start();
-		for(TimeUpdate t : this.timeUpdates){
-			t.setClock(this.mClock);
-		}
 		this.reactivateComponentRenderers();
 		Node.initNewNodes();
 	}

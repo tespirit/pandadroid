@@ -2,15 +2,18 @@ package com.tespirit.bamporter.editor;
 
 import java.awt.Component;
 
+import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
 
 public class NodeEditor extends TreeNodeEditor{
 	Node mNode;
+	RenderManager mRenderManager;
 	
-	public NodeEditor(Node node){
+	public NodeEditor(Node node, RenderManager renderManager){
+		this.mRenderManager = renderManager;
 		this.mNode = node;
 		for(int i = 0; i < node.getChildCount(); i++){
-			this.add(new NodeEditor(node.getChild(i)));
+			this.add(new NodeEditor(node.getChild(i), renderManager));
 		}
 	}
 	
@@ -49,8 +52,14 @@ public class NodeEditor extends TreeNodeEditor{
 	}
 
 	@Override
-	public Component getPropertyPanel() {
-		// TODO Auto-generated method stub
-		return null;
+	public void recycle() {
+		if(this.mRenderManager != null){
+			this.mRenderManager.removeNode(this.mNode);
+		}
+		this.mRenderManager = null;
+		this.mNode = null;
+		while(this.children().hasMoreElements()){
+			this.children().nextElement().recycle();
+		}
 	}
 }

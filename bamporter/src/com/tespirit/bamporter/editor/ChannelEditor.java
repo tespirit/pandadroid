@@ -3,11 +3,12 @@ package com.tespirit.bamporter.editor;
 import java.awt.Component;
 
 import com.tespirit.bamboo.animation.Channel;
+import com.tespirit.bamboo.render.RenderManager;
 
 public class ChannelEditor extends TreeNodeEditor{
 	private Channel mChannel;
 	
-	public ChannelEditor(Channel channel){
+	public ChannelEditor(Channel channel, RenderManager renderManager){
 		super(false);
 		this.mChannel = channel;
 	}
@@ -21,16 +22,16 @@ public class ChannelEditor extends TreeNodeEditor{
 		EditorPanels.getTextInfo().setText(output);
 		return EditorPanels.getTextInfo();
 	}
-
-	@Override
-	public Component getPropertyPanel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public String toString(){
 		return Util.getClassName(this.mChannel);
+	}
+
+
+	@Override
+	public void recycle() {
+		this.mChannel = null;
 	}
 
 }

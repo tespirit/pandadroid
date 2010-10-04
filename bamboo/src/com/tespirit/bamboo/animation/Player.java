@@ -6,7 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.tespirit.bamboo.render.Clock;
-import com.tespirit.bamboo.render.TimeUpdate;
+import com.tespirit.bamboo.render.TimeUpdater;
 import com.tespirit.bamboo.scenegraph.Node;
 
 /**
@@ -14,7 +14,7 @@ import com.tespirit.bamboo.scenegraph.Node;
  * @author Todd Espiritu Santo
  *
  */
-public class Player implements TimeUpdate, Externalizable{
+public class Player implements TimeUpdater, Externalizable{
 	private Animation mAnimation;
 	private Joint mSkeleton;
 	private long mCurrentTime;
@@ -54,10 +54,6 @@ public class Player implements TimeUpdate, Externalizable{
 		if(this.mDofs == null || this.mDofs.getCount() < animation.getChannelCount()){
 			this.mDofs = new DofStream(animation.getChannelCount());
 		}
-		if(this.mSkeleton != null){
-			this.mSkeleton.setDofs(this.mDofs);
-			
-		}
 	}
 	
 	public void setSkeleton(String skeletonName){
@@ -69,14 +65,7 @@ public class Player implements TimeUpdate, Externalizable{
 	
 	public void setSkeleton(Joint skeleton){
 		this.mSkeletonName = skeleton.getName();
-		//remove dofs from the previous skeleton
-		if(this.mSkeleton != null){
-			this.mSkeleton.setDofs(null);
-		}
 		this.mSkeleton = skeleton;
-		if(this.mDofs != null){
-			this.mSkeleton.setDofs(this.mDofs);
-		}
 	}
 	
 	public void play(){
@@ -103,21 +92,22 @@ public class Player implements TimeUpdate, Externalizable{
 
 	@Override
 	public void update() {
-		this.mDofs.reset();
 		switch(this.mState){
 		case forward:
 			this.mCurrentTime += this.mClock.getDeltaTime();
-			this.mAnimation.update(this.mCurrentClipId,
-					   this.mCurrentTime, 
-					   this.mDofs);
 			break;
 		case backward:
 			this.mCurrentTime -= this.mClock.getDeltaTime();
-			this.mAnimation.update(this.mCurrentClipId,
-					   this.mCurrentTime, 
-					   this.mDofs);
 			break;
+		default:
+			return;
 		}
+		
+		this.mAnimation.update(this.mCurrentClipId,
+				   this.mCurrentTime, 
+				   this.mDofs);
+		this.mDofs.reset();
+		this.mSkeleton.update(this.mDofs);
 		this.mDofs.reset();
 	}
 	

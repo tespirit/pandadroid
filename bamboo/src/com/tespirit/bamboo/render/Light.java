@@ -8,7 +8,7 @@ import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 
-public class Light extends Node implements RenderableNode{
+public class Light extends RenderableNode{
 	private Color4 ambient;
 	private Color4 diffuse;
 	private Color4 specular;

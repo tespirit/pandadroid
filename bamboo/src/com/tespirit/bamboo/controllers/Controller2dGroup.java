@@ -10,18 +10,25 @@ import java.util.ArrayList;
 public class Controller2dGroup implements Controller2d {
 
 	private ArrayList<Controller2d> controllers;
-	
+
 	@Override
-	public void update(float x, float y) {
+	public void update() {
 		for(Controller2d controller : this.controllers){
-			controller.update(x, y);
+			controller.update();
 		}
 	}
 
 	@Override
-	public void update(float x, float y, long time) {
+	public void init(float x, float y, long time) {
 		for(Controller2d controller : this.controllers){
-			controller.update(x, y, time);
+			controller.init(x, y, time);
+		}
+	}
+
+	@Override
+	public void set(float x, float y, long time) {
+		for(Controller2d controller : this.controllers){
+			controller.set(x, y, time);
 		}
 	}
 

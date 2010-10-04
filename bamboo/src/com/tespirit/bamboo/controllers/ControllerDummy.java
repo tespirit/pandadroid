@@ -24,16 +24,6 @@ public class ControllerDummy implements Controller1d, Controller2d, Controller3d
 	}
 
 	@Override
-	public void update(float x, float y) {
-		//VOID
-	}
-
-	@Override
-	public void update(float x, float y, long time) {
-		//VOID
-	}
-
-	@Override
 	public void update(float x, float y, float z) {
 		//VOID
 	}
@@ -41,5 +31,23 @@ public class ControllerDummy implements Controller1d, Controller2d, Controller3d
 	@Override
 	public void update(float x, float y, float z, long time) {
 		//VOID
+	}
+
+	@Override
+	public void init(float x, float y, long time) {
+		//VOID
+		
+	}
+
+	@Override
+	public void set(float x, float y, long time) {
+		//VOID
+		
+	}
+
+	@Override
+	public void update() {
+		//VOID
+		
 	}
 }

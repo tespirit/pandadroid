@@ -1,15 +1,17 @@
 package com.tespirit.bamboo.scenegraph;
 
-import com.tespirit.bamboo.vectors.AxisAlignedBox;
-import com.tespirit.bamboo.vectors.Matrix3d;
-
-public interface RenderableNode {
+public abstract class RenderableNode extends Node{
+	
+	public RenderableNode(){
+		this(null);
+	}
+	
+	public RenderableNode(String name){
+		super(name);
+	}
+	
 	/**
 	 * This is called every frame in rendering the scene.
 	 */
-	public void render();
-	
-	public Matrix3d getWorldTransform();
-	
-	public AxisAlignedBox getBoundingBox();
+	public abstract void render();
 }

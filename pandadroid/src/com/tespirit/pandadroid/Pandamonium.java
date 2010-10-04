@@ -25,7 +25,7 @@ import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.pandadroid.R;
 import com.tespirit.pandadroid.app.Assets;
 import com.tespirit.pandadroid.app.PandadroidView;
-import com.tespirit.pandadroid.app.TranslateAbsolute;
+import com.tespirit.pandadroid.app.MoveTouchController2d;
 import com.tespirit.pandadroid.debug.Debug;
 
 import android.view.*;
@@ -51,7 +51,7 @@ public class Pandamonium extends Activity {
 
     	view.createTouchRotateCamera(-2);
     	
-    	view.setTouchDownController(new TranslateAbsolute(view));
+    	view.setTouchClickController(new MoveTouchController2d(view));
     	
     	view.createDefaultLight();
     	

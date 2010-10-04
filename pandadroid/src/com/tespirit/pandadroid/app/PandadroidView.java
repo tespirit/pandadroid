@@ -15,6 +15,7 @@ import com.tespirit.bamboo.controllers.TranslateController2d;
 import com.tespirit.bamboo.creation.Lights;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.Updater;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.pandadroid.R;
@@ -31,9 +32,8 @@ import android.view.MotionEvent;
 
 public class PandadroidView extends GLSurfaceView {
 	private com.tespirit.bamboo.render.RenderManager renderer;
-	private Controller2d touchUpController;
+	private Controller2d touchClickController;
 	private Controller2d touchMoveController;
-	private Controller2d touchDownController;
 	private boolean debug;
 	private Context context;
 
@@ -75,9 +75,8 @@ public class PandadroidView extends GLSurfaceView {
 		//TODO:smartly create a renderer based on the availible graphics api.
 		this.initOpenGl1x();
 		
-		this.touchUpController = ControllerDummy.getInstance();
+		this.touchClickController = ControllerDummy.getInstance();
 		this.touchMoveController = ControllerDummy.getInstance();
-		this.touchDownController = ControllerDummy.getInstance();
 	}
 	
 	private void initOpenGl1x(){
@@ -100,17 +99,8 @@ public class PandadroidView extends GLSurfaceView {
 	 * when the first touchDown event is called.
 	 * @param m
 	 */
-	public void setTouchUpController(Controller2d m){
-		this.touchUpController = m;
-	}
-	
-	/**
-	 * The controller is passed in the absolute position of the press (typically
-	 * you'll have to make a custom controller for this to behave reasonably)
-	 * @param m
-	 */
-	public void setTouchDownController(Controller2d m){
-		this.touchDownController = m;
+	public void setTouchClickController(Controller2d m){
+		this.touchClickController = m;
 	}
 	
 	/**
@@ -122,24 +112,13 @@ public class PandadroidView extends GLSurfaceView {
 		this.touchMoveController = m;
 	}
 	
-	public Controller2d getTouchUpController(){
-		return this.touchUpController;
-	}
-	
-	public Controller2d getTouchDownController(){
-		return this.touchDownController;
+	public Controller2d getTouchClickController(){
+		return this.touchClickController;
 	}
 	
 	public Controller2d getTouchMoveController(){
 		return this.touchMoveController;
 	}
-	
-	float startX;
-	float startY;
-	long startTime;
-	float prevX;
-	float prevY;
-	long prevTime;
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -150,24 +129,18 @@ public class PandadroidView extends GLSurfaceView {
 		
 		switch(event.getAction()){
 		case MotionEvent.ACTION_UP:
-			this.touchUpController.update(x-this.startX, y-this.startY, time-this.startTime);
+			this.touchClickController.set(x, y, time);
 			break;
 		case MotionEvent.ACTION_DOWN:
-			this.startX = x;
-			this.startY = y;
-			this.startTime = time;
-			this.touchDownController.update(x, y);
+			this.touchMoveController.init(x, y, time);
+			this.touchClickController.init(x, y, time);
 			break;
 		case MotionEvent.ACTION_MOVE:
-			this.touchMoveController.update(x-this.prevX, y-this.prevY, time-this.prevTime);
+			this.touchMoveController.set(x, y, time);
 			break;
 		default:
 			break;
 		}
-		
-		this.prevX = x;
-		this.prevY = y;
-		this.prevTime = time;
 		
 		return true;
 	}
@@ -258,10 +231,18 @@ public class PandadroidView extends GLSurfaceView {
 		this.renderer.setCamera(camera);
 	}
 	
+	public void addUpdater(Updater updater){
+		this.renderer.addUpdater(updater);
+	}
+	
+	public void removeUpdater(Updater updater){
+		this.renderer.removeUpdater(updater);
+	}
+	
 	public Player addAnimation(Animation animation){
 		Player player = new Player();
 		player.setAnimation(animation);
-		this.renderer.addTimeUpdate(player);
+		this.renderer.addUpdater(player);
 		return player;
 	}
 	
