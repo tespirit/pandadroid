@@ -11,8 +11,6 @@ public class MotionSensor3d implements SensorEventListener{
 	private Controller3d onRotateController;
 	private Controller3d onAccelerateController;
 	
-	private long lastTime;
-	
 	float[] orientation;
 	float[] acceleration;
 	float[] geoMagnetic;
@@ -28,7 +26,6 @@ public class MotionSensor3d implements SensorEventListener{
 		this.rotationMatrix = new float[16];
 		this.acceleration = MotionSensor3d.nullArray;
 		this.geoMagnetic = MotionSensor3d.nullArray;
-		this.lastTime = -1;
 	}
 
 	@Override
@@ -40,21 +37,14 @@ public class MotionSensor3d implements SensorEventListener{
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		long time;
-		if(this.lastTime != -1) { 
-			time = event.timestamp - this.lastTime;
-		} else {
-			time = 0;
-		}
-		this.lastTime = event.timestamp;
 		
 		switch(event.sensor.getType()){
 		case Sensor.TYPE_ACCELEROMETER:
 			this.acceleration = event.values.clone();
-			this.onAccelerateController.update(this.acceleration[0],
+			this.onAccelerateController.set(this.acceleration[0],
                     this.acceleration[1],
                 	   this.acceleration[2],
-                	   time);
+                	   event.timestamp);
 			break;
 		case Sensor.TYPE_MAGNETIC_FIELD:
 			this.geoMagnetic = event.values.clone();
@@ -63,10 +53,10 @@ public class MotionSensor3d implements SensorEventListener{
 		
 		if(SensorManager.getRotationMatrix(this.rotationMatrix, null, this.acceleration, this.geoMagnetic)){
 			SensorManager.getOrientation(this.rotationMatrix, this.orientation);
-			this.onRotateController.update((float)Math.toDegrees(this.orientation[0]),
+			this.onRotateController.set((float)Math.toDegrees(this.orientation[0]),
 										   (float)Math.toDegrees(this.orientation[1]),
 										   (float)Math.toDegrees(this.orientation[2]),
-										   time);
+										   event.timestamp);
 		}
 		
 	}

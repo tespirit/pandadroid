@@ -2,7 +2,7 @@ package com.tespirit.bamboo.controllers;
 
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class TranslateController1d extends MatrixController1d{
+public class TranslateController1d extends AxisController1d{
 
 	Vector3d mTemp;
 	
@@ -12,15 +12,9 @@ public class TranslateController1d extends MatrixController1d{
 	}
 
 	@Override
-	public void update(float x) {
+	protected void update(float x, float deltaX, long time, long deltaTime) {
 		this.mTemp.copy(this.mAxis);
-		this.mTemp.scale(x*this.mScale);
-		this.mMatrix.translate(this.mTemp);
+		this.mTemp.scale(deltaX*this.mScale);
+		this.mControlled.translate(this.mTemp);
 	}
-
-	@Override
-	public void update(float x, long time) {
-		this.update(x);
-	}
-
 }

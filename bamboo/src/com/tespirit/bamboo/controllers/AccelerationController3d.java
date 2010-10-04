@@ -1,10 +1,6 @@
 package com.tespirit.bamboo.controllers;
 
-import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamboo.vectors.Matrix3d;
-
-public class AccelerationController3d implements Controller3d{
-	Matrix3d matrix;
+public class AccelerationController3d extends MatrixController3d{
 	
 	private float xScale;
 	private float yScale;
@@ -22,49 +18,20 @@ public class AccelerationController3d implements Controller3d{
 		this.timeScale = tScale;
 	}
 
-	public void setControlled(Matrix3d matrix) {
-		this.matrix = matrix;
-	}
-
-	public void setControlled(Node node) {
-		this.matrix = node.getTransform();
-	}
-
-	public void setControlled(String nodeName) {
-		Node n = Node.getNode(nodeName);
-		if(n != null){
-			this.matrix = n.getTransform();
-		}
-	}
-	
-	
-	/**
-	 * values are assumed to be in m/s^2
-	 */
 	@Override
-	public void update(float x, float y, float z) {
-		this.update(x, y, z, 0);
-	}
-
-	/**
-	 * values are assumed to be in m/s^2
-	 * time assumed to be in nano seconds
-	 */
-	@Override
-	public void update(float x, float y, float z, long time) {
-		//compute position:
+	protected void update(float[] values, long time, long deltaTime) {
+		// TODO Auto-generated method stub
 		time *= 0.5f*time;
-		x = x*time*xScale;
-		y = y*time*yScale;
-		z = z*time*zScale;
+		float x = values[BaseController3d.DELTA_X]*time*xScale;
+		float y = values[BaseController3d.DELTA_Y]*time*yScale;
+		float z = values[BaseController3d.DELTA_Z]*time*zScale;
 		
 		float tScale = this.timeScale*this.timeScale;
 		x /= tScale;
 		y /= tScale;
 		z /= tScale;
 		
-		
-		this.matrix.translate(x, y, z);
+		this.mControlled.translate(x, y, z);
 	}
 	
 }

@@ -1,6 +1,8 @@
 package com.tespirit.bamboo.controllers;
 
-public interface Controller3d {
-	public void update(float x, float y, float z);
-	public void update(float x, float y, float z, long time);
+import com.tespirit.bamboo.render.Updater;
+
+public interface Controller3d extends Updater{
+	public void set(float x, float y, float z, long time);
+	public void init(float x, float y, float z, long time);
 }
