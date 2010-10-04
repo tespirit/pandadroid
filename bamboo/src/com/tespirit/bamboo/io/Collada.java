@@ -17,7 +17,7 @@ import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Group;
 import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -1427,12 +1427,12 @@ public class Collada implements BambooAsset{
 	}
 
 	@Override
-	public List<Camera> getRootCameras() {
+	public List<Camera> getCameras() {
 		return this.mCameras;
 	}
 
 	@Override
-	public List<Node> getRootSceneNodes() {
+	public List<Node> getScenes() {
 		return this.mSceneRoots;
 	}
 }

@@ -1,7 +1,7 @@
 package com.tespirit.bamboo.creation;
 
-import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.scenegraph.Light;
 
 /**
  * Place any simple configured light setups here. Obviously bam files with lights 
@@ -14,6 +14,6 @@ public class Lights {
 	public static void addDefaultLight(RenderManager r){
 		Light light = new Light();
 		light.setPosition(50.0f, 50.0f, 50.0f);
-		r.addNode(light);
+		r.addScene(light);
 	}
 }

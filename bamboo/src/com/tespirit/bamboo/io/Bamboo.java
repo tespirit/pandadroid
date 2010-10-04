@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.tespirit.bamboo.animation.Animation;
-import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.render.Compare;
+import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
 
 
@@ -92,21 +92,21 @@ public class Bamboo implements BambooAsset{
 	 * @throws Exception
 	 */
 	public static void saveBamboo(BambooAsset asset, OutputStream stream) throws Exception{
-		Collections.sort(asset.getRootSceneNodes(), Compare.nodePrioritySort);
+		Collections.sort(asset.getScenes(), Compare.nodePrioritySort);
 		BambooHeader header = new BambooHeader(BambooHeader.BAMBOO);
-		header.mNodeCount = asset.getRootSceneNodes().size();
+		header.mNodeCount = asset.getScenes().size();
 		header.mAnimationCount = asset.getAnimations().size();
-		header.mCameraCount = asset.getRootCameras().size();
+		header.mCameraCount = asset.getCameras().size();
 		
 		ObjectOutputStream output = new ObjectOutputStream(stream);
 		header.write(output);
-		for(Node node : asset.getRootSceneNodes()){
+		for(Node node : asset.getScenes()){
 			output.writeObject(node);
 		}
 		for(Animation animation : asset.getAnimations()){
 			output.writeObject(animation);
 		}
-		for(Camera camera : asset.getRootCameras()){
+		for(Camera camera : asset.getCameras()){
 			output.writeObject(camera);
 		}
 	}
@@ -189,12 +189,12 @@ public class Bamboo implements BambooAsset{
 	}
 
 	@Override
-	public List<Camera> getRootCameras() {
+	public List<Camera> getCameras() {
 		return this.mCameras;
 	}
 
 	@Override
-	public List<Node> getRootSceneNodes() {
+	public List<Node> getScenes() {
 		return this.mSceneRoots;
 	}
 }

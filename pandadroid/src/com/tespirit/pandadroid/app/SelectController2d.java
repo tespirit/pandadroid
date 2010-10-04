@@ -11,8 +11,8 @@ public abstract class SelectController2d extends BaseController2d{
 	}
 
 	@Override
-	public void update() {
-		this.select(this.mView.getRenderer().selectModel(this.mX, this.mY));
+	protected void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
+		this.select(this.mView.getRenderer().selectModel(x, y));
 	}
 
 	public abstract void select(Model model);

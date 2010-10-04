@@ -1,6 +1,7 @@
 package com.tespirit.bamporter.editor;
 
 import java.awt.Component;
+import java.util.Enumeration;
 
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -53,13 +54,12 @@ public class NodeEditor extends TreeNodeEditor{
 
 	@Override
 	public void recycle() {
-		if(this.mRenderManager != null){
-			this.mRenderManager.removeNode(this.mNode);
-		}
-		this.mRenderManager = null;
-		this.mNode = null;
-		while(this.children().hasMoreElements()){
-			this.children().nextElement().recycle();
+		if(this.mNode != null){
+			this.mNode.recycle();
+			this.mNode = null;
+			for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
+				children.nextElement().recycle();
+			}
 		}
 	}
 }

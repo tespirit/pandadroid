@@ -3,8 +3,9 @@ package com.tespirit.bamboo.render;
 import java.util.Comparator;
 
 import com.tespirit.bamboo.animation.Joint;
+import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamboo.scenegraph.RenderableNode;
+import com.tespirit.bamboo.vectors.Vector3d;
 
 /**
  * A convenient location for any comparator classes.
@@ -12,15 +13,27 @@ import com.tespirit.bamboo.scenegraph.RenderableNode;
  *
  */
 public class Compare {
-	public static final Comparator<RenderableNode> renderableSort = new RenderableSort();
-	public static final Comparator<Node> nodePrioritySort = new NodePrioritySort();
+	public static final NodePrioritySort nodePrioritySort = new NodePrioritySort();
 	
-	private static class RenderableSort implements Comparator<RenderableNode>{
+	public static class RenderableSort implements Comparator<RenderableNode>{
+		private Vector3d mViewPos;
+		private Vector3d mDistance;
+		
+		public RenderableSort(){
+			this.mDistance = new Vector3d();
+		}
+		
+		public void setView(Camera view){
+			this.mViewPos = view.getWorldTransform().getTranslation();
+		}
 
 		@Override
 		public int compare(RenderableNode object1, RenderableNode object2) {
-			float z1 = object1.getWorldTransform().getTranslation().getZ();
-			float z2 = object2.getWorldTransform().getTranslation().getZ();
+			//sort by distance
+			float z1 = this.mDistance.sub(object1.getWorldTransform().getTranslation(), 
+										  this.mViewPos).magnitude2();
+			float z2 = this.mDistance.sub(object1.getWorldTransform().getTranslation(), 
+										  this.mViewPos).magnitude2();
 			if(z1 < z2) return 1;
 			else if(z1 > z2) return -1;
 			else return 0;
@@ -28,19 +41,21 @@ public class Compare {
 		
 	}
 	
-	private static class NodePrioritySort implements Comparator<Node>{
+	public static class NodePrioritySort implements Comparator<Node>{
+		private NodePrioritySort(){
+			
+		}
+		
 		@Override
 		public int compare(Node object1, Node object2) {
 			return this.getPriority(object1)-this.getPriority(object2);
 		}
 		
 		private int getPriority(Node node){
-			if(node instanceof Light){
+			if(node instanceof Joint){
 				return 1;
-			} else if(node instanceof Joint){
-				return 0;
 			} else {
-				return -1;
+				return 0;
 			}
 		}
 	}

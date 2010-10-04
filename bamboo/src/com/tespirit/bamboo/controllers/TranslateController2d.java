@@ -21,13 +21,13 @@ public class TranslateController2d extends AxisController2d{
 	}
 
 	@Override
-	public void update() {
+	protected void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
 		this.mTemp.copy(this.mXAxis);
-		this.mTemp.scale(this.mDeltaX*this.mScale);
+		this.mTemp.scale(deltaX*this.mScale);
 		this.mControlled.translate(this.mTemp);
 		
 		this.mTemp.copy(this.mYAxis);
-		this.mTemp.scale(this.mDeltaY*this.mScale);
+		this.mTemp.scale(deltaY*this.mScale);
 		this.mControlled.translate(this.mTemp);
 	}
 

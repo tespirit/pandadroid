@@ -5,7 +5,7 @@ package com.tespirit.bamboo.render;
  * @author Todd Espiritu Santo
  *
  */
-public interface DynamicLoader {
+public interface Resource {
 	/**
 	 * This sets up the resource
 	 */

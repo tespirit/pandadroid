@@ -1,23 +1,22 @@
 package com.tespirit.bamboo.scenegraph;
 
+import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.render.UpdateManager;
+import com.tespirit.bamboo.render.Updater;
 import com.tespirit.bamboo.vectors.*;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public abstract class Node {
-
 	private String mName;
-	private int mUid;
 		
 	static private Map<String, Node> nameLookup = new HashMap<String, Node>();
-	static private List<Node> nodes = new Vector<Node>(); 
-	static private List<Node> newNodes = new Vector<Node>();
+	
+	private RenderManager mRenderManager;
 	
 	public Node(){
 		this(null);
@@ -28,13 +27,6 @@ public abstract class Node {
 		if(this.mName != null){
 			Node.nameLookup.put(this.mName, this);
 		}
-		this.mUid = Node.nodes.size();
-		Node.nodes.add(this);
-		Node.newNodes.add(this);
-	}
-	
-	public int getUid(){
-		return this.mUid;
 	}
 	
 	public String getName() {
@@ -56,6 +48,21 @@ public abstract class Node {
 		}
 	}
 	
+	/**
+	 * Override for classes that actually handle resources.
+	 * @param renderManager
+	 */
+	public void setRenderManager(RenderManager renderManager){
+		this.mRenderManager = renderManager;
+		for(int i = 0; i < this.getChildCount(); i++){
+			this.getChild(i).setRenderManager(renderManager);
+		}
+	}
+	
+	public RenderManager getRenderManager(){
+		return this.mRenderManager;
+	}
+	
 	public abstract Node getChild(int i);
 	
 	public abstract int getChildCount();
@@ -72,22 +79,34 @@ public abstract class Node {
 	 */
 	public abstract void update(Matrix3d transform);
 	
-	public abstract void init();
+	
+	public final void recycle(){
+		this.mRenderManager.addUpdater(new Recycler());
+	}
+	
+	private class Recycler implements Updater{
+
+		@Override
+		public void update() {
+			recycleInternal();
+			mRenderManager.removeScene(Node.this);
+			if(Node.nameLookup.containsKey(mName)){
+				Node.nameLookup.remove(mName);
+			}
+			mName = null;
+		}
+
+		@Override
+		public void setUpdateManager(UpdateManager updateManager) {
+			//VOID
+		}
+		
+	}
+	
+	protected abstract void recycleInternal();
 	
 	public static Node getNode(String name){
 		return Node.nameLookup.get(name);
-	}
-	
-	public static Node getNode(int uid){
-		return Node.nodes.get(uid);
-	}
-	
-	public static void initNewNodes(){
-		for(int i = 0; i < Node.newNodes.size(); i++){
-			Node.newNodes.get(i).init();
-			Node.newNodes.set(i, null);
-		}
-		Node.newNodes.clear();
 	}
 	
 	//IO

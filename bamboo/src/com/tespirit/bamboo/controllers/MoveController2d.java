@@ -39,8 +39,8 @@ public class MoveController2d extends MatrixController2d{
 	}
 	
 	@Override
-	public void update() {
-		Ray ray = this.mRenderManager.getCamera().createRay(this.mX, this.mY);
+	protected void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
+		Ray ray = this.mRenderManager.getCamera().createRay(x, y);
 		ray.transformBy(this.mInverter);
 		this.mPlane.setNormal(ray.getPosition());
 		Vector3d intersect = mPlane.rayIntersectsAt(ray);

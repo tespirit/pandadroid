@@ -17,9 +17,9 @@ public class RotateController2d extends AxisController2d{
 	}
 
 	@Override
-	public void update() {
-		this.mControlled.rotateAxis(this.mScale*this.mDeltaX, this.mXAxis);
-		this.mControlled.rotateAxis(this.mScale*this.mDeltaY, this.mYAxis);
+	protected void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
+		this.mControlled.rotateAxis(this.mScale*deltaX, this.mXAxis);
+		this.mControlled.rotateAxis(this.mScale*deltaY, this.mYAxis);
 	}
 
 }

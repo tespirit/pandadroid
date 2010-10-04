@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -11,7 +12,7 @@ import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.render.Light;
+import com.tespirit.bamboo.scenegraph.Light;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.vectors.Matrix3d;
@@ -104,9 +105,8 @@ public class RendererDebug extends Renderer{
 				this.popMatrix();
 			}
 			
-			
-			while(this.getRootIterator().hasNext()){
-				this.drawNodeInfo(this.getRootIterator().next());
+			for (Iterator<Node> i = this.getSceneIterator(); i.hasNext();){
+				this.drawNodeInfo(i.next());
 			}
 			
 			this.popMatrix();
@@ -142,7 +142,7 @@ public class RendererDebug extends Renderer{
 	}
 	
 	@Override
-	public void createRenderers(){
+	protected void createRenderers(){
 		super.createRenderers();
 		this.addComponentRenderer(new TriangleIndicesDebugRenderer());
 		this.addComponentRenderer(new TriangleListDebugRenderer());

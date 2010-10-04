@@ -75,7 +75,7 @@ public class LOD extends Node{
 	}
 
 	@Override
-	public void init(){
-		//VOID
+	protected void recycleInternal() {
+		this.lods = null;
 	}
 }

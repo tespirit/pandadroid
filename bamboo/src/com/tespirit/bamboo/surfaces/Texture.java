@@ -11,19 +11,15 @@ import com.tespirit.bamboo.render.ComponentRenderer;
 public class Texture extends Surface implements Externalizable{
 
 	private String mDiffuseTextureName;
-	private boolean mInitialized;
 	
 	private int mDiffuseTextureId;
 	
 	public Texture(){
-		this.mInitialized = false;
 	}
 	
+	@Override
 	public void init(){
-		if(!this.mInitialized){
-			Texture.renderer.init(this);
-			this.mInitialized = true;
-		}
+		Texture.renderer.init(this);
 	}
 	
 	public void setDiffuseTextureName(String textureName){

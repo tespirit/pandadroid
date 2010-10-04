@@ -6,6 +6,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.tespirit.bamboo.primitives.Primitive;
+import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.render.RenderableNode;
 import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.vectors.*;
 
@@ -17,8 +19,6 @@ public class Model extends RenderableNode implements Externalizable{
 	
 	private Matrix3d mTransform;
 	private Matrix3d mWorldTransform;
-	
-	private boolean mInitialized;
 	
 	public Model(){
 		this(null);
@@ -32,16 +32,6 @@ public class Model extends RenderableNode implements Externalizable{
 		this.mTransform.identity();
 		this.mWorldTransform = new Matrix3d(m, Matrix3d.SIZE);
 		this.mSurface = Surface.getDefaultSurface();
-		this.mInitialized = false;
-	}
-	
-	@Override
-	public void init(){
-		if(!this.mInitialized){
-			this.mSurface.init();
-			this.mPrimitive.init();
-			this.mInitialized = true;
-		}
 	}
 	
 	@Override
@@ -67,10 +57,9 @@ public class Model extends RenderableNode implements Externalizable{
 	
 	@Override
 	public void update(Matrix3d transform) {
+		super.update(transform);
 		this.mWorldTransform.multiply(transform,this.mTransform);
-		if(this.mInitialized){
-			this.mPrimitive.update();
-		}
+		this.mPrimitive.update();
 	}
 
 	@Override
@@ -90,6 +79,7 @@ public class Model extends RenderableNode implements Externalizable{
 	public void setPrimative(Primitive primitive){
 		this.mPrimitive = primitive;
 		this.mPrimitive.computeBoundingBox(this.mBoundingBox);
+		this.registerDynamicLoader(this.mSurface);
 	}
 	
 	public Surface getSurface(){
@@ -101,14 +91,31 @@ public class Model extends RenderableNode implements Externalizable{
 			this.mSurface = surface;
 		else
 			this.mSurface = Surface.getDefaultSurface();
+		this.registerDynamicLoader(this.mSurface);
 	}
 
 	@Override
 	public void render() {
-		if(this.mInitialized){
-			this.mSurface.render();
-			this.mPrimitive.render();
-		}
+		this.mSurface.render();
+		this.mPrimitive.render();
+	}
+	
+	@Override
+	public void setRenderManager(RenderManager renderManager){
+		super.setRenderManager(renderManager);
+		this.registerDynamicLoader(this.mSurface);
+		this.registerDynamicLoader(this.mPrimitive);
+	}
+	
+	@Override
+	protected void recycleInternal(){
+		this.unregisterDynamicLoader(this.mSurface);
+		this.unregisterDynamicLoader(this.mPrimitive);
+		this.mBoundingBox = null;
+		this.mTransform = null;
+		this.mWorldTransform = null;
+		this.mPrimitive = null;
+		this.mSurface = null;
 	}
 	
 	//IO

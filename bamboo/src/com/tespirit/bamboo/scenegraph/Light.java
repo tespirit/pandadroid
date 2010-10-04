@@ -1,14 +1,16 @@
-package com.tespirit.bamboo.render;
+package com.tespirit.bamboo.scenegraph;
 
-import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamboo.scenegraph.RenderableNode;
+import com.tespirit.bamboo.render.ComponentRenderer;
+import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.render.RenderableNode;
+import com.tespirit.bamboo.render.Resource;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 
-public class Light extends RenderableNode{
+public class Light extends RenderableNode implements Resource{
 	private Color4 ambient;
 	private Color4 diffuse;
 	private Color4 specular;
@@ -40,6 +42,7 @@ public class Light extends RenderableNode{
 	
 	@Override
 	public void update(Matrix3d transform){
+		super.update(transform);
 		this.worldTransform = transform;
 		this.worldTransform.transform(this.position, this.worldPosition);
 	}
@@ -113,8 +116,25 @@ public class Light extends RenderableNode{
 	}
 	
 	@Override
+	protected void recycleInternal(){
+		this.ambient = null;
+		this.diffuse = null;
+		this.position = null;
+		this.specular = null;
+		this.worldPosition = null;
+		this.worldTransform = null;
+		this.unregisterDynamicLoader(this);
+	}
+	
+	@Override
 	public void render(){
 		Light.renderer.render(this);
+	}
+	
+	@Override
+	public void setRenderManager(RenderManager renderManager){
+		super.setRenderManager(renderManager);
+		this.registerDynamicLoader(this);
 	}
 	
 	@Override

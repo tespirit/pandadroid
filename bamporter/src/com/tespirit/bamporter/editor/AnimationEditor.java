@@ -3,6 +3,7 @@ package com.tespirit.bamporter.editor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -117,8 +118,8 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mPlayer = null;
 		this.mSkeleton = null;
 		this.mPanel = null;
-		while(this.children().hasMoreElements()){
-			this.children().nextElement().recycle();
+		for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
+			children.nextElement().recycle();
 		}
 	}
 

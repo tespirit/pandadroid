@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import com.tespirit.bamboo.render.Resource;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
-public abstract class Primitive{
+public abstract class Primitive implements Resource{
 	public static final int TRIANGLES = 0;
 	public static final int TRIANGLE_STRIP = 1;
 	public static final int TRIANGLE_FAN = 2;
@@ -59,6 +60,4 @@ public abstract class Primitive{
 	abstract public void render();
 	
 	abstract public void update();
-	
-	abstract public void init();
 }

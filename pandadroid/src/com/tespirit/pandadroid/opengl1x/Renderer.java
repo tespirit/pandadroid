@@ -9,10 +9,10 @@ import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.render.Clock;
-import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.scenegraph.Camera;
+import com.tespirit.bamboo.scenegraph.Light;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
 import com.tespirit.bamboo.surfaces.Texture;
@@ -73,10 +73,10 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		this.mGl = gl;
 		
-		this.mGl.glClearColor(this.backgroundColor.getRed(), 
-							 this.backgroundColor.getGreen(),
-							 this.backgroundColor.getBlue(),
-							 this.backgroundColor.getAlpha());
+		this.mGl.glClearColor(this.mBackgroundColor.getRed(), 
+							 this.mBackgroundColor.getGreen(),
+							 this.mBackgroundColor.getBlue(),
+							 this.mBackgroundColor.getAlpha());
 		
 		this.mGl.glClearDepthf(1.0f);
 		this.mGl.glShadeModel(GL10.GL_SMOOTH);
@@ -85,12 +85,10 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		this.mGl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 		this.mGl.glCullFace(GL10.GL_BACK);
 		
-		
-		
-		this.setupRender();
+		this.initRender();
 	}
 	
-	public void createRenderers(){
+	protected void createRenderers(){
 		//create renderers!
 		this.addComponentRenderer(new VertexIndicesRenderer());
 		this.addComponentRenderer(new VertexListRenderer());
@@ -102,36 +100,36 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 	}
 
 	@Override
-	public void enableLights() {
+	protected void enableLights() {
 		this.mGl.glEnable(GL10.GL_LIGHTING);
 		this.mGl.glEnable(GL10.GL_COLOR_MATERIAL);
 		this.mGl.glEnable(GL10.GL_NORMALIZE);
 	}
 	
 	@Override
-	public void disableLights(){
+	protected void disableLights(){
 		this.mGl.glDisable(GL10.GL_LIGHTING);
 		this.mGl.glDisable(GL10.GL_COLOR_MATERIAL);
 		this.mGl.glDisable(GL10.GL_NORMALIZE);
 	}
 
 	@Override
-	public void enableTextures() {
+	protected void enableTextures() {
 		//VOID
 	}
 	
 	@Override
-	public void disableTextures(){
+	protected void disableTextures(){
 		//VOID
 	}
 
 	@Override
-	public void popMatrix() {
+	protected void popMatrix() {
 		this.mGl.glPopMatrix();
 	}
 
 	@Override
-	public void pushMatrix(Matrix3d transform) {
+	protected void pushMatrix(Matrix3d transform) {
 		this.mGl.glPushMatrix();
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}

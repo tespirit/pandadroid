@@ -7,6 +7,7 @@ import java.io.ObjectOutput;
 
 import com.tespirit.bamboo.render.Clock;
 import com.tespirit.bamboo.render.TimeUpdater;
+import com.tespirit.bamboo.render.UpdateManager;
 import com.tespirit.bamboo.scenegraph.Node;
 
 /**
@@ -131,4 +132,10 @@ public class Player implements TimeUpdater, Externalizable{
 		out.writeUTF(this.mAnimationName);
 		out.writeUTF(this.mSkeletonName);
 	}
+
+	@Override
+	public void setUpdateManager(UpdateManager updateManager) {
+		//VOID: no need to dispatch updaters... yet :)
+	}
+
 }

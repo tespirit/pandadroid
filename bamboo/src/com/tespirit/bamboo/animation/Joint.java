@@ -21,11 +21,6 @@ import com.tespirit.bamboo.vectors.*;
  *
  */
 public abstract class Joint extends Node{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6138379270722022703L;
 	protected Matrix3d mLocalTransform;
 	protected Matrix3d mWorldTransform;
 	protected ArrayList<Joint> mChildren;
@@ -42,11 +37,6 @@ public abstract class Joint extends Node{
 		float[] buffer = Matrix3d.createBuffer(2);
 		this.mLocalTransform = new Matrix3d(buffer);
 		this.mWorldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
-	}
-	
-	@Override
-	public void init(){
-		//VOID
 	}
 	
 	/**
@@ -130,9 +120,18 @@ public abstract class Joint extends Node{
 		for(Joint j : this.mChildren){
 			j.update(dofs);
 		}
-		
 	}
 	
+	@Override
+	protected void recycleInternal(){
+		this.mBone = null;
+		this.mLocalTransform = null;
+		this.mWorldTransform = null;
+		this.mChildren.clear();
+	}
+	
+	//IO
+	private static final long serialVersionUID = -6138379270722022703L;
 	protected void write(ObjectOutput out) throws IOException{
 		super.write(out);
 		if(this.mBone != null){

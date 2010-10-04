@@ -6,10 +6,24 @@ import java.util.Enumeration;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-public abstract class TreeNodeEditor implements Editor, MutableTreeNode, Enumeration<TreeNodeEditor> {
+public abstract class TreeNodeEditor implements Editor, MutableTreeNode {
 
 	private ArrayList<TreeNodeEditor> mChildren;
 	private MutableTreeNode mParentNode;
+	
+	private class TNEenumerator implements Enumeration<TreeNodeEditor>{
+		int i;
+		@Override
+		public boolean hasMoreElements() {
+			return i < mChildren.size();
+		}
+
+		@Override
+		public TreeNodeEditor nextElement() {
+			return mChildren.get(i++);
+		}
+		
+	}
 	
 	/**
 	 * Default constructor allows children.
@@ -38,7 +52,7 @@ public abstract class TreeNodeEditor implements Editor, MutableTreeNode, Enumera
 		
 	@Override
 	public Enumeration<TreeNodeEditor> children() {
-		return this;
+		return new TNEenumerator();
 	}
 
 	@Override
@@ -77,23 +91,6 @@ public abstract class TreeNodeEditor implements Editor, MutableTreeNode, Enumera
 	@Override
 	public boolean isLeaf() {
 		return this.getChildCount() == 0;
-	}
-
-	int mCurrentIndex = 0;
-	@Override
-	public boolean hasMoreElements() {
-		boolean retVal = this.mChildren.size() > this.mCurrentIndex;
-		if(retVal == false){
-			mCurrentIndex = 0;
-		}
-		return retVal;
-	}
-
-	@Override
-	public TreeNodeEditor nextElement() {
-		TreeNodeEditor node = this.mChildren.get(this.mCurrentIndex);
-		this.mCurrentIndex++;
-		return node;
 	}
 	
 	@Override

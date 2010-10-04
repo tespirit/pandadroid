@@ -1,13 +1,14 @@
-package com.tespirit.bamboo.render;
+package com.tespirit.bamboo.scenegraph;
 
-import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamboo.scenegraph.RenderableNode;
+import com.tespirit.bamboo.render.ComponentRenderer;
+import com.tespirit.bamboo.render.UpdateManager;
+import com.tespirit.bamboo.render.Updater;
 import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Ray;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class Camera extends RenderableNode{
+public class Camera extends Node implements Updater{
 	private Matrix3d camera;
 	private Matrix3d pivot;
 	private Matrix3d worldTransform;
@@ -68,6 +69,7 @@ public class Camera extends RenderableNode{
 	
 	public void setFov(float fov){
 		this.fov = fov;
+		this.markDirty();
 	}
 	
 	public float getNear(){
@@ -76,6 +78,7 @@ public class Camera extends RenderableNode{
 	
 	public void setNear(float near){
 		this.near = near;
+		this.markDirty();
 	}
 	
 	public float getFar(){
@@ -84,6 +87,7 @@ public class Camera extends RenderableNode{
 	
 	public void setFar(float far){
 		this.far = far;
+		this.markDirty();
 	}
 	
 	/**
@@ -134,23 +138,29 @@ public class Camera extends RenderableNode{
 		//TODO: implement
 	}
 	
-	@Override
 	public void render(){
 		Camera.renderer.render(this);
 	}
 	
+	private void markDirty(){
+		if(this.getRenderManager() != null){
+			this.getRenderManager().addSingleUpdater(this);
+		}
+	}
+	
 	@Override
-	public void init() {
-		//VOID for now		
+	public void update() {
+		//compute near and far heights
+		this.nearHeight = (float)(this.near * Math.tan(this.fov/2.0));
+		this.aspectRatio = (float)width/(float)height;
+		Camera.renderer.setDisplay(this, width, height);
+		Camera.renderer.setDisplay(this, this.width, this.height);
 	}
 
 	public void setDisplay(int width, int height) {
 		this.width = width;
 		this.height = height;
-		//compute near and far heights
-		this.nearHeight = (float)(this.near * Math.tan(this.fov/2.0));
-		this.aspectRatio = (float)width/(float)height;
-		Camera.renderer.setDisplay(this, width, height);
+		this.update();
 	}
 	
 	@Override
@@ -166,6 +176,12 @@ public class Camera extends RenderableNode{
 	@Override
 	public int getChildCount() {
 		return 0;
+	}
+	
+	@Override
+	protected void recycleInternal(){
+		this.camera = null;
+		this.pivot = null;
 	}
 	
 	public Ray createRay(float x, float y){
@@ -195,5 +211,10 @@ public class Camera extends RenderableNode{
 		
 		public abstract void render(Camera camera);
 		public abstract void setDisplay(Camera camera, int width, int height);
+	}
+
+	@Override
+	public void setUpdateManager(UpdateManager updateManager) {
+		//VOID this is handled with the fact that a node gets full renderManager access.
 	}
 }

@@ -1,5 +1,7 @@
 package com.tespirit.bamboo.controllers;
 
+import com.tespirit.bamboo.render.UpdateManager;
+
 public class ControllerDummy implements Controller1d, Controller2d, Controller3d{
 
 	private static ControllerDummy instance = new ControllerDummy();
@@ -49,5 +51,10 @@ public class ControllerDummy implements Controller1d, Controller2d, Controller3d
 	public void update() {
 		//VOID
 		
+	}
+
+	@Override
+	public void setUpdateManager(UpdateManager updateManager) {
+		//VOID
 	}
 }

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -22,9 +23,9 @@ import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexList;
 import com.tespirit.bamboo.primitives.VertexBuffer;
-import com.tespirit.bamboo.render.Camera;
-import com.tespirit.bamboo.render.Light;
 import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.scenegraph.Camera;
+import com.tespirit.bamboo.scenegraph.Light;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
@@ -41,9 +42,9 @@ public class Renderer extends RenderManager implements GLEventListener{
 	
 	private boolean mRenderBoundingBox;
 	private boolean mRenderAxis;
-	Primitives.WireCube mBoundingBox = new Primitives.WireCube();
-	Primitives.Axis mAxis = new Primitives.Axis();
-	Color mBoundingBoxColor = new Color();
+	private Primitives.WireCube mBoundingBox = new Primitives.WireCube();
+	private Primitives.Axis mAxis = new Primitives.Axis();
+	private Color mBoundingBoxColor = new Color();
 	
 	private int[] mIndexTypes;
 	private int[] mPrimitiveTypes;
@@ -120,7 +121,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		});
 		
 		//add a camera listener!
-		this.mCameraControl = new CameraControl(camera);
+		this.mCameraControl = new CameraControl(this);
 		this.mCanvas.addMouseMotionListener(this.mCameraControl);
 		this.mCanvas.addMouseListener(this.mCameraControl);
 		
@@ -136,7 +137,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		return this.mCanvas;
 	}
 
-	public void createRenderers(){
+	protected void createRenderers(){
 		//create renderers!
 		this.addComponentRenderer(new VertexIndicesRenderer());
 		this.addComponentRenderer(new VertexListRenderer());
@@ -148,46 +149,46 @@ public class Renderer extends RenderManager implements GLEventListener{
 	}
 
 	@Override
-	public void enableLights() {
+	protected void enableLights() {
 		this.mGl.glEnable(GL2.GL_LIGHTING);
 		this.mGl.glEnable(GL2.GL_COLOR_MATERIAL);
 		this.mGl.glEnable(GL2.GL_NORMALIZE);
 	}
 	
 	@Override
-	public void disableLights(){
+	protected void disableLights(){
 		this.mGl.glDisable(GL2.GL_LIGHTING);
 		this.mGl.glDisable(GL2.GL_COLOR_MATERIAL);
 		this.mGl.glDisable(GL2.GL_NORMALIZE);
 	}
 
 	@Override
-	public void enableTextures() {
+	protected void enableTextures() {
 		//VOID
 	}
 	
 	@Override
-	public void disableTextures(){
+	protected void disableTextures(){
 		//VOID
 	}
 
 	@Override
-	public void popMatrix() {
+	protected void popMatrix() {
 		this.mGl.glPopMatrix();
 	}
 
 	@Override
-	public void pushMatrix(Matrix3d transform) {
+	protected void pushMatrix(Matrix3d transform) {
 		this.mGl.glPushMatrix();
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
 
-	public void renderDebug(){
+	private void renderDebug(){
 		this.mGl.glDisable(GL2.GL_LIGHTING);
 		this.mGl.glDisable(GL2.GL_TEXTURE_2D);
 		this.pushMatrix(this.getCamera().getWorldTransform());
-		for(int i = 0; i < this.getRootCount(); i++){
-			this.drawNodeInfo(this.getRoot(i));
+		for (Iterator<Node> i = this.getSceneIterator(); i.hasNext();){
+			this.drawNodeInfo(i.next());
 		}
 		this.popMatrix();
 		if(this.lightsEnabled()){
@@ -196,7 +197,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 	}
 	
 	
-	public void drawNodeInfo(Node node){
+	protected void drawNodeInfo(Node node){
 		if(node.getWorldTransform() != null){
 			this.pushMatrix(node.getWorldTransform());
 		}
@@ -246,7 +247,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.mGl.glDepthFunc(GL2.GL_LEQUAL);
 		this.mGl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
 		this.mGl.glCullFace(GL2.GL_BACK);
-		this.setupRender();
+		this.initRender();
 	}
 
 	@Override

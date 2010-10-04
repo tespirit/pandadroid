@@ -8,7 +8,8 @@ import com.tespirit.bamboo.controllers.Dof3;
 import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController1d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
-import com.tespirit.bamboo.render.Camera;
+import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.scenegraph.Camera;
 
 public class CameraControl implements MouseListener, MouseMotionListener{
 	
@@ -16,7 +17,8 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 	TranslateController2d mTranslate;
 	TranslateController1d mZoom;
 	
-	public CameraControl(Camera camera){
+	public CameraControl(RenderManager renderManager){
+		Camera camera = renderManager.getCamera();
 		this.mRotate = new RotateController2d(Dof3.Y, Dof3.X);
 		this.mRotate.setScale(0.25f);
 		this.mRotate.setControlled(camera.getPivotTransform());
@@ -28,6 +30,9 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 		this.mZoom = new TranslateController1d(Dof3.Z);
 		this.mZoom.setScale(0.0025f);
 		this.mZoom.setControlled(camera.getPivotTransform());
+		
+		renderManager.registerUpdater(this.mRotate);
+		renderManager.registerUpdater(this.mTranslate);
 		
 		this.mIsDrag = false;
 	}

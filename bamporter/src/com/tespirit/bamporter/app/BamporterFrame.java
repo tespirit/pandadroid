@@ -194,10 +194,10 @@ public class BamporterFrame extends JFrame{
 			e.recycle();
 		}
 		this.mRoot.removeAllChildren();
-		this.mRenderer.addNode(this.mBamboo.getRootSceneNodes());
+		this.mRenderer.addScenes(this.mBamboo.getScenes());
 		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
 		DefaultMutableTreeNode animations = new DefaultMutableTreeNode("Animations");
-		for(Node node : this.mBamboo.getRootSceneNodes()){
+		for(Node node : this.mBamboo.getScenes()){
 			NodeEditor ne = new NodeEditor(node, this.mRenderer);
 			this.mEditors.add(ne);
 			sceneGraph.add(ne);
@@ -208,7 +208,7 @@ public class BamporterFrame extends JFrame{
 			animations.add(ae);
 		}
 		
-		if(this.mBamboo.getRootSceneNodes().size() > 0){
+		if(this.mBamboo.getScenes().size() > 0){
 			this.mRoot.add(sceneGraph);
 			this.mSaveNodeButton.setEnabled(true);
 			this.mSaveAllButton.setEnabled(true);

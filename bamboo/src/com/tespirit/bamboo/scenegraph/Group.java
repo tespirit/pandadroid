@@ -36,15 +36,16 @@ public class Group extends Node implements Externalizable{
 		this.mWorldTransform = new Matrix3d(m, Matrix3d.SIZE);
 	}
 	
-	@Override
-	public void init(){
-		//VOID
-	}
-	
 	public void appendChild(Node node){
 		if(node != null){
 			this.mChildren.add(node);
+			node.setRenderManager(this.getRenderManager());
 		}
+	}
+	
+	public void removeChild(Node node){
+		node.setRenderManager(null);
+		this.mChildren.remove(node);
 	}
 	
 	@Override
@@ -78,6 +79,13 @@ public class Group extends Node implements Externalizable{
 		for(int i = 0; i < this.mChildren.size(); i++){
 			this.mChildren.get(i).update(this.mWorldTransform);
 		}
+	}
+	
+	@Override
+	protected void recycleInternal(){
+		this.mChildren.clear();
+		this.mTransform = null;
+		this.mWorldTransform = null;
 	}
 
 	//IO

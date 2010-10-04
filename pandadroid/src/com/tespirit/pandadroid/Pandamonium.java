@@ -233,8 +233,8 @@ public class Pandamonium extends Activity {
 		animation.addClip(new Clip("bob", 0, 3000));
 		
 		Bamboo asset = new Bamboo();
-		asset.getRootSceneNodes().add(joint1);
-		asset.getRootSceneNodes().add(model);
+		asset.getScenes().add(joint1);
+		asset.getScenes().add(model);
 		asset.getAnimations().add(animation);
 		
 		return asset;

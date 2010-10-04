@@ -1,6 +1,8 @@
 package com.tespirit.bamboo.surfaces;
 
-public abstract class Surface{
+import com.tespirit.bamboo.render.Resource;
+
+public abstract class Surface implements Resource{
 	
 	private static Surface defaultSurface = new Color();
 
@@ -10,5 +12,4 @@ public abstract class Surface{
 	
 	public abstract void render();
 	
-	public abstract void init();
 }

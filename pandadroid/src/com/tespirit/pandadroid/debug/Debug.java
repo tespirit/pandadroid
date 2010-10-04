@@ -202,7 +202,7 @@ public class Debug {
 					Debug.print("Lights on: "+Debug.renderer.lightsOn);
 					break;
 				case KeyEvent.KEYCODE_TAB:
-					Debug.print(Debug.renderer.getRootIterator());
+					Debug.print(Debug.renderer.getSceneIterator());
 					break;
 				case KeyEvent.KEYCODE_N:
 					if(currentAnimation != -1){

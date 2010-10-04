@@ -57,7 +57,7 @@ public class IOManager {
 	public static void saveSceneGraph(BambooAsset asset, File file) throws Exception{
 		FileOutputStream stream = new FileOutputStream(file);
 		try{
-			Bamboo.saveNodes(asset.getRootSceneNodes(), stream);
+			Bamboo.saveNodes(asset.getScenes(), stream);
 			stream.close();
 		} catch(Exception e){
 			stream.close();

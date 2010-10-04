@@ -14,8 +14,8 @@ import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
 import com.tespirit.bamboo.creation.Lights;
 import com.tespirit.bamboo.io.BambooAsset;
-import com.tespirit.bamboo.render.Camera;
 import com.tespirit.bamboo.render.Updater;
+import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.pandadroid.R;
@@ -101,6 +101,7 @@ public class PandadroidView extends GLSurfaceView {
 	 */
 	public void setTouchClickController(Controller2d m){
 		this.touchClickController = m;
+		this.renderer.registerUpdater(m);
 	}
 	
 	/**
@@ -110,6 +111,7 @@ public class PandadroidView extends GLSurfaceView {
 	 */
 	public void setTouchMoveController(Controller2d m){
 		this.touchMoveController = m;
+		this.renderer.registerUpdater(m);
 	}
 	
 	public Controller2d getTouchClickController(){
@@ -247,7 +249,7 @@ public class PandadroidView extends GLSurfaceView {
 	}
 	
 	public void addSceneNode(Node node){
-		this.renderer.addNode(node);
+		this.renderer.addScene(node);
 	}
 	
 	/**
@@ -256,7 +258,7 @@ public class PandadroidView extends GLSurfaceView {
 	 * @return
 	 */
 	public Player addBambooSingleAnimation(BambooAsset bamboo){
-		this.renderer.addNode(bamboo.getRootSceneNodes());
+		this.renderer.addScenes(bamboo.getScenes());
 		return this.addAnimation(bamboo.getAnimations().get(0));
 	}
 	

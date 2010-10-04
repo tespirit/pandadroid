@@ -1,10 +1,12 @@
 package com.tespirit.bamboo.render;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.tespirit.bamboo.scenegraph.*;
 import com.tespirit.bamboo.vectors.Color4;
@@ -16,82 +18,137 @@ import com.tespirit.bamboo.vectors.Ray;
  * @author Todd Espiritu Santo
  *
  */
-public abstract class RenderManager {
-	/* basic attributes */
-	protected Color4 backgroundColor;
+public abstract class RenderManager implements UpdateManager {
+	
+	private class ThreadBuffer<Item> implements Iterable<Item>{
+		protected Collection<Item> mRead;
+		protected Collection<Item> mWrite;
+		
+		protected ThreadBuffer(Collection<Item> read, Collection<Item> write){
+			this.mRead = read;
+			this.mWrite = write;
+		}
+		
+		public void add(Item object){
+			this.mWrite.add(object);
+		}
+		
+		public void remove(Item object){
+			this.mRead.remove(object);
+			this.mWrite.remove(object);
+		}
+		
+		public void removeAll(Collection<Item> objects){
+			this.mRead.removeAll(objects);
+			this.mWrite.removeAll(objects);
+		}
+		
+		public void clear(){
+			this.mRead.clear();
+			this.mWrite.clear();
+		}
+		
+		@Override
+		public Iterator<Item> iterator() {
+			Collection<Item> temp = this.mRead;
+			temp.clear();
+			this.mRead = mWrite;
+			this.mWrite = temp;
+			return this.mRead.iterator();
+		}
+		
+	}
+	
+	private class ThreadBufferList<Item> extends ThreadBuffer<Item>{
+		ThreadBufferList(){
+			super(new ArrayList<Item>(), new ArrayList<Item>());
+		}
+	}
+	
+	private class ThreadBufferSet<Item> extends ThreadBuffer<Item>{
+
+		protected ThreadBufferSet() {
+			super(new HashSet<Item>(), new HashSet<Item>());
+		}
+		
+	}
+	
+	List<Updater> mUpdaters;
+	
+	List<Node> mScene;
+	List<RenderableNode> mRenderables;
+	
+	ThreadBufferSet<Updater> mSingleUpdaters;
+	ThreadBufferList<Node> mNewNodes;
+	Set<Resource> mStoredResources;
+	ThreadBufferList<Resource> mResources;
 	
 	private Camera mCamera;
-	private List<Node> mScene;
-	private List<Light> mLights; 
-	private List<RenderableNode> mRenderableNodes;
 	
-	private List<Updater> mUpdates;
+	protected Color4 mBackgroundColor;
+	
 	private List<ComponentRenderer> mRenderers;
 	
 	private Clock mClock;
+
+	private boolean mLightsEnabled;
+	
+	private Compare.RenderableSort mRenderSort;
 	
 	public RenderManager(Clock clock){
 		this.mClock = clock;
-		this.mScene = new ArrayList<Node>();
-		this.mLights = new ArrayList<Light>();
-		this.mUpdates = new LinkedList<Updater>();
-		
-		this.backgroundColor = new Color4();
-		
+		this.mBackgroundColor = new Color4();
 		this.mRenderers = new ArrayList<ComponentRenderer>();
-		this.mRenderableNodes = new ArrayList<RenderableNode>();
+		this.mLightsEnabled = true;
+		this.mRenderSort = new Compare.RenderableSort();
+		
+		this.mSingleUpdaters = new ThreadBufferSet<Updater>();
+		this.mNewNodes = new ThreadBufferList<Node>();
+		this.mResources = new ThreadBufferList<Resource>();
+		this.mStoredResources = new HashSet<Resource>();
+		this.mScene = new ArrayList<Node>();
+		this.mRenderables = new ArrayList<RenderableNode>();
+		this.mUpdaters = new ArrayList<Updater>();
+	}
+	
+	public void clear(){
+		this.mSingleUpdaters.clear();
+		this.mNewNodes.clear();
+		this.mRenderables.clear();
+		this.mResources.clear();
+		this.mScene.clear();
+		this.mUpdaters.clear();
 	}
 	
 	public void setBackgroundColor(Color4 color){
-		this.backgroundColor.copy(color);
+		this.mBackgroundColor.copy(color);
 	}
 	
-	public void clearScene(){
-		this.mScene.clear();
-		this.mRenderableNodes.clear();
-		this.mLights.clear();
+	public void addScene(Node scene){
+		scene.setRenderManager(this);
+		this.mNewNodes.add(scene);
 	}
 	
-	public void addNode(Node node){
-		Node prev = null;
-		if(this.mScene.size() > 0){
-			prev = this.mScene.get(this.mScene.size()-1);
-		}
-		this.mScene.add(node);
-		this.gatherRenderables(node);
-		//only sort if there is a need. in most cases new scene nodes will be inserted.
-		if(prev != null && Compare.nodePrioritySort.compare(node, prev)>0){
-			Collections.sort(this.mScene, Compare.nodePrioritySort);
+	public void addScenes(List<Node> scenes){
+		for(Node node : scenes){
+			this.addScene(node);
 		}
 	}
 	
-	public void addNode(List<Node> nodes){
-		for(Node node : nodes){
-			this.addNode(node);
-		}
+	public void removeScene(Node scene){
+		scene.setRenderManager(null);
+		this.mScene.remove(scene);
+		this.mRenderables.remove(scene);
+		this.mNewNodes.remove(scene);
 	}
 	
-	public void removeNode(Node node){
-		this.mScene.remove(node);
-		this.mRenderableNodes.remove(node);
-		this.mLights.remove(node);
+	public void removeNode(Collection<Node> scenes){
+		this.mScene.removeAll(scenes);
+		this.mRenderables.removeAll(scenes);
+		this.mNewNodes.removeAll(scenes);
 	}
 	
-	public void removeNode(List<Node> nodes){
-		this.mScene.removeAll(nodes);
-		this.mRenderableNodes.removeAll(nodes);
-		this.mLights.removeAll(nodes);
-	}
-	
-	public int getRootCount(){
-		return this.mScene.size();
-	}
-	
-	public Node getRoot(int i){
-		return this.mScene.get(i);
-	}
-	
-	public Iterator<Node> getRootIterator(){
+	public Iterator<Node> getSceneIterator(){
 		return this.mScene.iterator();
 	}
 	
@@ -99,81 +156,118 @@ public abstract class RenderManager {
 		if(updater instanceof TimeUpdater){
 			((TimeUpdater)updater).setClock(this.mClock);
 		}
-		this.mUpdates.add(updater);
+		this.mUpdaters.add(updater);
 	}
 	
 	public void removeUpdater(Updater updater){
-		this.mUpdates.remove(updater);
+		this.mUpdaters.remove(updater);
 	}
 	
-	public void removeUpdater(List<Updater> updaters){
-		this.mUpdates.removeAll(updaters);
+	public void removeUpdaters(Collection<Updater> updaters){
+		this.mUpdaters.removeAll(updaters);
 	}
 	
-	public void clearUpdaters(){
-		this.mUpdates.clear();
-	}
 	
 	public Iterator<Updater> getUpdateIterator(){
-		return this.mUpdates.iterator();
+		return this.mUpdaters.iterator();
+	}
+	
+	/**
+	 * This is for Updaters that run once.
+	 * Please register updaters before adding them to here.
+	 */
+	public void addSingleUpdater(Updater updater){
+		this.mSingleUpdaters.add(updater);
+	}
+	
+	public void removeSingleUpdater(Updater updater){
+		this.mSingleUpdaters.remove(updater);
+	}
+	
+	public void removeSingleUpdaters(Collection<Updater> updaters){
+		this.mSingleUpdaters.removeAll(updaters);
+	}
+	
+	/**
+	 * This will set an Updater's UpdateManager for Updaters that
+	 * are to be used as single updaters.
+	 * @param updater
+	 */
+	public void registerUpdater(Updater updater){
+		updater.setUpdateManager(this);
+	}
+	
+	public void loadResource(Resource resource){
+		if(!this.mStoredResources.contains(resource)){
+			this.mResources.add(resource);
+			this.mStoredResources.add(resource);
+		}
+	}
+	
+	public void unloadResource(Resource resource){
+		if(this.mStoredResources.contains(resource)){
+			this.mResources.remove(resource);
+			this.mStoredResources.remove(resource);
+		}
+	}
+	
+	void addRenderable(RenderableNode node){
+		this.mRenderables.add(node);
 	}
 	
 	public void setCamera(Camera camera){
 		this.mCamera = camera;
+		this.mRenderSort.setView(camera);
 	}
 	
 	public Camera getCamera(){
 		return this.mCamera;
 	}
 	
-	public void updateScene(){
+	protected void updateScene(){
 		this.mClock.update();
-		for(Updater updater : this.mUpdates){
-			updater.update();
+		for(Resource r : this.mResources){
+			r.init();
 		}
+		for(Node n : this.mNewNodes){
+			this.mScene.add(n);
+		}
+		for(Updater u : this.mSingleUpdaters){
+			u.update();
+		}
+		for(Updater u : this.mUpdaters){
+			u.update();
+		}
+		this.mRenderables.clear();
 		this.mCamera.update(Matrix3d.IDENTITY);
-		for(Node node : this.mScene){
-			node.update(Matrix3d.IDENTITY);
+		for(Node n : this.mScene){
+			n.update(Matrix3d.IDENTITY);
 		}
-		Collections.sort(this.mRenderableNodes, Compare.renderableSort);
 	}
 	
-	public void renderScene(){
-		Node.initNewNodes();
-		
+	protected void renderScene(){
 		this.mCamera.render();
-		for(Light light : this.mLights){
-			light.render();
-		}
-		for(RenderableNode node : this.mRenderableNodes){
+		Collections.sort(this.mRenderables, this.mRenderSort);
+		for(RenderableNode node : this.mRenderables){
 			this.pushMatrix(node.getWorldTransform());
 			node.render();
 			this.popMatrix();
 		}
 	}
 	
-	public boolean lightsEnabled(){
-		return this.mLights.size() > 0;
+	protected boolean lightsEnabled(){
+		return this.mLightsEnabled;
 	}
 
 	/**
 	 * This should be called to initialize any render settings before rendering
 	 * takes place.
 	 */
-	public void setupRender(){
+	protected void initRender(){
 		this.mClock.start();
 		this.reactivateComponentRenderers();
-		Node.initNewNodes();
-	}
-	
-	private void gatherRenderables(Node node){
-		if(node instanceof RenderableNode){
-			this.mRenderableNodes.add((RenderableNode)node);
-		} else if (node instanceof Light){
-			this.mLights.add((Light)node);
-		}
-		for(int i = 0; i < node.getChildCount(); i++){
-			this.gatherRenderables(node.getChild(i));
+		if(this.mLightsEnabled){
+			this.enableLights();
 		}
 	}
 
@@ -182,15 +276,15 @@ public abstract class RenderManager {
 	 * @param width
 	 * @param height
 	 */
-	public void setDisplay(int width, int height){
+	protected void setDisplay(int width, int height){
 		this.mCamera.setDisplay(width, height);
 	}
 	
-	public void addComponentRenderer(ComponentRenderer r){
+	protected void addComponentRenderer(ComponentRenderer r){
 		this.mRenderers.add(r);
 	}
 	
-	public void reactivateComponentRenderers(){
+	private void reactivateComponentRenderers(){
 		for(int i = 0; i < this.mRenderers.size(); i++){
 			this.mRenderers.get(i).activate();
 		}
@@ -200,7 +294,7 @@ public abstract class RenderManager {
 		Ray ray = mCamera.createRay(x, y);
 		Ray objectRay = new Ray();
 		Matrix3d invertWT = new Matrix3d();
-		for(RenderableNode node : this.mRenderableNodes){
+		for(RenderableNode node : this.mRenderables){
 			objectRay.transformBy(ray, invertWT.invert(node.getWorldTransform()));
 			if(node.getBoundingBox().intersectsRay(objectRay)){
 				return node;
@@ -213,7 +307,7 @@ public abstract class RenderManager {
 		Ray ray = mCamera.createRay(x, y);
 		Ray objectRay = ray.clone();
 		Matrix3d invertWT = new Matrix3d();
-		for(RenderableNode node : this.mRenderableNodes){
+		for(RenderableNode node : this.mRenderables){
 			if(node instanceof Model){
 				objectRay.transformBy(ray, invertWT.invert(node.getWorldTransform()));
 				if(node.getBoundingBox().intersectsRay(objectRay)){
@@ -225,12 +319,12 @@ public abstract class RenderManager {
 	}
 	
 	/* scenegraph manipulation */
-	public abstract void popMatrix();
-	public abstract void pushMatrix(Matrix3d transform);
+	protected abstract void popMatrix();
+	protected abstract void pushMatrix(Matrix3d transform);
 	
 	/* render settings */
-	public abstract void enableTextures();
-	public abstract void enableLights();
-	public abstract void disableLights();
-	public abstract void disableTextures();
+	protected abstract void enableTextures();
+	protected abstract void enableLights();
+	protected abstract void disableLights();
+	protected abstract void disableTextures();
 }
