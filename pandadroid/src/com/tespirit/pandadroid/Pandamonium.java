@@ -56,9 +56,10 @@ public class Pandamonium extends Activity {
     	view.createDefaultLight();
     	
     	//try{
-    	//	Player player = view.addBambooSingleAnimation(Assets.getManager().loadBamboo("candy.bam"));
+    	//	Player player = view.addBambooSingleAnimation(Assets.loadBamboo("candy.bam"));
     	//	player.setSkeleton("d_root1");
     	//	Debug.addTestAnimation(player);
+    	//	view.addBamboo(Assets.loadCollada("doug.dae"));
     	//} catch(Exception e){
     	//	Debug.print(e);
     		view.addSceneNode(this.createTestSG());

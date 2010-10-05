@@ -224,7 +224,7 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		
 		@Override
 		public void init(Texture texture) {
-			Bitmap bitmap = Assets.getManager().openBitmap(texture.getDiffuseTextureName());
+			Bitmap bitmap = Assets.openBitmap(texture.getDiffuseTextureName());
 			if(bitmap == null){
 				texture.setDiffuseTextureId(0);
 				return;

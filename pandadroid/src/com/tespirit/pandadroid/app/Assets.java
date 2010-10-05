@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
 import org.xmlpull.v1.XmlPullParser;
 
 import com.tespirit.bamboo.animation.Animation;
@@ -17,6 +13,7 @@ import com.tespirit.bamboo.io.Collada;
 import com.tespirit.bamboo.scenegraph.Node;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Xml;
@@ -30,52 +27,29 @@ import android.util.Xml;
  *
  */
 public class Assets {
-	private android.content.res.AssetManager assets;
-	private DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	private static Assets manager;
+	private static AssetManager mAssetManager;
 	
 	/**
 	 * this must be called first.
 	 * @param contex
 	 */
 	public static void init(Context contex){
-		Assets.manager = new Assets(contex);
+		Assets.mAssetManager = contex.getAssets();
 	}
 	
-	public static Assets getManager(){
-		return Assets.manager;
-	}
-	
-	private Assets(Context contex){
-		this.assets = contex.getAssets();
-	}
-	
-	public InputStream openStream(String name){
+	public static InputStream openStream(String name){
 		InputStream stream;
 		
 		try{
-			stream = this.assets.open(name);
+			stream = Assets.mAssetManager.open(name);
 		} catch (IOException e){
 			return null;
 		}
 		return stream;
 	}
 	
-	public Document openXmlDom(String xmlName){
-        try{
-        	DocumentBuilder builder = this.factory.newDocumentBuilder();
-        	InputStream stream = this.openStream(xmlName);
-        	Document doc = builder.parse(stream);
-        	stream.close();
-        	return doc;
-        	
-        } catch(Exception e){
-        	return null;
-        }
-	}
-	
-	public Bitmap openBitmap(String textureName){
-		InputStream stream = this.openStream(textureName);
+	public static Bitmap openBitmap(String textureName){
+		InputStream stream = Assets.openStream(textureName);
 		if(stream == null){
 			return null;
 		}
@@ -83,7 +57,7 @@ public class Assets {
 		Bitmap bitmap;
 		
 		try{
-			stream = this.assets.open(textureName);
+			stream = Assets.mAssetManager.open(textureName);
 		} catch (IOException e){
 			return null;
 		}
@@ -104,7 +78,7 @@ public class Assets {
 	}
 	
 	public List<Node> loadNodes(String name) throws Exception{
-		InputStream stream = this.openStream(name);
+		InputStream stream = Assets.openStream(name);
 		try{
 			List<Node> nodes = Bamboo.loadNodes(stream);
 			stream.close();
@@ -116,7 +90,7 @@ public class Assets {
 	}
 	
 	public List<Animation> loadAnimations(String name) throws Exception{
-		InputStream stream = this.openStream(name);
+		InputStream stream = Assets.openStream(name);
 		try{
 			List<Animation> animations = Bamboo.loadAnimations(stream);
 			stream.close();
@@ -128,7 +102,7 @@ public class Assets {
 	}
 	
 	public BambooAsset loadBamboo(String name) throws Exception{
-		InputStream stream = this.openStream(name);
+		InputStream stream = Assets.openStream(name);
 		try{
 			BambooAsset asset = new Bamboo(stream);
 			stream.close();
@@ -140,7 +114,7 @@ public class Assets {
 	}
 	
 	public BambooAsset loadCollada(String name) throws Exception{
-		InputStream stream = this.openStream(name);
+		InputStream stream = Assets.openStream(name);
 		try{
 			XmlPullParser parser = Xml.newPullParser();
 			parser.setInput(stream, null);
