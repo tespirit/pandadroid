@@ -15,12 +15,12 @@ public class ChannelEditor extends TreeNodeEditor{
 	
 	
 	@Override
-	public Component getEditorPanel() {
+	public Component getPropertyPanel() {
 		String output = "Bamboo Channel Info\n\n";
 		output += "Type: " + this.mChannel.toString() + "\n";
 		output += "Key Frame Count: " + this.mChannel.getKeyFrameCount();
-		EditorPanels.getTextInfo().setText(output);
-		return EditorPanels.getTextInfo();
+		Util.getTextInfo().setText(output);
+		return Util.getTextInfo();
 	}
 	
 	@Override

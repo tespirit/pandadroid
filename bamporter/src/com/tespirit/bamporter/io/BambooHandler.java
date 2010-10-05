@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamporter.app.Assets;
 
 public class BambooHandler extends FileHandler{
 	private static BambooHandler mFileHandler;
@@ -20,7 +21,7 @@ public class BambooHandler extends FileHandler{
 	
 	private BambooHandler() {
 		super("Bamboo Asset", "bam");
-		IOManager.registerFileHandler(this);
+		Assets.registerFileHandler(this);
 	}
 	
 	@Override

@@ -27,7 +27,6 @@ import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.editor.*;
 import com.tespirit.bamporter.io.BambooHandler;
-import com.tespirit.bamporter.io.IOManager;
 import com.tespirit.bamporter.opengl.Renderer;
 
 public class BamporterFrame extends JFrame{
@@ -58,7 +57,7 @@ public class BamporterFrame extends JFrame{
 	private void initComponents() {
 		setTitle(TITLE);
 		
-		IOManager.init();
+		Assets.init();
 		
 		JMenuItem openButton = new JMenuItem();
 		openButton.setText("Open");
@@ -89,7 +88,6 @@ public class BamporterFrame extends JFrame{
 		setLayout(layout);
 		treeView.setViewportView(mTree);
 		mTreeModel = new DefaultTreeModel(mRoot);
-		EditorPanels.setNavigator(mTreeModel);
 		mTree.setModel(mTreeModel);
 		splitPane.setTopComponent(treeView);
 		splitPane.setBottomComponent(splitPaneEditor);
@@ -162,7 +160,7 @@ public class BamporterFrame extends JFrame{
 	private void selectTreeNode(TreeSelectionEvent event) {
 		Object node = mTree.getLastSelectedPathComponent();
 		if(node instanceof TreeNodeEditor){
-			this.mEditorView.setViewportView(((TreeNodeEditor)node).getEditorPanel());
+			this.mEditorView.setViewportView(((TreeNodeEditor)node).getPropertyPanel());
 			this.mEditorView.setEnabled(true);
 		} else {
 			this.mEditorView.setEnabled(false);
@@ -173,13 +171,11 @@ public class BamporterFrame extends JFrame{
 		if(this.showOpenDialog() == JFileChooser.APPROVE_OPTION){
 			try{
 				File file = mFileDialog.getSelectedFile();
-				mBamboo = IOManager.open(file);
+				mBamboo = Assets.open(file);
 				setTitle(TITLE + " - " + file.getName());
-				
-				Assets.getInstance().addTexturePath(file.getParent());
 			} catch (Exception e){
 				e.printStackTrace();
-				EditorPanels.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
+				Util.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
 				return;
 			}
 			this.loadBamboo();
@@ -227,10 +223,10 @@ public class BamporterFrame extends JFrame{
 	private void saveAllButtonAction(ActionEvent event) {
 		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				IOManager.saveBamboo(this.mBamboo, mFileDialog.getSelectedFile());
+				//Assets.saveBamboo(this.mBamboo, mFileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
-				EditorPanels.alertError("An error happened while saving. Please contact support :(");
+				Util.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
 	}
@@ -238,10 +234,10 @@ public class BamporterFrame extends JFrame{
 	private void saveNodeButtonAction(ActionEvent event) {
 		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				IOManager.saveSceneGraph(this.mBamboo, mFileDialog.getSelectedFile());
+				//Assets.saveSceneGraph(this.mBamboo, mFileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
-				EditorPanels.alertError("An error happened while saving. Please contact support :(");
+				Util.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
 	}
@@ -249,10 +245,10 @@ public class BamporterFrame extends JFrame{
 	private void saveAnimationButtonAction(ActionEvent event) {
 		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
 			try{
-				IOManager.saveAnimation(this.mBamboo, mFileDialog.getSelectedFile());
+				//Assets.saveAnimation(this.mBamboo, mFileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
-				EditorPanels.alertError("An error happened while saving. Please contact support :(");
+				Util.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
 	}
@@ -268,7 +264,7 @@ public class BamporterFrame extends JFrame{
 	
 	private int showOpenDialog(){
 		mFileDialog.resetChoosableFileFilters();
-		for(FileFilter filter : IOManager.getFilters()){
+		for(FileFilter filter : Assets.getFilters()){
 			mFileDialog.addChoosableFileFilter(filter);
 		}
 		return mFileDialog.showOpenDialog(this);

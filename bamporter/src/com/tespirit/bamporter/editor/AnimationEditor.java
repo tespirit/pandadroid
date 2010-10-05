@@ -1,29 +1,25 @@
 package com.tespirit.bamporter.editor;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.Iterator;
 
-import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Clip;
+import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamporter.app.BamporterEditor;
 
 public class AnimationEditor extends TreeNodeEditor{
 	
 	private RenderManager mRenderManager;
 	private Animation mAnimation;
 	private Player mPlayer;
-	private JTextField mSkeleton;
-	private Box mPanel;
-	private JComboBox mClips;
+	private AnimationEditorPanel mPropertyPanel;
 	
 	public AnimationEditor(Animation animation, RenderManager renderManager){
 		this.mRenderManager = renderManager;
@@ -31,123 +27,85 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mPlayer = new Player();
 		this.mPlayer.setAnimation(this.mAnimation);
 		this.mRenderManager.addUpdater(this.mPlayer);
-		
+
+		this.mPropertyPanel = new AnimationEditorPanel();
 		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
 			Clip clip = this.mAnimation.getClip(i);
 			this.add(new ClipEditor(clip));
+			this.mPropertyPanel.mClips.addItem(clip.getName());
 		}
-		this.mPanel = Box.createVerticalBox();
 		
-		this.mClips = new JComboBox();
-		this.mClips.setEditable(false);
-		this.mClips.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				mPlayer.setActiveClip(mClips.getSelectedIndex());
-			}
-		});
+		if(this.mAnimation.getName() != null){
+			this.mPropertyPanel.mName.setText(this.mAnimation.getName());
+		}
+		this.updateSkeletons();
 		
-		JLabel info = new JLabel();
-		info.setText("Bamboo Animation Info");
-		
-		JLabel type = new JLabel();
-		type.setText(this.mAnimation.toString());
-		
-		this.mSkeleton = new JTextField();
-		this.mSkeleton.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				mPlayer.setSkeleton(mSkeleton.getText());
-			}
-		});
-		
-		JButton play = new JButton();
-		play.setText("Play");
-		play.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				mPlayer.play();
-			}
-		});
-		
-		JButton pause = new JButton();
-		pause.setText("Pause");
-		pause.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				mPlayer.pause();
-			}
-		});
-		
-		JButton reverse = new JButton();
-		reverse.setText("Play Reverse");
-		reverse.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				mPlayer.playReverse();
-			}
-		});
-		
-		JButton restart = new JButton();
-		restart.setText("Restart");
-		restart.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				mPlayer.restart();
-			}
-		});
-		
-		JButton newClip = new JButton();
-		newClip.setText("Create Clip");
-		newClip.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String name = EditorPanels.promptString("Please type in a name for this clip.");
-				if(name != null && name.length() > 0){
-					Clip clip = new Clip(name, 0,0);
-					mAnimation.addClip(clip);
-					add(new ClipEditor(clip));
-					refreshClips();
-				}
-			}
-		});
-		
-		this.mPanel.add(info);
-		this.mPanel.add(type);
-		
-
-		this.mPanel.add(new JLabel("Clips"));
-		this.mPanel.add(this.mClips);
-		this.mPanel.add(newClip);
-		
-		this.mPanel.add(new JLabel("Player"));
-		this.mPanel.add(new JLabel("Skeleton"));
-		this.mPanel.add(this.mSkeleton);
-		this.mPanel.add(play);
-		this.mPanel.add(pause);
-		this.mPanel.add(reverse);
-		this.mPanel.add(restart);
-		
-		
-		this.refreshClips();
 	}
 	
-	public void refreshClips(){
-		this.mClips.removeAllItems();
-		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
-			Clip clip = this.mAnimation.getClip(i);
-			this.mClips.addItem(clip.getName());
-		}
-		EditorPanels.refreshNavigator(this);
+	public void addClip(Clip clip){
+		this.mAnimation.addClip(clip);
+		this.add(new ClipEditor(clip));
+		JComboBox clips = this.mPropertyPanel.mClips;
+		clips.addItem(clip.getName());
+		BamporterEditor.getInstance().reloadNavigator();
 	}
 	
-	public Animation getAnimation(){
-		return this.mAnimation;
+	public void removeClip(Clip clip){
+		this.mAnimation.removeClip(clip);
+		JComboBox clips = this.mPropertyPanel.mClips;
+		clips.removeItem(clip.getName());
+	}
+	
+	public int getClipCount(){
+		return this.mAnimation.getClipCount();
+	}
+	
+	public void updateSkeleton(){
+		
+	}
+	
+	public void updateSkeletons(){
+		JComboBox skeletons = this.mPropertyPanel.mSkeletons;
+		
+		skeletons.removeAllItems();
+		skeletons.addItem("");
+		for(Iterator<Node> i = this.mRenderManager.getSceneIterator(); i.hasNext();){
+			this.updateSkeletons(i.next());
+		}
+	}
+	
+	private void updateSkeletons(Node node){
+		if(node instanceof Joint){
+			this.mPropertyPanel.mSkeletons.addItem(node.getName());
+		}
+		for(int i = 0; i < node.getChildCount(); i++){
+			this.updateSkeletons(node.getChild(i));
+		}
+	}
+	
+	public void updatePlay(){
+		
+	}
+	
+	public void play(){
+		
+	}
+	
+	public void pause(){
+		
+	}
+	
+	public void reverse(){
+		
+	}
+	
+	public void restart(){
+		
 	}
 
 	@Override
-	public Component getEditorPanel() {
-		return this.mPanel;
+	public Component getPropertyPanel() {
+		return this.mPropertyPanel;
 	}
 	
 	@Override
@@ -157,14 +115,11 @@ public class AnimationEditor extends TreeNodeEditor{
 
 	@Override
 	public void recycle() {
-		if(this.mRenderManager != null){
-			this.mRenderManager.removeUpdater(this.mPlayer);
-		}
+		this.mRenderManager.removeUpdater(this.mPlayer);
 		this.mRenderManager = null;
 		this.mAnimation = null;
 		this.mPlayer = null;
-		this.mSkeleton = null;
-		this.mPanel = null;
+		this.mPropertyPanel = null;
 		for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
 			children.nextElement().recycle();
 		}

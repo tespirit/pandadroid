@@ -2,6 +2,7 @@ package com.tespirit.bamporter.app;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -10,56 +11,113 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GLProfile;
+import javax.swing.filechooser.FileFilter;
 
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
+import com.tespirit.bamboo.io.Bamboo;
+import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamporter.io.BambooHandler;
+import com.tespirit.bamporter.io.ColladaHandler;
+import com.tespirit.bamporter.io.FileHandler;
 
 public class Assets {
 	
-	private static Assets mAssets;
+	private static Map<String, File> mAbsolutePaths = new HashMap<String, File>();
+	private static List<File> mPaths = new ArrayList<File>();
+	private static String mLocalPath;
+	private static GLProfile mGlProfile;
 	
-	public static Assets getInstance(){
-		if(mAssets == null){
-			mAssets = new Assets();
+	private static Map<String, FileHandler> mFileHandlers = new HashMap<String, FileHandler>();
+	private static List<FileFilter> mFilters = new ArrayList<FileFilter>();
+	
+	public static void init(){
+		BambooHandler.init();
+		ColladaHandler.init();
+	}
+	
+	public static void registerFileHandler(FileHandler fh){
+		mFileHandlers.put(fh.getExtension(), fh);
+		mFilters.add(fh.getFilter());
+	}
+	
+	public static List<FileFilter> getFilters(){
+		return mFilters;
+	}
+	
+	public static BambooAsset open(File file) throws Exception{
+		String ext = file.getName();
+		int dotIndex = ext.lastIndexOf('.');
+		if(dotIndex != -1){
+			ext = ext.substring(dotIndex);
 		}
-		return mAssets;
+		if(mFileHandlers.containsKey(ext)){
+			if(Assets.mLocalPath != null){
+				Assets.mPaths.remove(Assets.mLocalPath);
+			}
+			BambooAsset asset = mFileHandlers.get(ext).open(file);
+			Assets.mLocalPath = file.getParent();
+			Assets.addTexturePath(file.getParent());
+			return asset;
+		} else {
+			throw new Exception("The ext '"+ext+"' is not supported.");
+		}
 	}
 	
-	private Map<String, File> mAbsolutePaths;
-	private List<File> mPaths;
-	GLProfile mGlProfile;
-	
-	private Assets(){
-		this.mAbsolutePaths = new HashMap<String, File>();
-		this.mPaths = new ArrayList<File>();
+	public enum SaveTypes{
+		scene,
+		animation,
+		camera,
+		player,
+		all
 	}
 	
-	public void setGlProfile(GLProfile glProfile){
-		this.mGlProfile = glProfile;
+	public static void saveBamboo(BambooAsset asset, File file, SaveTypes type) throws Exception{
+		FileOutputStream stream = new FileOutputStream(file);
+		try{
+			switch(type){
+			case scene:
+				Bamboo.saveNodes(asset.getScenes(), stream);
+				break;
+			case animation:
+				Bamboo.saveAnimations(asset.getAnimations(), stream);
+				break;
+			case all:
+				Bamboo.saveBamboo(asset, stream);
+			}
+			stream.close();
+		} catch(Exception e){
+			stream.close();
+			throw e;
+		}
+	}
+	
+	public static void setGlProfile(GLProfile glProfile){
+		Assets.mGlProfile = glProfile;
 	}
 	
 	//use this to add a path, either absolute name for a texture or a directory.
 	//absolute paths will be checked first, then directories.
-	public void addTexturePath(String path){
+	public static void addTexturePath(String path){
 		File file = new File(path);
 		if(file.isDirectory()){
-			this.mPaths.add(file);
+			Assets.mPaths.add(file);
 		} else if(file.isFile()){
-			this.mAbsolutePaths.put(file.getName(), file);
+			Assets.mAbsolutePaths.put(file.getName(), file);
 		}
 	}
 	
-	public void exportTextures(String fileName, String outPath){
+	public static void exportTextures(String fileName, String outPath){
 		
 	}
 	
-	public TextureData openTexture(String fileName) throws Exception{
+	public static TextureData openTexture(String fileName) throws Exception{
 		File file = getTexturePath(fileName);
 		InputStream stream = new FileInputStream(file);
-		return TextureIO.newTextureData(this.mGlProfile, stream, false, this.getExtension(file));
+		return TextureIO.newTextureData(Assets.mGlProfile, stream, false, Assets.getExtension(file));
 	}
 	
-	public String getExtension(File file){
+	public static String getExtension(File file){
 		int index = file.getName().lastIndexOf('.');
 		if(index != -1 && index < file.getName().length()){
 			return file.getName().substring(index+1);
@@ -68,15 +126,15 @@ public class Assets {
 		}
 	}
 	
-	private File getTexturePath(String textureName) throws Exception{
+	private static File getTexturePath(String textureName) throws Exception{
 		File file = new File(textureName);
 		if(file.isFile()){
 			return file;
 		}
-		if(this.mAbsolutePaths.containsKey(file.getName())){
-			return this.mAbsolutePaths.get(file.getName());
+		if(Assets.mAbsolutePaths.containsKey(file.getName())){
+			return Assets.mAbsolutePaths.get(file.getName());
 		} else { //search file paths!
-			for(File path : this.mPaths){
+			for(File path : Assets.mPaths){
 				File fullPath = new File(path.getPath(),file.getName());
 				if(fullPath.exists()){
 					return fullPath;

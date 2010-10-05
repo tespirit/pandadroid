@@ -39,7 +39,7 @@ public class ColladaHandler extends FileHandler{
 		try{
 			mXmlParserFactory = XmlPullParserFactory.newInstance(System.getProperty(XmlPullParserFactory.PROPERTY_NAME), null);
 			mXmlParserFactory.setNamespaceAware(true);
-			IOManager.registerFileHandler(this);
+			Assets.registerFileHandler(this);
 		} catch(Exception e){
 			e.printStackTrace();
 		}
@@ -49,7 +49,7 @@ public class ColladaHandler extends FileHandler{
 		public Collada(XmlPullParser input) throws Exception{			
 			super(input);
 			for(String texturePath : this.mTexturePaths){
-				Assets.getInstance().addTexturePath(texturePath);
+				Assets.addTexturePath(texturePath);
 			}
 		}
 	}

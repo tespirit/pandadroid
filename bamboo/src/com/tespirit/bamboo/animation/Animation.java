@@ -91,6 +91,17 @@ public class Animation implements Externalizable{
 	public Clip getClip(int i){
 		return this.mClips.get(i);
 	}
+	
+	/**
+	 * This should only be used in editing applications as clip id's will
+	 * change.
+	 * @param clip
+	 */
+	public void removeClip(Clip clip){
+		this.mClips.remove(clip);
+		this.mClipLookup.remove(clip.getName());
+		clip = null;
+	}
 
 	public void addChannel(Channel c){
 		mChannels.add(c);

@@ -58,7 +58,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		GLProfile.initSingleton();
 		mGlProfile = GLProfile.getDefault();
 		mGlCapabilities = new GLCapabilities(mGlProfile);
-		Assets.getInstance().setGlProfile(mGlProfile);
+		Assets.setGlProfile(mGlProfile);
 	}
 	
 	public Renderer(){
@@ -352,7 +352,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		@Override
 		public void init(Texture texture) {
 			try{
-				TextureData textureData = Assets.getInstance().openTexture(texture.getDiffuseTextureName());
+				TextureData textureData = Assets.openTexture(texture.getDiffuseTextureName());
 				mTextures.add(TextureIO.newTexture(textureData));
 				texture.setDiffuseTextureId(mTextures.size()-1);
 			} catch(Exception e){

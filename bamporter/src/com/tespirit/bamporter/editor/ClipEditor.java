@@ -2,68 +2,51 @@ package com.tespirit.bamporter.editor;
 
 import java.awt.Component;
 
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Clip;
+import com.tespirit.bamporter.app.BamporterEditor;
 
 public class ClipEditor extends TreeNodeEditor{
 	private Clip mClip;
-	private Box mPanel;
-	private JSpinner mStart;
-	private JSpinner mEnd;
-	private JLabel mId;
-	private JLabel mName;
+	private ClipEditorPanel mProperties;
 	
 	
 	public ClipEditor(Clip clip){
 		this.mClip = clip;
-		this.mPanel = Box.createVerticalBox();
-		this.mStart = EditorPanels.createLongSpinner(clip.getStart(), Long.MIN_VALUE, Long.MAX_VALUE, 1);
-		this.mStart.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				SpinnerNumberModel model = (SpinnerNumberModel)mStart.getModel();
-				mClip.setStart(model.getNumber().longValue());
-				
-			}
-		});
+		this.mProperties = new ClipEditorPanel();
+		if(this.mClip.getName() != null){
+			this.mProperties.mName.setText(this.mClip.getName());
+		}
 		
-		this.mEnd = EditorPanels.createLongSpinner(clip.getEnd(), Long.MIN_VALUE, Long.MAX_VALUE, 1);
-		this.mEnd.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				SpinnerNumberModel model = (SpinnerNumberModel)mEnd.getModel();
-				mClip.setEnd(model.getNumber().longValue());
-				
-			}
-		});
+		this.mProperties.mStart.getModel().setValue(this.mClip.getStart());
+		this.mProperties.mEnd.getModel().setValue(this.mClip.getEnd());
+	}
+	
+	public void deleteClip(){
+		AnimationEditor parent = (AnimationEditor)this.getParent();
+		parent.removeClip(this.mClip);
+		this.removeFromParent();
+		BamporterEditor.getInstance().reloadNavigator();
+		this.recycle();
+	}
+	
+	public void updateClip(){
 		
-		this.mName = new JLabel();
-		this.mId = new JLabel();
+	}
+	
+	public void updateClipName(){
 		
-		this.mPanel.add(this.mName);
-		this.mPanel.add(this.mId);
-		this.mPanel.add(this.mStart);
-		this.mPanel.add(this.mEnd);
 	}
 
 	@Override
-	public Component getEditorPanel() {
-		Animation owner = ((AnimationEditor)this.getParent()).getAnimation();
-		this.mName.setText("Name: " + this.mClip.getName());
-		this.mId.setText("Id: "+owner.getClipId(this.mClip.getName()));
-		return this.mPanel;
+	public Component getPropertyPanel() {
+		AnimationEditor parent = (AnimationEditor)this.getParent();
+		this.mProperties.mDelete.setEnabled(parent.getClipCount()  > 1);
+		return this.mProperties;
 	}
 
 	@Override
 	public void recycle() {
-		this.mPanel = null;
+		this.mProperties = null;
 		this.mClip = null;
 	}
 	

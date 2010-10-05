@@ -5,16 +5,39 @@ import java.util.Enumeration;
 
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
 public class NodeEditor extends TreeNodeEditor{
 	Node mNode;
 	RenderManager mRenderManager;
+	NodeEditorPanel mProperties;
 	
 	public NodeEditor(Node node, RenderManager renderManager){
 		this.mRenderManager = renderManager;
 		this.mNode = node;
 		for(int i = 0; i < node.getChildCount(); i++){
 			this.add(new NodeEditor(node.getChild(i), renderManager));
+		}
+		this.mProperties = new NodeEditorPanel();
+		
+		if(this.mNode.getName() != null){
+			this.mProperties.mName.setText(this.mNode.getName());
+		}
+		AxisAlignedBox bb = this.mNode.getBoundingBox();
+		if(bb == null){
+			this.mProperties.mMaxX.setEnabled(false);
+			this.mProperties.mMaxY.setEnabled(false);
+			this.mProperties.mMaxZ.setEnabled(false);
+			this.mProperties.mMinX.setEnabled(false);
+			this.mProperties.mMinY.setEnabled(false);
+			this.mProperties.mMinZ.setEnabled(false);
+		} else {
+			this.mProperties.mMaxX.getModel().setValue(bb.getMax().getX());
+			this.mProperties.mMaxY.getModel().setValue(bb.getMax().getY());
+			this.mProperties.mMaxZ.getModel().setValue(bb.getMax().getZ());
+			this.mProperties.mMinX.getModel().setValue(bb.getMin().getX());
+			this.mProperties.mMinY.getModel().setValue(bb.getMin().getY());
+			this.mProperties.mMinZ.getModel().setValue(bb.getMin().getZ());
 		}
 	}
 	
@@ -24,42 +47,16 @@ public class NodeEditor extends TreeNodeEditor{
 	}
 
 	@Override
-	public Component getEditorPanel() {
-		String output = "Bamboo Scene Graph Node Info\n\n";
-		output += "Name: " + this.mNode.getName() + "\n";
-		output += "Type: " + this.mNode.toString() + "\n";
-		
-		if(this.mNode.getTransform() != null){
-			output += "\nLocalTransform:";
-			for(int j = 0; j < 4; j++){
-				output+= "\n\t";
-				for(int i = 0; i < 4; i++){
-					output += this.mNode.getTransform().getValue(j, i) + "\t";
-				}
-			}
-		}
-		if(this.mNode.getBoundingBox() != null){
-			output += "\nBoundingBox:\n\t";
-			for(int i = 0; i < 3; i++){
-				output += this.mNode.getBoundingBox().getMin().get(i) + "\t";
-			}
-			output += "\n\t";
-			for(int i = 0; i < 3; i++){
-				output += this.mNode.getBoundingBox().getMax().get(i) + "\t";
-			}
-		}
-		EditorPanels.getTextInfo().setText(output);
-		return EditorPanels.getTextInfo();
+	public Component getPropertyPanel() {
+		return this.mProperties;
 	}
 
 	@Override
 	public void recycle() {
-		if(this.mNode != null){
-			this.mNode.recycle();
-			this.mNode = null;
-			for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
-				children.nextElement().recycle();
-			}
+		this.mNode.recycle();
+		this.mNode = null;
+		for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
+			children.nextElement().recycle();
 		}
 	}
 }

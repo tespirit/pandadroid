@@ -85,8 +85,16 @@ public class Player implements TimeUpdater, Externalizable{
 	}
 	
 	public void setSkeleton(Joint skeleton){
-		this.mSkeletonName = skeleton.getName();
+		if(skeleton != null){
+			this.mSkeletonName = skeleton.getName();
+		} else {
+			this.mSkeletonName = null;
+		}
 		this.mSkeleton = skeleton;
+	}
+	
+	public Joint getSkeleton(){
+		return this.mSkeleton;
 	}
 	
 	public void play(){

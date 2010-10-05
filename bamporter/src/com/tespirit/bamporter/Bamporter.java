@@ -3,6 +3,7 @@ package com.tespirit.bamporter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.tespirit.bamporter.app.BamporterEditor;
 import com.tespirit.bamporter.app.BamporterFrame;
 import com.tespirit.bamporter.opengl.Renderer;
 
@@ -31,13 +32,7 @@ public class Bamporter {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				BamporterFrame frame = new BamporterFrame();
-				frame.setDefaultCloseOperation(BamporterFrame.EXIT_ON_CLOSE);
-				frame.setTitle("Bamporter");
-				frame.getContentPane().setPreferredSize(frame.getSize());
-				frame.pack();
-				frame.setLocationRelativeTo(null);
-				frame.setVisible(true);
+				BamporterEditor.getInstance().show();
 			}
 		});
 	}

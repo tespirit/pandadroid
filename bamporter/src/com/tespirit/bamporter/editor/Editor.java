@@ -3,6 +3,6 @@ package com.tespirit.bamporter.editor;
 import java.awt.Component;
 
 public interface Editor {
-	public Component getEditorPanel();
-	public void recycle();
+    public Component getPropertyPanel();
+    public void recycle();
 }
