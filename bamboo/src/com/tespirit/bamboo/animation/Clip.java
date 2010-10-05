@@ -21,7 +21,7 @@ public class Clip {
 	}
 	
 	public long getClipTime(long currentTime){
-		return (currentTime -this.mStart)%this.mEnd + this.mStart;
+		return (currentTime -this.mStart)%(this.mEnd-this.mStart) + this.mStart;
 	}
 	
 	public long getStart(){
@@ -30,5 +30,13 @@ public class Clip {
 	
 	public long getEnd(){
 		return this.mEnd;
+	}
+	
+	public void setStart(long start){
+		this.mStart = start;
+	}
+	
+	public void setEnd(long end){
+		this.mEnd = end;
 	}
 }

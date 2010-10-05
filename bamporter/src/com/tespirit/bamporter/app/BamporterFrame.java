@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -26,10 +25,7 @@ import javax.swing.tree.DefaultTreeModel;
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamporter.editor.AnimationEditor;
-import com.tespirit.bamporter.editor.Editor;
-import com.tespirit.bamporter.editor.NodeEditor;
-import com.tespirit.bamporter.editor.TreeNodeEditor;
+import com.tespirit.bamporter.editor.*;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.io.IOManager;
 import com.tespirit.bamporter.opengl.Renderer;
@@ -93,6 +89,7 @@ public class BamporterFrame extends JFrame{
 		setLayout(layout);
 		treeView.setViewportView(mTree);
 		mTreeModel = new DefaultTreeModel(mRoot);
+		EditorPanels.setNavigator(mTreeModel);
 		mTree.setModel(mTreeModel);
 		splitPane.setTopComponent(treeView);
 		splitPane.setBottomComponent(splitPaneEditor);
@@ -182,7 +179,7 @@ public class BamporterFrame extends JFrame{
 				Assets.getInstance().addTexturePath(file.getParent());
 			} catch (Exception e){
 				e.printStackTrace();
-				this.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
+				EditorPanels.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
 				return;
 			}
 			this.loadBamboo();
@@ -233,7 +230,7 @@ public class BamporterFrame extends JFrame{
 				IOManager.saveBamboo(this.mBamboo, mFileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
-				this.alertError("An error happened while saving. Please contact support :(");
+				EditorPanels.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
 	}
@@ -244,7 +241,7 @@ public class BamporterFrame extends JFrame{
 				IOManager.saveSceneGraph(this.mBamboo, mFileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
-				this.alertError("An error happened while saving. Please contact support :(");
+				EditorPanels.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
 	}
@@ -255,14 +252,9 @@ public class BamporterFrame extends JFrame{
 				IOManager.saveAnimation(this.mBamboo, mFileDialog.getSelectedFile());
 			} catch (Exception e){
 				e.printStackTrace();
-				this.alertError("An error happened while saving. Please contact support :(");
+				EditorPanels.alertError("An error happened while saving. Please contact support :(");
 			}
 		}
-	}
-
-	
-	private void alertError(String message){
-		JOptionPane.showMessageDialog(null, message, "Uh oh!", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	private int showSaveDialog(){

@@ -7,10 +7,12 @@ import java.util.Enumeration;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.render.RenderManager;
 
@@ -21,6 +23,7 @@ public class AnimationEditor extends TreeNodeEditor{
 	private Player mPlayer;
 	private JTextField mSkeleton;
 	private Box mPanel;
+	private JComboBox mClips;
 	
 	public AnimationEditor(Animation animation, RenderManager renderManager){
 		this.mRenderManager = renderManager;
@@ -29,19 +32,26 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mPlayer.setAnimation(this.mAnimation);
 		this.mRenderManager.addUpdater(this.mPlayer);
 		
-		for(int i = 0; i < animation.getChannelCount(); i++){
-			this.add(new ChannelEditor(animation.getChannel(i), renderManager));
+		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
+			Clip clip = this.mAnimation.getClip(i);
+			this.add(new ClipEditor(clip));
 		}
 		this.mPanel = Box.createVerticalBox();
+		
+		this.mClips = new JComboBox();
+		this.mClips.setEditable(false);
+		this.mClips.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				mPlayer.setActiveClip(mClips.getSelectedIndex());
+			}
+		});
 		
 		JLabel info = new JLabel();
 		info.setText("Bamboo Animation Info");
 		
 		JLabel type = new JLabel();
 		type.setText(this.mAnimation.toString());
-		
-		JLabel skeletonLabel = new JLabel();
-		skeletonLabel.setText("Skeleton Root");
 		
 		this.mSkeleton = new JTextField();
 		this.mSkeleton.addActionListener(new ActionListener(){
@@ -50,7 +60,6 @@ public class AnimationEditor extends TreeNodeEditor{
 				mPlayer.setSkeleton(mSkeleton.getText());
 			}
 		});
-		skeletonLabel.setLabelFor(this.mSkeleton);
 		
 		JButton play = new JButton();
 		play.setText("Play");
@@ -88,14 +97,52 @@ public class AnimationEditor extends TreeNodeEditor{
 			}
 		});
 		
+		JButton newClip = new JButton();
+		newClip.setText("Create Clip");
+		newClip.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String name = EditorPanels.promptString("Please type in a name for this clip.");
+				if(name != null && name.length() > 0){
+					Clip clip = new Clip(name, 0,0);
+					mAnimation.addClip(clip);
+					add(new ClipEditor(clip));
+					refreshClips();
+				}
+			}
+		});
+		
 		this.mPanel.add(info);
 		this.mPanel.add(type);
-		this.mPanel.add(skeletonLabel);
+		
+
+		this.mPanel.add(new JLabel("Clips"));
+		this.mPanel.add(this.mClips);
+		this.mPanel.add(newClip);
+		
+		this.mPanel.add(new JLabel("Player"));
+		this.mPanel.add(new JLabel("Skeleton"));
 		this.mPanel.add(this.mSkeleton);
 		this.mPanel.add(play);
 		this.mPanel.add(pause);
 		this.mPanel.add(reverse);
 		this.mPanel.add(restart);
+		
+		
+		this.refreshClips();
+	}
+	
+	public void refreshClips(){
+		this.mClips.removeAllItems();
+		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
+			Clip clip = this.mAnimation.getClip(i);
+			this.mClips.addItem(clip.getName());
+		}
+		EditorPanels.refreshNavigator(this);
+	}
+	
+	public Animation getAnimation(){
+		return this.mAnimation;
 	}
 
 	@Override

@@ -84,6 +84,14 @@ public class Animation implements Externalizable{
 		return this.mClipLookup.get(clipName);
 	}
 	
+	public int getClipCount(){
+		return this.mClips.size();
+	}
+	
+	public Clip getClip(int i){
+		return this.mClips.get(i);
+	}
+
 	public void addChannel(Channel c){
 		mChannels.add(c);
 	}

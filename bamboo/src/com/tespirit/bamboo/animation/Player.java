@@ -48,6 +48,26 @@ public class Player implements TimeUpdater, Externalizable{
 		}
 	}
 	
+	/**
+	 * This allows you to set an active clip by name. it will return the clip id,
+	 * incase you want to activate this again later.
+	 * @param name
+	 * @return
+	 */
+	public int setActiveClip(String name){
+		this.mCurrentClipId = this.mAnimation.getClipId(name);
+		return this.mCurrentClipId;
+		
+	}
+	
+	public void setActiveClip(int id){
+		this.mCurrentClipId = id;
+	}
+	
+	public int getClipId(String name){
+		return this.mAnimation.getClipId(name);
+	}
+	
 	public void setAnimation(Animation animation){
 		this.mAnimationName = animation.getName();
 		this.mAnimation = animation;
