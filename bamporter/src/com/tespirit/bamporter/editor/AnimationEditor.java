@@ -28,7 +28,9 @@ public class AnimationEditor extends TreeNodeEditor{
 	private JTextField mName;
 	private JComboBox mClips;
 	private JButton mNewClip;
+	private JToggleButton mPlay;
 	private JComboBox mSkeletons;
+	private ClipEditor mCurrentClip;
 	
 	public AnimationEditor(Animation animation, RenderManager renderManager){
 		this.mRenderManager = renderManager;
@@ -44,17 +46,19 @@ public class AnimationEditor extends TreeNodeEditor{
 	
 	private void generatePanel(){
 		this.mPropertyPanel = new SimplePanel();
-		this.mName = this.mPropertyPanel.addTextField("Name");
-		this.mClips = this.mPropertyPanel.addComboBox("Clips");
-		this.mNewClip = this.mPropertyPanel.addButton("New Clip");
-		this.mSkeletons = this.mPropertyPanel.addComboBox("Skeleton");
+		this.mName = this.mPropertyPanel.createTextField("Name");
+		this.mClips = this.mPropertyPanel.createComboBox("Clips");
+		this.mNewClip = this.mPropertyPanel.createButton("New Clip");
+		this.mSkeletons = this.mPropertyPanel.createComboBox("Skeleton");
 		
-		JToggleButton play = this.mPropertyPanel.addToggleButton("Play");
-		JButton restart = this.mPropertyPanel.addButton("Restart");
+		this.mPlay = this.mPropertyPanel.createToggleButton("Play");
+		JButton restart = this.mPropertyPanel.createButton("Restart");
 		
 		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
 			this.mClips.addItem(this.mAnimation.getClip(i).getName());
 		}
+		
+		this.mCurrentClip = this.getSelectedClipEditor();
 		
 		this.updateSkeletons();
 		
@@ -74,6 +78,8 @@ public class AnimationEditor extends TreeNodeEditor{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mPlayer.setActiveClip(mClips.getSelectedIndex());
+				mCurrentClip.setPlayState(false);
+				mCurrentClip = getSelectedClipEditor();
 			}
 		});
 		
@@ -98,14 +104,15 @@ public class AnimationEditor extends TreeNodeEditor{
 			}
 		});
 		
-		play.addActionListener(new ActionListener(){
+		mPlay.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(((JToggleButton)e.getSource()).getModel().isSelected()){
+				if(mPlay.getModel().isSelected()){
 					mPlayer.play();
 				} else {
 					mPlayer.pause();
 				}
+				mCurrentClip.setPlayState(mPlay.getModel().isSelected());
 			}
 		});
 		
@@ -156,6 +163,34 @@ public class AnimationEditor extends TreeNodeEditor{
 			this.updateSkeletons(node.getChild(i));
 		}
 	}
+	
+	public boolean playClip(String name){
+		if(this.mPlayer.getSkeleton() != null){
+			this.mClips.setSelectedItem(name);
+			this.mPlayer.setActiveClip(name);
+			this.mPlayer.play();
+			this.mPlay.getModel().setSelected(true);
+			return true;
+		} else {
+			Util.alertError("Please set a skeleton to use in the player.");
+			return false;
+		}
+	}
+	
+	public void pauseClip(){
+		if(this.mPlay != null){
+			this.mPlayer.pause();
+			this.mPlay.getModel().setSelected(false);
+		}
+	}
+	
+	public ClipEditor getSelectedClipEditor(){
+		if(this.mClips != null){
+			return (ClipEditor)this.getChildAt(this.mClips.getSelectedIndex());
+		}
+		else return null;
+	}
+	
 
 	@Override
 	public Component getPropertyPanel() {

@@ -61,10 +61,10 @@ public class Renderer extends RenderManager implements GLEventListener{
 		Assets.setGlProfile(mGlProfile);
 	}
 	
-	public Renderer(){
+	public Renderer(java.awt.Color background){
 		super(new CalendarClock());
 		this.mCurrentLightId = 0;
-		this.mBackgroundColor.set(256, 256, 256);
+		this.mBackgroundColor.set(background.getRed(), background.getGreen(), background.getBlue());
 		
 		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
 		this.mIndexTypes[IndexBuffer.BUFFER32] = GL2.GL_UNSIGNED_INT;

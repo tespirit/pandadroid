@@ -1,5 +1,6 @@
 package com.tespirit.bamporter.app;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -57,8 +58,11 @@ public class BamporterFrame extends JFrame{
 	
 	private static final String TITLE = "Bamporter";
 	
+	private Color mBackground;
+	
 	public BamporterFrame() {
 		this.mEditors = new ArrayList<Editor>();
+		this.mBackground = new Color(0xffffffff);
 		initComponents();
 	}
 
@@ -97,13 +101,14 @@ public class BamporterFrame extends JFrame{
 		JScrollPane navScroll = new JScrollPane();
 		navScroll.setBorder(BorderFactory.createTitledBorder("Navigator"));
 		this.mNavigator = new JTree();
+		this.mNavigator.setBorder(BorderFactory.createLineBorder(new Color(0xff888888), 1));
 		this.mNavigator.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Root")));
 		this.mNavigator.setRootVisible(false);
 		
 		this.mPropertyPane = new JScrollPane();
 		this.mPropertyPane.setBorder(BorderFactory.createTitledBorder("Properties"));
 		
-		this.mRenderer = new Renderer();
+		this.mRenderer = new Renderer(this.mBackground);
 		
 		navScroll.setViewportView(this.mNavigator);
 		editSplitter.setTopComponent(navScroll);
@@ -165,6 +170,15 @@ public class BamporterFrame extends JFrame{
 			}
 		});
 		
+		exitButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				close();
+			}
+			
+		});
+		
 		this.setSize(800, 600);
 		this.enableSaves();
 		
@@ -175,6 +189,12 @@ public class BamporterFrame extends JFrame{
 		for(FileFilter filter : Assets.getFilters()){
 			this.mFileOpen.addChoosableFileFilter(filter);
 		}
+	}
+	
+	public void close(){
+		//TODO: make this close by sending a close event, thus listeners will work.
+		setVisible(false);
+		dispose();
 	}
 	
 	private void enableSaves(){
@@ -219,7 +239,7 @@ public class BamporterFrame extends JFrame{
 	}
 	
 	private void onSaveClicked(ActionEvent event, SaveTypes type){
-		if(this.mFileSave.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
+		if(this.mFileSave.showSaveDialog(this) == JFileChooser.APPROVE_OPTION){
 			try{
 				File file = this.mFileSave.getSelectedFile();
 				Assets.saveBamboo(this.mBamboo, file, type);

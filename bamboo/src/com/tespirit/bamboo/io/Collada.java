@@ -26,6 +26,7 @@ import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
+import com.tespirit.bamboo.vectors.Util;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -554,8 +555,13 @@ public class Collada implements BambooAsset{
 		
 		for(int i = 0; i < targetIds.length; i++){
 			Channel channel = new Channel();
+			float previousValue = Float.POSITIVE_INFINITY;
 			for(int j  = 0; j < input.length; j++){
-				channel.addKeyFrame(new Channel.KeyFrame(output[j*targetIds.length+i], (long)(input[j]*1000)));
+				float value = output[j*targetIds.length+i];
+				if(!Util.floatEquals(value, previousValue)){
+					channel.addKeyFrame(new Channel.KeyFrame(output[j*targetIds.length+i], (long)(input[j]*1000)));
+					previousValue = value;
+				}
 			}
 			this.mChannels.put(targetIds[i], channel);
 		}

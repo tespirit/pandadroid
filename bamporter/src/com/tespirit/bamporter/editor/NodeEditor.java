@@ -25,7 +25,7 @@ public class NodeEditor extends TreeNodeEditor{
 	
 	private void generatePanel(){
 		this.mPropertyPanel = new SimplePanel();
-		JTextField name = this.mPropertyPanel.addTextField("Name");
+		JTextField name = this.mPropertyPanel.createTextField("Name");
 		if(this.mNode.getName() != null){
 			name.setText(this.mNode.getName());
 		}
