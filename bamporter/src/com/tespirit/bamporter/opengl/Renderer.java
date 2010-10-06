@@ -64,6 +64,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 	public Renderer(){
 		super(new CalendarClock());
 		this.mCurrentLightId = 0;
+		this.mBackgroundColor.set(256, 256, 256);
 		
 		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
 		this.mIndexTypes[IndexBuffer.BUFFER32] = GL2.GL_UNSIGNED_INT;
@@ -241,6 +242,10 @@ public class Renderer extends RenderManager implements GLEventListener{
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		this.mGl = drawable.getGL().getGL2();
+		this.mGl.glClearColor(this.mBackgroundColor.getRed(), 
+				 this.mBackgroundColor.getGreen(),
+				 this.mBackgroundColor.getBlue(),
+				 this.mBackgroundColor.getAlpha());
 		this.mGl.glClearDepthf(1.0f);
 		this.mGl.glShadeModel(GL2.GL_SMOOTH);
 		this.mGl.glEnable(GL2.GL_DEPTH_TEST);

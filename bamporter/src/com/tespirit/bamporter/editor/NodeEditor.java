@@ -1,16 +1,19 @@
 package com.tespirit.bamporter.editor;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Enumeration;
+
+import javax.swing.JTextField;
 
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamboo.vectors.AxisAlignedBox;
 
 public class NodeEditor extends TreeNodeEditor{
 	Node mNode;
 	RenderManager mRenderManager;
-	NodeEditorPanel mProperties;
+	SimplePanel mPropertyPanel;
 	
 	public NodeEditor(Node node, RenderManager renderManager){
 		this.mRenderManager = renderManager;
@@ -18,27 +21,21 @@ public class NodeEditor extends TreeNodeEditor{
 		for(int i = 0; i < node.getChildCount(); i++){
 			this.add(new NodeEditor(node.getChild(i), renderManager));
 		}
-		this.mProperties = new NodeEditorPanel();
-		
+	}
+	
+	private void generatePanel(){
+		this.mPropertyPanel = new SimplePanel();
+		JTextField name = this.mPropertyPanel.addTextField("Name");
 		if(this.mNode.getName() != null){
-			this.mProperties.mName.setText(this.mNode.getName());
+			name.setText(this.mNode.getName());
 		}
-		AxisAlignedBox bb = this.mNode.getBoundingBox();
-		if(bb == null){
-			this.mProperties.mMaxX.setEnabled(false);
-			this.mProperties.mMaxY.setEnabled(false);
-			this.mProperties.mMaxZ.setEnabled(false);
-			this.mProperties.mMinX.setEnabled(false);
-			this.mProperties.mMinY.setEnabled(false);
-			this.mProperties.mMinZ.setEnabled(false);
-		} else {
-			this.mProperties.mMaxX.getModel().setValue(bb.getMax().getX());
-			this.mProperties.mMaxY.getModel().setValue(bb.getMax().getY());
-			this.mProperties.mMaxZ.getModel().setValue(bb.getMax().getZ());
-			this.mProperties.mMinX.getModel().setValue(bb.getMin().getX());
-			this.mProperties.mMinY.getModel().setValue(bb.getMin().getY());
-			this.mProperties.mMinZ.getModel().setValue(bb.getMin().getZ());
-		}
+		
+		name.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mNode.setName(((JTextField)e.getSource()).getText());
+			}
+		});
 	}
 	
 	@Override
@@ -48,7 +45,10 @@ public class NodeEditor extends TreeNodeEditor{
 
 	@Override
 	public Component getPropertyPanel() {
-		return this.mProperties;
+		if(this.mPropertyPanel == null){
+			this.generatePanel();
+		}
+		return this.mPropertyPanel;
 	}
 
 	@Override

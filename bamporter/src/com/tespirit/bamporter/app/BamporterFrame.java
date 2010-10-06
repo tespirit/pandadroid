@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -25,6 +26,7 @@ import javax.swing.tree.DefaultTreeModel;
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamporter.app.Assets.SaveTypes;
 import com.tespirit.bamporter.editor.*;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.opengl.Renderer;
@@ -32,20 +34,26 @@ import com.tespirit.bamporter.opengl.Renderer;
 public class BamporterFrame extends JFrame{
 	private static final long serialVersionUID = 5177383861730200564L;
 
-	private JMenu mFileMenu;
-	private JMenuBar mMenu;
-	private JFileChooser mFileDialog;
-	private JTree mTree;
-	private DefaultMutableTreeNode mRoot;
-	private DefaultTreeModel mTreeModel;
-	private JScrollPane mEditorView;
-	private JMenuItem mSaveAllButton;
-	private JMenuItem mSaveNodeButton;
-	private JMenuItem mSaveAnimationButton;
-	private Renderer mRenderer;
-	private List<Editor> mEditors;
+	private static BamporterFrame mEditor;
 	
-	private BambooAsset mBamboo;	
+	public static BamporterFrame getInstance(){
+		if(mEditor == null){
+			mEditor = new BamporterFrame();
+		}
+		return mEditor;
+	}
+	
+	private JMenuItem mSaveAllButton;
+	private JMenuItem mSaveScenesButton;
+	private JMenuItem mSaveAnimationsButton;
+	
+	private JTree mNavigator;
+	private JScrollPane mPropertyPane;
+	private Renderer mRenderer;
+	private JFileChooser mFileOpen;
+	private JFileChooser mFileSave;
+	private BambooAsset mBamboo;
+	private List<Editor> mEditors;
 	
 	private static final String TITLE = "Bamporter";
 	
@@ -59,68 +67,72 @@ public class BamporterFrame extends JFrame{
 		
 		Assets.init();
 		
-		JMenuItem openButton = new JMenuItem();
-		openButton.setText("Open");
-		mSaveAllButton = new JMenuItem();
-		mSaveAllButton.setText("Save All");
-		mSaveAllButton.setEnabled(false);
-		mSaveNodeButton = new JMenuItem();
-		mSaveNodeButton.setText("Save SceneGraph");
-		mSaveNodeButton.setEnabled(false);
-		mSaveAnimationButton = new JMenuItem();
-		mSaveAnimationButton.setText("Save Animation");
-		mSaveAnimationButton.setEnabled(false);
-		JMenuItem exitButton = new JMenuItem();
-		exitButton.setText("Exit");
-		mFileMenu = new JMenu();
-		mFileMenu.setText("File");
-		mMenu = new JMenuBar();
-		mFileDialog = new JFileChooser();
-		mRoot = new DefaultMutableTreeNode("Workspace");
-		mTree = new JTree();
-		JScrollPane treeView = new JScrollPane();
-		mEditorView = new JScrollPane();
+		this.setLayout(new GridLayout(1,1));
 		
-		GridLayout layout = new GridLayout(1,0);
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		JSplitPane splitPaneEditor = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
-		setLayout(layout);
-		treeView.setViewportView(mTree);
-		mTreeModel = new DefaultTreeModel(mRoot);
-		mTree.setModel(mTreeModel);
-		splitPane.setTopComponent(treeView);
-		splitPane.setBottomComponent(splitPaneEditor);
-		splitPaneEditor.setBottomComponent(mEditorView);
+		//initialize the menus!
+		JMenuBar menuBar = new JMenuBar();
+		JMenu fileMenu = new JMenu("File");
+		JMenuItem openButton = new JMenuItem("Open");
+		this.mSaveAllButton = new JMenuItem("Save All");
+		this.mSaveScenesButton = new JMenuItem("Save Scenes");
+		this.mSaveAnimationsButton = new JMenuItem("Save Animations");
+		JMenuItem exitButton = new JMenuItem("Exit");
 		
-		mRenderer = new Renderer();
+		fileMenu.add(openButton);
+		fileMenu.addSeparator();
+		fileMenu.add(this.mSaveAllButton);
+		fileMenu.add(this.mSaveScenesButton);
+		fileMenu.add(this.mSaveAnimationsButton);
+		fileMenu.addSeparator();
+		fileMenu.add(exitButton);
 		
-		splitPaneEditor.setTopComponent(mRenderer.getView());
+		menuBar.add(fileMenu);
 		
-		Dimension minimumSize = new Dimension(50, 100);
-		mEditorView.setMinimumSize(minimumSize);
-	    treeView.setMinimumSize(minimumSize);
-	    mRenderer.getView().setMinimumSize(minimumSize);
-	    splitPane.setDividerLocation(200); 
-	    splitPane.setPreferredSize(new Dimension(800, 600));
-	    splitPaneEditor.setDividerLocation(400);
-	    splitPaneEditor.setPreferredSize(new Dimension(600, 600));
-	    
-		add(splitPane);
+		this.setJMenuBar(menuBar);
 		
-		mMenu.add(mFileMenu);
-		mFileMenu.add(openButton);
-		mFileMenu.add(mSaveAllButton);
-		mFileMenu.add(mSaveNodeButton);
-		mFileMenu.add(mSaveAnimationButton);
-		mFileMenu.addSeparator();
-		mFileMenu.add(exitButton);
+		//initialize the editors!
+		JSplitPane renderSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane editSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		
-		mTree.addTreeSelectionListener(new TreeSelectionListener(){
+		JScrollPane navScroll = new JScrollPane();
+		navScroll.setBorder(BorderFactory.createTitledBorder("Navigator"));
+		this.mNavigator = new JTree();
+		this.mNavigator.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Root")));
+		this.mNavigator.setRootVisible(false);
+		
+		this.mPropertyPane = new JScrollPane();
+		this.mPropertyPane.setBorder(BorderFactory.createTitledBorder("Properties"));
+		
+		this.mRenderer = new Renderer();
+		
+		navScroll.setViewportView(this.mNavigator);
+		editSplitter.setTopComponent(navScroll);
+		editSplitter.setBottomComponent(this.mPropertyPane);
+		
+		renderSplitter.setTopComponent(editSplitter);
+		renderSplitter.setBottomComponent(this.mRenderer.getView());
+		
+		editSplitter.setMinimumSize(new Dimension(100,100));
+		navScroll.setMinimumSize(new Dimension(100,100));
+		this.mPropertyPane.setMinimumSize(new Dimension(100,100));
+		this.mNavigator.setMinimumSize(new Dimension(100, 100));
+		
+		this.mRenderer.getView().setMinimumSize(new Dimension(100,100));
+		renderSplitter.setMinimumSize(new Dimension(300,300));
+		
+		renderSplitter.setDividerSize(4);
+		renderSplitter.setDividerLocation(300);
+		
+		editSplitter.setDividerSize(4);
+		editSplitter.setDividerLocation(300);
+		
+		this.add(renderSplitter);
+		
+		this.mNavigator.addTreeSelectionListener(new TreeSelectionListener(){
 
 			@Override
 			public void valueChanged(TreeSelectionEvent event) {
-				selectTreeNode(event);
+				onSelectTreeNode(event);
 			}
 			
 		});
@@ -128,51 +140,75 @@ public class BamporterFrame extends JFrame{
 		openButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				openButtonAction(event);
+				onOpenClicked(event);
 			}
 		});
 		
-		mSaveAllButton.addActionListener(new ActionListener(){
+		this.mSaveAllButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				saveAllButtonAction(event);
+				onSaveClicked(event, SaveTypes.all);
 			}
 		});
 		
-		mSaveNodeButton.addActionListener(new ActionListener(){
+		this.mSaveScenesButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				saveNodeButtonAction(event);
+				onSaveClicked(event, SaveTypes.scene);
 			}
 		});
 		
-		mSaveAnimationButton.addActionListener(new ActionListener(){
+		this.mSaveAnimationsButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				saveAnimationButtonAction(event);
+				onSaveClicked(event, SaveTypes.animation);
 			}
 		});
 		
-		setJMenuBar(mMenu);
-		setSize(800, 600);
-	}
-	
-	private void selectTreeNode(TreeSelectionEvent event) {
-		Object node = mTree.getLastSelectedPathComponent();
-		if(node instanceof TreeNodeEditor){
-			this.mEditorView.setViewportView(((TreeNodeEditor)node).getPropertyPanel());
-			this.mEditorView.setEnabled(true);
-		} else {
-			this.mEditorView.setEnabled(false);
+		this.setSize(800, 600);
+		this.enableSaves();
+		
+		this.mFileOpen = new JFileChooser();
+		this.mFileSave = new JFileChooser();
+
+		this.mFileSave.setFileFilter(BambooHandler.getInstance().getFilter());
+		for(FileFilter filter : Assets.getFilters()){
+			this.mFileOpen.addChoosableFileFilter(filter);
 		}
 	}
 	
-	private void openButtonAction(ActionEvent event) {
-		if(this.showOpenDialog() == JFileChooser.APPROVE_OPTION){
+	private void enableSaves(){
+
+		if(this.mBamboo != null && this.mBamboo.getScenes().size() > 0){
+			this.mSaveScenesButton.setEnabled(true);
+			this.mSaveAllButton.setEnabled(true);
+		} else {
+			this.mSaveScenesButton.setEnabled(false);
+			this.mSaveAllButton.setEnabled(false);
+		}
+		if(this.mBamboo != null && this.mBamboo.getAnimations().size() > 0){
+			this.mSaveAnimationsButton.setEnabled(true);
+			this.mSaveAllButton.setEnabled(true);
+		} else {
+			this.mSaveAnimationsButton.setEnabled(false);
+		}
+	}
+	
+	private void onSelectTreeNode(TreeSelectionEvent event) {
+		Object node = this.mNavigator.getLastSelectedPathComponent();
+		if(node instanceof Editor){
+			this.mPropertyPane.setViewportView(((Editor)node).getPropertyPanel());
+			this.mPropertyPane.setEnabled(true);
+		} else {
+			this.mPropertyPane.setEnabled(false);
+		}
+	}
+	private void onOpenClicked(ActionEvent event){
+		if(this.mFileOpen.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
 			try{
-				File file = mFileDialog.getSelectedFile();
-				mBamboo = Assets.open(file);
-				setTitle(TITLE + " - " + file.getName());
+				File file = this.mFileOpen.getSelectedFile();
+				this.mBamboo = Assets.open(file);
+				this.setTitle(TITLE + " - " + file.getName());
 			} catch (Exception e){
 				e.printStackTrace();
 				Util.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
@@ -182,13 +218,29 @@ public class BamporterFrame extends JFrame{
 		}
 	}
 	
+	private void onSaveClicked(ActionEvent event, SaveTypes type){
+		if(this.mFileSave.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
+			try{
+				File file = this.mFileSave.getSelectedFile();
+				Assets.saveBamboo(this.mBamboo, file, type);
+			} catch (Exception e){
+				e.printStackTrace();
+				Util.alertError("I couldn't save the file.");
+			}
+		}
+	}
+	
 	private void loadBamboo(){
 		for(Editor e : this.mEditors){
 			e.recycle();
 		}
-		this.mRoot.removeAllChildren();
+		this.mEditors.clear();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)this.mNavigator.getModel().getRoot();
+		root.removeAllChildren();
+		
 		this.mRenderer.addScenes(this.mBamboo.getScenes());
-		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("SceneGraph");
+		
+		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("Scenes");
 		DefaultMutableTreeNode animations = new DefaultMutableTreeNode("Animations");
 		for(Node node : this.mBamboo.getScenes()){
 			NodeEditor ne = new NodeEditor(node, this.mRenderer);
@@ -202,71 +254,19 @@ public class BamporterFrame extends JFrame{
 		}
 		
 		if(this.mBamboo.getScenes().size() > 0){
-			this.mRoot.add(sceneGraph);
-			this.mSaveNodeButton.setEnabled(true);
-			this.mSaveAllButton.setEnabled(true);
-		} else {
-			this.mSaveNodeButton.setEnabled(false);
-			this.mSaveAllButton.setEnabled(false);
+			root.add(sceneGraph);
 		}
+		
 		if(this.mBamboo.getAnimations().size() > 0){
-			this.mRoot.add(animations);
-			mSaveAnimationButton.setEnabled(true);
-			mSaveAllButton.setEnabled(true);
-		} else {
-			mSaveAnimationButton.setEnabled(false);
+			root.add(animations);
 		}
-
-		mTreeModel.reload();
+		
+		this.enableSaves();
+		this.reloadNavigator();
 	}
 	
-	private void saveAllButtonAction(ActionEvent event) {
-		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
-			try{
-				//Assets.saveBamboo(this.mBamboo, mFileDialog.getSelectedFile());
-			} catch (Exception e){
-				e.printStackTrace();
-				Util.alertError("An error happened while saving. Please contact support :(");
-			}
-		}
-	}
-
-	private void saveNodeButtonAction(ActionEvent event) {
-		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
-			try{
-				//Assets.saveSceneGraph(this.mBamboo, mFileDialog.getSelectedFile());
-			} catch (Exception e){
-				e.printStackTrace();
-				Util.alertError("An error happened while saving. Please contact support :(");
-			}
-		}
-	}
-
-	private void saveAnimationButtonAction(ActionEvent event) {
-		if(this.showSaveDialog() == JFileChooser.APPROVE_OPTION){
-			try{
-				//Assets.saveAnimation(this.mBamboo, mFileDialog.getSelectedFile());
-			} catch (Exception e){
-				e.printStackTrace();
-				Util.alertError("An error happened while saving. Please contact support :(");
-			}
-		}
-	}
-	
-	private int showSaveDialog(){
-		mFileDialog.resetChoosableFileFilters();
-		FileFilter prev = mFileDialog.getFileFilter();
-		mFileDialog.setFileFilter(BambooHandler.getInstance().getFilter());
-		int result = mFileDialog.showSaveDialog(this);
-		mFileDialog.setFileFilter(prev);
-		return result;
-	}
-	
-	private int showOpenDialog(){
-		mFileDialog.resetChoosableFileFilters();
-		for(FileFilter filter : Assets.getFilters()){
-			mFileDialog.addChoosableFileFilter(filter);
-		}
-		return mFileDialog.showOpenDialog(this);
+	public void reloadNavigator(){
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.reload();
 	}
 }
