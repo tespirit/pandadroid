@@ -40,13 +40,13 @@ public class PandadroidView extends GLSurfaceView {
 	public PandadroidView(Context context){
 		super(context);
 		this.debug = false;
-		this.init(context);
+		this.init(context, new Color4());
 	}
 	
 	public PandadroidView(Context context, boolean debug){
 		super(context);
 		this.debug = debug;
-		this.init(context);
+		this.init(context, new Color4());
 	}
 	
 	public PandadroidView(Context context, AttributeSet attrs){
@@ -64,27 +64,26 @@ public class PandadroidView extends GLSurfaceView {
 					Color.alpha(color));
 		a.recycle();
 		
-		this.init(context);
-		this.renderer.setBackgroundColor(bgColor);
+		this.init(context, bgColor);
 	}
 	
-	private void init(Context context){
+	private void init(Context context, Color4 bgColor){
 		Assets.init(context);
 		this.context = context;
 		
 		//TODO:smartly create a renderer based on the availible graphics api.
-		this.initOpenGl1x();
+		this.initOpenGl1x(bgColor);
 		
 		this.touchClickController = ControllerDummy.getInstance();
 		this.touchMoveController = ControllerDummy.getInstance();
 	}
 	
-	private void initOpenGl1x(){
+	private void initOpenGl1x(Color4 bgColor){
 		com.tespirit.pandadroid.opengl1x.Renderer gl1x;
 		if(this.debug){
 			gl1x = Debug.init(this);
 		} else {
-			gl1x = new com.tespirit.pandadroid.opengl1x.Renderer();
+			gl1x = new com.tespirit.pandadroid.opengl1x.Renderer(bgColor);
 		}
 		this.renderer = gl1x;
 		this.setRenderer(gl1x);

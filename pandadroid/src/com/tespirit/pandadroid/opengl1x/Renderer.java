@@ -34,8 +34,17 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		this(new AndroidClock());
 	}
 	
+	public Renderer(Color4 backgroundColor){
+		this(new AndroidClock(), backgroundColor);
+	}
+	
 	public Renderer(Clock clock){
-		super(clock);
+		this(clock, new Color4());
+		
+	}
+	
+	public Renderer(Clock clock, Color4 backgroundColor){
+		super(clock, backgroundColor);
 		this.mCurrentLightId = 0;
 		
 		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
@@ -73,11 +82,6 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		this.mGl = gl;
 		
-		this.mGl.glClearColor(this.mBackgroundColor.getRed(), 
-							 this.mBackgroundColor.getGreen(),
-							 this.mBackgroundColor.getBlue(),
-							 this.mBackgroundColor.getAlpha());
-		
 		this.mGl.glClearDepthf(1.0f);
 		this.mGl.glShadeModel(GL10.GL_SMOOTH);
 		this.mGl.glEnable(GL10.GL_DEPTH_TEST);
@@ -97,6 +101,11 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		this.addComponentRenderer(new CameraRenderer());
 		this.addComponentRenderer(new TextureRenderer());
 		this.addComponentRenderer(new ColorRenderer());
+	}
+	
+	@Override
+	protected void setBackgroundColor(Color4 color) {
+		this.mGl.glClearColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 	}
 
 	@Override

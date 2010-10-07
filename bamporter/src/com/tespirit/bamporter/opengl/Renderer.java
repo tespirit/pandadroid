@@ -62,9 +62,12 @@ public class Renderer extends RenderManager implements GLEventListener{
 	}
 	
 	public Renderer(java.awt.Color background){
-		super(new CalendarClock());
+		super(new CalendarClock(), new Color4());
 		this.mCurrentLightId = 0;
-		this.mBackgroundColor.set(background.getRed(), background.getGreen(), background.getBlue());
+		
+		Color4 bgColor = new Color4();
+		bgColor.set(background.getRed(), background.getGreen(), background.getBlue());
+		this.setBackground(bgColor);
 		
 		this.mIndexTypes = new int[IndexBuffer.TYPE_COUNT];
 		this.mIndexTypes[IndexBuffer.BUFFER32] = GL2.GL_UNSIGNED_INT;
@@ -148,6 +151,10 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.addComponentRenderer(new TextureRenderer());
 		this.addComponentRenderer(new ColorRenderer());
 	}
+	
+	public void setBackground(java.awt.Color color){
+		this.setBackground(new Color4(color.getRed(), color.getGreen(), color.getBlue()));
+	}
 
 	@Override
 	protected void enableLights() {
@@ -161,6 +168,11 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.mGl.glDisable(GL2.GL_LIGHTING);
 		this.mGl.glDisable(GL2.GL_COLOR_MATERIAL);
 		this.mGl.glDisable(GL2.GL_NORMALIZE);
+	}
+	
+	@Override
+	protected void setBackgroundColor(Color4 color) {
+		this.mGl.glClearColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 	}
 
 	@Override
@@ -242,10 +254,6 @@ public class Renderer extends RenderManager implements GLEventListener{
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		this.mGl = drawable.getGL().getGL2();
-		this.mGl.glClearColor(this.mBackgroundColor.getRed(), 
-				 this.mBackgroundColor.getGreen(),
-				 this.mBackgroundColor.getBlue(),
-				 this.mBackgroundColor.getAlpha());
 		this.mGl.glClearDepthf(1.0f);
 		this.mGl.glShadeModel(GL2.GL_SMOOTH);
 		this.mGl.glEnable(GL2.GL_DEPTH_TEST);

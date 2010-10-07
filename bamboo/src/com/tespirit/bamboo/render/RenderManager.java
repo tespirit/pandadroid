@@ -85,7 +85,7 @@ public abstract class RenderManager implements UpdateManager {
 	
 	private Camera mCamera;
 	
-	protected Color4 mBackgroundColor;
+	private Color4 mBackgroundColor;
 	
 	private List<ComponentRenderer> mRenderers;
 	
@@ -96,8 +96,12 @@ public abstract class RenderManager implements UpdateManager {
 	private Compare.RenderableSort mRenderSort;
 	
 	public RenderManager(Clock clock){
+		this(clock, new Color4());
+	}
+	
+	public RenderManager(Clock clock, Color4 backgroundColor){
 		this.mClock = clock;
-		this.mBackgroundColor = new Color4();
+		this.mBackgroundColor = backgroundColor;
 		this.mRenderers = new ArrayList<ComponentRenderer>();
 		this.mLightsEnabled = true;
 		this.mRenderSort = new Compare.RenderableSort();
@@ -120,9 +124,24 @@ public abstract class RenderManager implements UpdateManager {
 		this.mUpdaters.clear();
 	}
 	
-	public void setBackgroundColor(Color4 color){
+	public void setBackground(Color4 color){
 		this.mBackgroundColor.copy(color);
+		this.addSingleUpdater(mBackgroundUpdater);
 	}
+	
+	private Updater mBackgroundUpdater = new Updater(){
+
+		@Override
+		public void update() {
+			setBackgroundColor(mBackgroundColor);
+		}
+
+		@Override
+		public void setUpdateManager(UpdateManager updateManager) {
+			//VOID
+		}
+		
+	};
 	
 	public void addScene(Node scene){
 		scene.setRenderManager(this);
@@ -265,6 +284,7 @@ public abstract class RenderManager implements UpdateManager {
 	 */
 	protected void initRender(){
 		this.mClock.start();
+		this.setBackgroundColor(this.mBackgroundColor);
 		this.reactivateComponentRenderers();
 		if(this.mLightsEnabled){
 			this.enableLights();
@@ -327,4 +347,5 @@ public abstract class RenderManager implements UpdateManager {
 	protected abstract void enableLights();
 	protected abstract void disableLights();
 	protected abstract void disableTextures();
+	protected abstract void setBackgroundColor(Color4 color);
 }

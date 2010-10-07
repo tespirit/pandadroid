@@ -7,6 +7,7 @@ import java.util.Enumeration;
 
 import javax.swing.JTextField;
 
+
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
 

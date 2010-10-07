@@ -3,18 +3,22 @@ package com.tespirit.bamporter.app;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -56,18 +60,19 @@ public class BamporterFrame extends JFrame{
 	private BambooAsset mBamboo;
 	private List<Editor> mEditors;
 	
-	private static final String TITLE = "Bamporter";
+	private static final String TITLE = "BAMporter";
 	
 	private Color mBackground;
 	
-	public BamporterFrame() {
+	private BamporterFrame() {
 		this.mEditors = new ArrayList<Editor>();
 		this.mBackground = new Color(0xffffffff);
 		initComponents();
 	}
 
 	private void initComponents() {
-		setTitle(TITLE);
+		
+		this.setTitle(TITLE);
 		
 		Assets.init();
 		
@@ -92,6 +97,18 @@ public class BamporterFrame extends JFrame{
 		
 		menuBar.add(fileMenu);
 		
+		JMenu settingsMenu = new JMenu("Settings");
+		JMenuItem bgColorButton = new JMenuItem("Scene View Background Color");
+		settingsMenu.add(bgColorButton);
+		
+		menuBar.add(settingsMenu);
+		
+		JMenu helpMenu = new JMenu("Help");
+		JMenuItem aboutButton = new JMenuItem("About");
+		helpMenu.add(aboutButton);
+		
+		menuBar.add(helpMenu);
+		
 		this.setJMenuBar(menuBar);
 		
 		//initialize the editors!
@@ -108,6 +125,14 @@ public class BamporterFrame extends JFrame{
 		this.mPropertyPane = new JScrollPane();
 		this.mPropertyPane.setBorder(BorderFactory.createTitledBorder("Properties"));
 		
+		JPanel renderView = new JPanel();
+		renderView.setLayout(new GridLayout(1,1));
+		renderView.setBorder(BorderFactory.createTitledBorder("Scene View"));
+		
+		JPanel renderBorder = new JPanel();
+		renderBorder.setLayout(new GridLayout(1,1));
+		renderBorder.setBorder(BorderFactory.createLineBorder(new Color(0xff888888), 1));
+		
 		this.mRenderer = new Renderer(this.mBackground);
 		
 		navScroll.setViewportView(this.mNavigator);
@@ -115,21 +140,24 @@ public class BamporterFrame extends JFrame{
 		editSplitter.setBottomComponent(this.mPropertyPane);
 		
 		renderSplitter.setTopComponent(editSplitter);
-		renderSplitter.setBottomComponent(this.mRenderer.getView());
+		
+		renderBorder.add(this.mRenderer.getView());
+		renderView.add(renderBorder);
+		renderSplitter.setBottomComponent(renderView);
 		
 		editSplitter.setMinimumSize(new Dimension(100,100));
 		navScroll.setMinimumSize(new Dimension(100,100));
 		this.mPropertyPane.setMinimumSize(new Dimension(100,100));
 		this.mNavigator.setMinimumSize(new Dimension(100, 100));
 		
-		this.mRenderer.getView().setMinimumSize(new Dimension(100,100));
+		renderView.setMinimumSize(new Dimension(100,100));
 		renderSplitter.setMinimumSize(new Dimension(300,300));
 		
-		renderSplitter.setDividerSize(4);
 		renderSplitter.setDividerLocation(300);
+		renderSplitter.setOneTouchExpandable(true);
 		
-		editSplitter.setDividerSize(4);
 		editSplitter.setDividerLocation(300);
+		editSplitter.setOneTouchExpandable(true);
 		
 		this.add(renderSplitter);
 		
@@ -171,12 +199,28 @@ public class BamporterFrame extends JFrame{
 		});
 		
 		exitButton.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				close();
 			}
-			
+		});
+		
+		bgColorButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				Color bg = JColorChooser.showDialog(mEditor, "Scene View Background Color", mBackground);
+				if(bg != null){
+					mBackground = bg;
+					mRenderer.setBackground(mBackground);
+				}
+			}
+		});
+		
+		aboutButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new AboutDialog(mEditor);
+			}
 		});
 		
 		this.setSize(800, 600);
@@ -184,17 +228,20 @@ public class BamporterFrame extends JFrame{
 		
 		this.mFileOpen = new JFileChooser();
 		this.mFileSave = new JFileChooser();
-
+		
 		this.mFileSave.setFileFilter(BambooHandler.getInstance().getFilter());
 		for(FileFilter filter : Assets.getFilters()){
 			this.mFileOpen.addChoosableFileFilter(filter);
 		}
+		
 	}
 	
 	public void close(){
-		//TODO: make this close by sending a close event, thus listeners will work.
-		setVisible(false);
-		dispose();
+		if (this.isActive())
+		{
+			WindowEvent windowClosing = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
+		}
 	}
 	
 	private void enableSaves(){

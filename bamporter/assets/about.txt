@@ -1,0 +1,3 @@
+BAMporter is part of the Pandadroid 3d Engine suite. It allows artists and programmers to get art data in and also to look at a file to see what nodes and animations are named. It has some simple functionality too, like the ability to create animation clips (since that is typically a difficult piece of data to export).
+
+Created by Todd Espiritu Santo.

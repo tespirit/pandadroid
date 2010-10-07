@@ -1,8 +1,10 @@
 package com.tespirit.bamporter.app;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GLProfile;
+import javax.swing.ImageIcon;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 
 import com.jogamp.opengl.util.texture.TextureData;
@@ -31,9 +35,69 @@ public class Assets {
 	private static Map<String, FileHandler> mFileHandlers = new HashMap<String, FileHandler>();
 	private static List<FileFilter> mFilters = new ArrayList<FileFilter>();
 	
+	private static final String ASSET_DIR = "assets";
+	
 	public static void init(){
 		BambooHandler.init();
 		ColladaHandler.init();
+	}
+	
+	public static ImagePanel openImagePanel(String name){
+		return new ImagePanel(Assets.openImageIcon(name));
+	}
+	
+	public static ImageIcon openImageIcon(String name){
+		return new ImageIcon(new File(ASSET_DIR, name).getPath());
+	}
+	
+	public static JTextArea openTextPanel(String name){
+		JTextArea text = new JTextArea();
+		text.setEditable(false);
+		text.setFocusable(false);
+		text.setWrapStyleWord(true);
+		text.setLineWrap(true);
+		String value = Assets.openText(name);
+		if(value != null){
+			text.setText(value);
+		}
+		return text;
+	}
+	
+	private static File getFile(String name){
+		return new File(ASSET_DIR, name);
+	}
+	
+	public static String openText(String name){
+		BufferedReader reader = null;
+		StringBuffer contents = new StringBuffer();
+		try{
+			reader = new BufferedReader(new FileReader(Assets.getFile(name)));
+			String line;
+			while((line=reader.readLine()) != null){
+				contents.append(line).append('\n');
+			}
+			reader.close();
+		} catch(Exception e){
+			return null;
+		} finally {
+			try{
+				if(reader != null){
+					reader.close();
+				}
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return contents.toString();
+	}
+	
+	public static FileInputStream open(String name){
+		try{
+			return new FileInputStream(Assets.getFile(name));
+		} catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static void registerFileHandler(FileHandler fh){

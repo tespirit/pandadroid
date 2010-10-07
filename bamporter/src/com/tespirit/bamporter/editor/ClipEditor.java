@@ -12,6 +12,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+
 import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamporter.app.BamporterFrame;
 
