@@ -1,6 +1,8 @@
 package com.tespirit.bamboo.io;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -17,6 +19,8 @@ import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.Primitive;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
+import com.tespirit.bamboo.render.Compare;
+import com.tespirit.bamboo.render.RenderableNode;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Group;
 import com.tespirit.bamboo.scenegraph.Model;
@@ -808,7 +812,7 @@ public class Collada implements BambooAsset{
 		
 		JointTranslate joint = new JointTranslate(name);
 		JointRotate subJoint = new JointRotate(name+"/rotate");
-		joint.appendChild(subJoint);
+		JointNode subJointNode = new JointNode(subJoint);
 		
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
@@ -832,14 +836,17 @@ public class Collada implements BambooAsset{
 					break;
 				case node:
 					if(this.getAttrId(NameId.type) == NameId.JOINT){
-						Joint child = this.parseJoint();
-						subJoint.appendChild(child);
+						JointNode child = this.parseJoint();
+						if(child != null){
+							subJointNode.mChildren.add(child);
+						}
 					}
 					break;
 				}
 				break;
 			case XmlPullParser.END_TAG:
 				if(this.getTagId() == NameId.node){
+					joint.appendChild(subJointNode.createSkeleton(false));
 					joint.createAllBones(0.05f);
 					return joint;
 				}
@@ -847,6 +854,52 @@ public class Collada implements BambooAsset{
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * This is to account for rearranging sibling joints which can occur either by user mistake or just the fact that
+	 * one collada exporter orders siblings in a different way (this was an issue i ran into a while back). This class
+	 * is a temporary skeleton that then sorts the child nodes alphabetically before generating the channel information
+	 * so that as long as the skeleton joint names are the same for all nodes above the root, the animations should 
+	 * import correctly. namespaces on joints will also work, as long as it sorts the same.
+	 * @author Todd Espiritu Santo
+	 *
+	 */
+	private class JointNode implements Comparator<JointNode>{
+		Joint mJoint;
+		Joint mJointOrient;
+		List<JointNode> mChildren;
+		
+		JointNode(Joint joint){
+			this.mJoint = joint;
+			mChildren = new ArrayList<JointNode>();
+		}
+		
+		void sortChildren(){
+			Collections.sort(mChildren, this);
+		}
+		
+		Joint createSkeleton(boolean genChannels){
+			if(genChannels){
+				generateChannels(this.mJoint.getName(), true, true, true, true); //rotate
+			}
+			this.sortChildren();
+			for(JointNode child : this.mChildren){	
+				this.mJoint.appendChild(child.createSkeleton(true));
+			}
+			if(mJointOrient != null){
+				mJointOrient.appendChild(mJoint);
+				return mJointOrient;
+			} else {
+				return this.mJoint;
+			}
+		}
+
+		@Override
+		public int compare(JointNode o1, JointNode o2) {
+			return o1.mJoint.getName().compareTo(o2.mJoint.getName());
+		}
+		
 	}
 	
 	private void generateChannels(String name, boolean rotate, boolean x, boolean y, boolean z){
@@ -873,13 +926,13 @@ public class Collada implements BambooAsset{
 		}
 	}
 	
-	private Joint parseJoint() throws Exception{
+	private JointNode parseJoint() throws Exception{
 		String name = this.getAttr(NameId.id);
-		this.generateChannels(name, true, true, true, true); //rotate
 		
 		Matrix3d orientMatrix = new Matrix3d();
 		
 		Joint joint = new JointRotate(name);
+		JointNode jointNode = new JointNode(joint);
 		
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
@@ -903,8 +956,10 @@ public class Collada implements BambooAsset{
 					break;
 				case node:
 					if(this.getAttrId(NameId.type) == NameId.JOINT){
-						Joint child = this.parseJoint();
-						joint.appendChild(child);
+						JointNode child = this.parseJoint();
+						if(child != null){
+							jointNode.mChildren.add(child);
+						}
 					}
 					break;
 				}
@@ -916,10 +971,9 @@ public class Collada implements BambooAsset{
 					} else {
 						JointOrient jointO = new JointOrient(name+"/orient");
 						jointO.getTransform().copy(orientMatrix);
-						jointO.appendChild(joint);
-						joint = jointO;
+						jointNode.mJointOrient = jointO;
 					}
-					return joint;
+					return jointNode;
 				}
 				break;
 			}

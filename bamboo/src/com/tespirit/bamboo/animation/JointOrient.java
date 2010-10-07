@@ -4,7 +4,6 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 
 public class JointOrient extends Joint implements Externalizable{
 
@@ -20,15 +19,12 @@ public class JointOrient extends Joint implements Externalizable{
 	protected void updateLocalMatrix(DofStream dofs) {
 		//VOID: this joint does not recieve animations.
 	}
-	
-	private void writeObject(ObjectOutputStream out) throws IOException{
-		this.write(out);
+
+	@Override
+	public int getDofCount(){
+		return 0;
 	}
 	
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
-    	this.read(in);
-    }
-    
     //IO
 	private static final long serialVersionUID = -1269762051395304350L;
 

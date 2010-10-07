@@ -6,6 +6,10 @@ import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.render.RenderManager;
 
 public class ChannelEditor extends TreeNodeEditor{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9219286824739948996L;
 	private Channel mChannel;
 	
 	public ChannelEditor(Channel channel, RenderManager renderManager){

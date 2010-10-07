@@ -27,6 +27,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.io.BambooAsset;
@@ -35,6 +36,7 @@ import com.tespirit.bamporter.app.Assets.SaveTypes;
 import com.tespirit.bamporter.editor.*;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.opengl.Renderer;
+import com.tespirit.bamporter.tools.AnimationEdit;
 
 public class BamporterFrame extends JFrame{
 	private static final long serialVersionUID = 5177383861730200564L;
@@ -85,6 +87,7 @@ public class BamporterFrame extends JFrame{
 		this.mSaveAllButton = new JMenuItem("Save All");
 		this.mSaveScenesButton = new JMenuItem("Save Scenes");
 		this.mSaveAnimationsButton = new JMenuItem("Save Animations");
+		JMenuItem mergeAnimationsButton = new JMenuItem("Merge Animations");
 		JMenuItem exitButton = new JMenuItem("Exit");
 		
 		fileMenu.add(openButton);
@@ -92,6 +95,8 @@ public class BamporterFrame extends JFrame{
 		fileMenu.add(this.mSaveAllButton);
 		fileMenu.add(this.mSaveScenesButton);
 		fileMenu.add(this.mSaveAnimationsButton);
+		fileMenu.addSeparator();
+		fileMenu.add(mergeAnimationsButton);
 		fileMenu.addSeparator();
 		fileMenu.add(exitButton);
 		
@@ -198,6 +203,13 @@ public class BamporterFrame extends JFrame{
 			}
 		});
 		
+		mergeAnimationsButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mergeAnimation();
+			}
+		});
+		
 		exitButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -297,6 +309,25 @@ public class BamporterFrame extends JFrame{
 		}
 	}
 	
+	private void mergeAnimation(){
+		if(this.mFileOpen.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
+			try{
+				File file = this.mFileOpen.getSelectedFile();
+				BambooAsset merge = Assets.open(file);
+				AnimationEdit.mergeAnimation(merge, this.mBamboo);
+				for(Editor e : this.mEditors){
+					if(e instanceof AnimationEditor){
+						((AnimationEditor)e).refreshClips();
+					}
+				}
+				
+			} catch (Exception e){
+				e.printStackTrace();
+				Util.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
+			}
+		}
+	}
+	
 	private void loadBamboo(){
 		for(Editor e : this.mEditors){
 			e.recycle();
@@ -329,11 +360,26 @@ public class BamporterFrame extends JFrame{
 		}
 		
 		this.enableSaves();
-		this.reloadNavigator();
-	}
-	
-	public void reloadNavigator(){
 		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
 		treeModel.reload();
+	}
+	
+	public void refreshNode(DefaultMutableTreeNode node){
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.nodeChanged(node);
+	}
+	
+	public void insertNodeTo(TreeNodeEditor child, TreeNodeEditor parent, int index){
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.insertNodeInto(child, parent, parent.getChildCount());
+	}
+	
+	public void removeNode(TreeNodeEditor child){
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.removeNodeFromParent(child);
+	}
+	
+	public void selectNode(TreeNodeEditor node){
+		this.mNavigator.setSelectionPath(new TreePath(node.getPath()));
 	}
 }

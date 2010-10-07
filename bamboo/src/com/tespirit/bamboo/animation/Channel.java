@@ -7,17 +7,22 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 
 public class Channel implements Externalizable{
-	private ArrayList<KeyFrame> keys;
-	long lastTime;
-	int lastFrame;
+	private ArrayList<KeyFrame> mKeys;
+	private long mTotalLength;
+	private long mPrevTime;
+	private int mPrevFrame;
 	
 	public Channel(){
-		this.keys = new ArrayList<KeyFrame>();
+		this.mKeys = new ArrayList<KeyFrame>();
+	}
+	
+	public void reserve(int keyFrameCount){
+		this.mKeys.ensureCapacity(keyFrameCount);
 	}
 	
 	public static class KeyFrame{
-		float value;
-		long time;
+		private float mValue;
+		private long mTime;
 		
 		/**
 		 * 
@@ -25,18 +30,44 @@ public class Channel implements Externalizable{
 		 * @param time - milliseconds
 		 */
 		public KeyFrame(float value, long time){
-			this.value = value;
-			this.time = time;
+			this.mValue = value;
+			this.mTime = time;
 		}
 		
+		//used to clone a keyframe at a time offset
+		public KeyFrame(KeyFrame keyFrame, long timeOffset){
+			this.mValue = keyFrame.mValue;
+			this.mTime = keyFrame.mTime + timeOffset;
+		}
+		
+		public float getValue(){
+			return this.mValue;
+		}
+		
+		public long getTime(){
+			return this.mTime;
+		}
 	}
 	
 	public int getKeyFrameCount(){
-		return this.keys.size();
+		return this.mKeys.size();
 	}
 	
+	public KeyFrame getKeyFrame(int i){
+		return this.mKeys.get(i);
+	}
+	
+	public long getTotalLength(){
+		return this.mTotalLength;
+	}
+	
+	/**
+	 * This currently does not sort, so data inputed must be sorted.
+	 * @param k
+	 */
 	public void addKeyFrame(KeyFrame k){
-		this.keys.add(k);
+		this.mKeys.add(k);
+		this.mTotalLength = k.mTime;
 	}
 	
 	/**
@@ -45,23 +76,23 @@ public class Channel implements Externalizable{
 	 * @return
 	 */
 	public float getValue(long time){
-		if(this.keys.size() == 0) return 0;
-		if(time < this.lastTime){
-			this.lastFrame = 0;
+		if(this.mKeys.size() == 0) return 0;
+		if(time < this.mPrevTime){
+			this.mPrevFrame = 0;
 		}
-		this.lastTime = time;
-		for(; this.lastFrame < this.keys.size(); this.lastFrame++){
-			KeyFrame frame = this.keys.get(this.lastFrame);
-			if(frame.time > time){
+		this.mPrevTime = time;
+		for(; this.mPrevFrame < this.mKeys.size(); this.mPrevFrame++){
+			KeyFrame frame = this.mKeys.get(this.mPrevFrame);
+			if(frame.mTime > time){
 				//for now no interpolation
-				if(this.lastFrame > 0){
-					this.lastFrame--;
+				if(this.mPrevFrame > 0){
+					this.mPrevFrame--;
 				}
-				return this.keys.get(this.lastFrame).value;
+				return this.mKeys.get(this.mPrevFrame).mValue;
 			}
 		}
-		this.lastFrame = 0;
-		return this.keys.get(this.keys.size()-1).value;
+		this.mPrevFrame = 0;
+		return this.mKeys.get(this.mKeys.size()-1).mValue;
 	}
 
 
@@ -72,7 +103,7 @@ public class Channel implements Externalizable{
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		int count = in.readInt();
-    	this.keys = new ArrayList<KeyFrame>();
+    	this.mKeys = new ArrayList<KeyFrame>(count);
     	for(int i = 0; i < count; i++){
     		this.addKeyFrame(new KeyFrame(in.readFloat(), in.readLong()));
     	}
@@ -80,10 +111,10 @@ public class Channel implements Externalizable{
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeInt(this.keys.size());
-		for(KeyFrame k : this.keys){
-			out.writeFloat(k.value);
-			out.writeLong(k.time);
+		out.writeInt(this.mKeys.size());
+		for(KeyFrame k : this.mKeys){
+			out.writeFloat(k.mValue);
+			out.writeLong(k.mTime);
 		}
 	}
 }

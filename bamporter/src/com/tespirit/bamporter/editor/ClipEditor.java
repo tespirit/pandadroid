@@ -14,11 +14,15 @@ import javax.swing.event.ChangeListener;
 
 
 import com.tespirit.bamboo.animation.Clip;
-import com.tespirit.bamporter.app.BamporterFrame;
 
 public class ClipEditor extends TreeNodeEditor{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4480406979875461348L;
 	private Clip mClip;
 	private SimplePanel mPropertyPanel;
+	private JTextField  mName;
 	private JButton mDeleteClip;
 	private JToggleButton mPlay;
 	private boolean mPlayState;
@@ -29,33 +33,35 @@ public class ClipEditor extends TreeNodeEditor{
 	}
 	
 	public void deleteClip(){
-		AnimationEditor parent = (AnimationEditor)this.getParent();
-		parent.removeClip(this.mClip);
-		this.removeFromParent();
-		BamporterFrame.getInstance().reloadNavigator();
+		this.removeEditorFromParent();
 		this.recycle();
+	}
+	
+	public Clip getClip(){
+		return this.mClip;
 	}
 	
 	private void generatePanel(){
 		this.mPropertyPanel = new SimplePanel();
 		
-		JTextField name = this.mPropertyPanel.createTextField("Name");
+		this.mName = this.mPropertyPanel.createTextField("Name");
 		JSpinner start = this.mPropertyPanel.createLongSpinner("Start", Long.MIN_VALUE, Long.MAX_VALUE, 30);
 		JSpinner end = this.mPropertyPanel.createLongSpinner("End", Long.MIN_VALUE, Long.MAX_VALUE, 30);
 		this.mPlay = this.mPropertyPanel.createToggleButton("Play Clip");
 		this.mDeleteClip = this.mPropertyPanel.createButton("Delete");
 		
 		if(this.mClip.getName() != null){
-			name.setText(this.mClip.getName());
+			this.mName.setText(this.mClip.getName());
 		}
 		
 		start.getModel().setValue(this.mClip.getStart());
 		end.getModel().setValue(this.mClip.getEnd());
 		
-		name.addActionListener(new ActionListener(){
+		this.mName.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mClip.setName(((JTextField)e.getSource()).getText());
+				mClip.setName(mName.getText());
+				updateEditor();
 			}
 		});
 		
@@ -128,7 +134,11 @@ public class ClipEditor extends TreeNodeEditor{
 	
 	@Override
 	public String toString(){
-		return "<Clip> " + this.mClip.getName();
+		if(this.mClip != null){
+			return Util.getClassName(this.mClip) + " " + this.mClip.getName();
+		} else {
+			return "<null>";
+		}
 	}
 
 }

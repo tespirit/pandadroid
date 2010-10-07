@@ -21,6 +21,10 @@ public class JointTranslate extends Joint implements Externalizable{
 		this.mLocalTransform.getTranslation().set(dofs.getNext(), dofs.getNext(), dofs.getNext());
 	}
 	
+	@Override
+	public int getDofCount(){
+		return 3;
+	}
 
 	//IO
 	private static final long serialVersionUID = 3068129007429760116L;

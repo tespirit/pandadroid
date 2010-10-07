@@ -3,7 +3,6 @@ package com.tespirit.bamporter.editor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
 
 import javax.swing.JTextField;
 
@@ -12,6 +11,11 @@ import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
 
 public class NodeEditor extends TreeNodeEditor{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Node mNode;
 	RenderManager mRenderManager;
 	SimplePanel mPropertyPanel;
@@ -20,7 +24,7 @@ public class NodeEditor extends TreeNodeEditor{
 		this.mRenderManager = renderManager;
 		this.mNode = node;
 		for(int i = 0; i < node.getChildCount(); i++){
-			this.add(new NodeEditor(node.getChild(i), renderManager));
+			this.addNewEditor(new NodeEditor(node.getChild(i), renderManager));
 		}
 	}
 	
@@ -35,6 +39,7 @@ public class NodeEditor extends TreeNodeEditor{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mNode.setName(((JTextField)e.getSource()).getText());
+				updateEditor();
 			}
 		});
 	}
@@ -56,8 +61,6 @@ public class NodeEditor extends TreeNodeEditor{
 	public void recycle() {
 		this.mNode.recycle();
 		this.mNode = null;
-		for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
-			children.nextElement().recycle();
-		}
+		super.recycle();
 	}
 }

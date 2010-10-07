@@ -25,6 +25,7 @@ public abstract class Joint extends Node{
 	protected Matrix3d mWorldTransform;
 	protected ArrayList<Joint> mChildren;
 	private AxisAlignedBox mBone;
+	private int mChannelCount;
 	
 	public Joint(){
 		this(null);
@@ -33,6 +34,7 @@ public abstract class Joint extends Node{
 	public Joint(String name){
 		super(name);
 		this.mChildren = new ArrayList<Joint>();
+		this.mChannelCount = this.getDofCount();
 
 		float[] buffer = Matrix3d.createBuffer(2);
 		this.mLocalTransform = new Matrix3d(buffer);
@@ -85,6 +87,11 @@ public abstract class Joint extends Node{
 	
 	public void appendChild(Joint joint){
 		this.mChildren.add(joint);
+		this.mChannelCount += joint.mChannelCount;
+	}
+	
+	public int getChannelCount(){
+		return this.mChannelCount;
 	}
 
 	@Override
@@ -173,6 +180,5 @@ public abstract class Joint extends Node{
     }
 	
 	protected abstract void updateLocalMatrix(DofStream dofs);
-	
-
+	public abstract int getDofCount();
 }

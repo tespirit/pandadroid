@@ -57,6 +57,12 @@ public class SimplePanel extends JPanel{
 		this.mInputPanel.add(Box.createVerticalStrut(5));
 	}
 
+	public JLabel createLabel(String label, String value){
+		JLabel valueLabel = new JLabel(value);
+		this.addComponent(label, valueLabel);
+		return valueLabel;
+	}
+	
 	public JButton createButton(String text){
 		JButton button = new JButton(text);
 		this.addComponent("", button);

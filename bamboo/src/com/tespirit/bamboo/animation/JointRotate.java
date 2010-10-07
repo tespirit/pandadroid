@@ -22,6 +22,11 @@ public class JointRotate extends Joint implements Externalizable{
 		this.mLocalTransform.rotateY(dofs.getNext());
 		this.mLocalTransform.rotateZ(dofs.getNext());
 	}
+	
+	@Override
+	public int getDofCount(){
+		return 3;
+	}
 
 	//IO
 	private static final long serialVersionUID = 9114034209802305745L;

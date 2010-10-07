@@ -1,29 +1,16 @@
 package com.tespirit.bamporter.editor;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
+import com.tespirit.bamporter.app.BamporterFrame;
 
-public abstract class TreeNodeEditor implements Editor, MutableTreeNode {
+public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements Editor {
 
-	private ArrayList<TreeNodeEditor> mChildren;
-	private MutableTreeNode mParentNode;
-	
-	private class TNEenumerator implements Enumeration<TreeNodeEditor>{
-		int i;
-		@Override
-		public boolean hasMoreElements() {
-			return i < mChildren.size();
-		}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2041667420816532942L;
 
-		@Override
-		public TreeNodeEditor nextElement() {
-			return mChildren.get(i++);
-		}
-		
-	}
 	
 	/**
 	 * Default constructor allows children.
@@ -33,101 +20,46 @@ public abstract class TreeNodeEditor implements Editor, MutableTreeNode {
 	}
 	
 	protected TreeNodeEditor(boolean allowChildren){
-		if(allowChildren){
-			this.mChildren = new ArrayList<TreeNodeEditor>();
-		} else {
-			this.mChildren = null;
-		}
+		this.allowsChildren = allowChildren;
 	}
 	
-	public void add(TreeNodeEditor node){
-		node.setParent(this);
-		this.mChildren.add(node);
+	/**
+	 * use this for initialization as it does not call insertEditor.
+	 * @param node
+	 */
+	public void addNewEditor(TreeNodeEditor node){
+		super.insert(node, this.getChildCount());
 	}
 	
-	public void remove(TreeNodeEditor node){
-		node.setParent(null);
-		this.mChildren.remove(node);
-	}
+	public void addEditor(TreeNodeEditor node){
+		this.insertEditor(node, this.getChildCount());
 		
-	@Override
-	public Enumeration<TreeNodeEditor> children() {
-		return new TNEenumerator();
 	}
-
-	@Override
-	public boolean getAllowsChildren() {
-		return this.mChildren != null;
+	
+	public void insertEditor(TreeNodeEditor newChild, int childIndex){
+		BamporterFrame.getInstance().insertNodeTo(newChild, this, childIndex);
 	}
-
-	@Override
-	public TreeNode getChildAt(int childIndex) {
-		return this.mChildren.get(childIndex);
+	
+	public void removeEditor(TreeNodeEditor node){
+		BamporterFrame.getInstance().removeNode(node);
 	}
-
-	@Override
-	public int getChildCount() {
-		if(this.mChildren != null){
-			return this.mChildren.size();
-		} else {
-			return 0;
+	
+	public void removeEditorFromParent(){
+		if(this.parent instanceof TreeNodeEditor){
+			((TreeNodeEditor)this.parent).removeEditor(this);
 		}
 	}
-
-	@Override
-	public int getIndex(TreeNode node) {
-		if(this.mChildren != null){
-			return this.mChildren.indexOf(node);
-		} else {
-			return 0;
-		}
-	}
-
-	@Override
-	public TreeNode getParent() {
-		return this.mParentNode;
-	}
-
-	@Override
-	public boolean isLeaf() {
-		return this.getChildCount() == 0;
+	
+	public void updateEditor(){
+		BamporterFrame.getInstance().refreshNode(this);
 	}
 	
 	@Override
-	public void insert(MutableTreeNode child, int index) {
-		if(child instanceof TreeNodeEditor){
-			TreeNodeEditor node = (TreeNodeEditor)child;
-			node.setParent(this);
-			this.mChildren.add(index, node);
+	public void recycle(){
+		for(Object child : this.children){
+			if(child instanceof TreeNodeEditor){
+				((TreeNodeEditor)child).recycle();
+			}
 		}
 	}
-
-	@Override
-	public void remove(int index) {
-		this.mChildren.remove(index);
-	}
-
-	@Override
-	public void remove(MutableTreeNode node) {
-		this.mChildren.remove(node);
-	}
-
-	@Override
-	public void removeFromParent() {
-		if(this.mParentNode != null){
-			this.mParentNode.remove(this);
-		}
-	}
-
-	@Override
-	public void setParent(MutableTreeNode newParent) {
-		this.removeFromParent();
-		this.mParentNode = newParent;
-	}
-
-	@Override
-	public void setUserObject(Object object) {
-		//VOID these nodes are the userobjects!
-	}
-
 }

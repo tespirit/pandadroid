@@ -14,6 +14,7 @@ import com.tespirit.bamboo.vectors.Vector3d;
  */
 public class Compare {
 	public static final NodePrioritySort nodePrioritySort = new NodePrioritySort();
+	public static final NodeNameSort nodeNameSort = new NodeNameSort();
 	
 	public static class RenderableSort implements Comparator<RenderableNode>{
 		private Vector3d mViewPos;
@@ -57,6 +58,17 @@ public class Compare {
 			} else {
 				return 0;
 			}
+		}
+	}
+	
+	public static class NodeNameSort implements Comparator<Node>{
+		private NodeNameSort(){
+			
+		}
+		
+		@Override
+		public int compare(Node object1, Node object2){
+			return object1.getName().compareTo(object2.getName());
 		}
 	}
 }

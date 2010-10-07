@@ -3,8 +3,9 @@ package com.tespirit.bamporter.editor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -18,10 +19,13 @@ import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamporter.app.BamporterFrame;
 
 public class AnimationEditor extends TreeNodeEditor{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1574225716204462101L;
 	private RenderManager mRenderManager;
 	private Animation mAnimation;
 	private Player mPlayer;
@@ -32,6 +36,7 @@ public class AnimationEditor extends TreeNodeEditor{
 	private JToggleButton mPlay;
 	private JComboBox mSkeletons;
 	private ClipEditor mCurrentClip;
+	private Set<String> mClipLookup;
 	
 	public AnimationEditor(Animation animation, RenderManager renderManager){
 		this.mRenderManager = renderManager;
@@ -39,15 +44,20 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mPlayer = new Player();
 		this.mPlayer.setAnimation(this.mAnimation);
 		this.mRenderManager.addUpdater(this.mPlayer);
+		this.mClipLookup = new HashSet<String>();
 		
 		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
-			this.add(new ClipEditor(this.mAnimation.getClip(i)));
+			this.addNewEditor(new ClipEditor(this.mAnimation.getClip(i)));
+			this.mClipLookup.add(this.mAnimation.getClip(i).getName());
 		}
 	}
 	
 	private void generatePanel(){
 		this.mPropertyPanel = new SimplePanel();
 		this.mName = this.mPropertyPanel.createTextField("Name");
+		
+		this.mPropertyPanel.createLabel("Channels", String.valueOf(this.mAnimation.getChannelCount()));
+		
 		this.mClips = this.mPropertyPanel.createComboBox("Clips");
 		this.mNewClip = this.mPropertyPanel.createButton("New Clip");
 		this.mSkeletons = this.mPropertyPanel.createComboBox("Skeleton");
@@ -71,16 +81,18 @@ public class AnimationEditor extends TreeNodeEditor{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mAnimation.setName(mName.getText());
-				BamporterFrame.getInstance().reloadNavigator();
+				updateEditor();
 			}
 		});
 		
 		this.mClips.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mPlayer.setActiveClip(mClips.getSelectedIndex());
-				mCurrentClip.setPlayState(false);
-				mCurrentClip = getSelectedClipEditor();
+				if(mClips.getSelectedIndex() < getChildCount() && mClips.getSelectedIndex() > 0){	
+					mPlayer.setActiveClip(mClips.getSelectedIndex());
+					mCurrentClip.setPlayState(false);
+					mCurrentClip = getSelectedClipEditor();
+				}
 			}
 		});
 		
@@ -89,7 +101,7 @@ public class AnimationEditor extends TreeNodeEditor{
 			public void actionPerformed(ActionEvent e){
 				String name = Util.promptString("Please enter a clip name");
 				if(name != null && name.length() > 0){
-					addClip(new Clip(name,0,0));
+					addNewClip(new Clip(name, 0, 0));
 				}
 			}
 		});
@@ -99,13 +111,15 @@ public class AnimationEditor extends TreeNodeEditor{
 			public void actionPerformed(ActionEvent e) {
 				if(mSkeletons.getSelectedIndex() == 0){
 					mPlayer.removeSkeleton();
+					mPlay.setEnabled(false);
 				} else {
-					mPlayer.setSkeleton((String)mSkeletons.getSelectedItem());
+					mPlayer.setSkeleton(((JointDisplay)mSkeletons.getSelectedItem()).mJoint);
+					mPlay.setEnabled(true);
 				}
 			}
 		});
 		
-		mPlay.addActionListener(new ActionListener(){
+		this.mPlay.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(mPlay.getModel().isSelected()){
@@ -123,27 +137,81 @@ public class AnimationEditor extends TreeNodeEditor{
 				mPlayer.restart();
 			}
 		});
+		
+		if(this.mSkeletons.getItemCount() > 1){
+			this.mSkeletons.setSelectedIndex(1);
+		} else {
+			this.mPlay.setEnabled(false);
+		}
 	}
 	
-	public void addClip(Clip clip){
+	public void addNewClip(Clip clip){
+		ClipEditor editor = new ClipEditor(clip);
 		this.mAnimation.addClip(clip);
-		this.add(new ClipEditor(clip));
+		this.mClipLookup.add(clip.getName());
 		if(this.mClips != null){
 			this.mClips.addItem(clip.getName());
 		}
-		BamporterFrame.getInstance().reloadNavigator();
+		this.addEditor(editor);
 	}
 	
-	public void removeClip(Clip clip){
-		this.mAnimation.removeClip(clip);
+	public void insertClip(Clip clip, int index){
 		if(this.mClips != null){
-			this.mClips.removeItem(clip.getName());
-			this.mPlayer.setActiveClip(0);
+			if(index > this.mClips.getItemCount()){
+				this.mClips.addItem(clip.getName());
+			} else {
+				this.mClips.insertItemAt(clip.getName(), index);
+			}
+		}
+		this.mClipLookup.add(clip.getName());
+		this.insertEditor(new ClipEditor(clip), index);
+	}
+	
+	public void refreshClips() {
+		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
+			Clip clip = this.mAnimation.getClip(i);
+			if(!this.mClipLookup.contains(clip.getName())){
+				this.insertClip(clip, i);
+			}
+		}
+	}
+	
+	@Override
+	public void removeEditor(TreeNodeEditor node){
+		super.removeEditor(node);
+		if(node instanceof ClipEditor){
+			Clip clip = ((ClipEditor)node).getClip();
+			this.mClipLookup.remove(clip.getName());
+			int id = this.mPlayer.getClipId(clip.getName());
+			if(this.mClips != null){
+				int clipIndex = this.mClips.getSelectedIndex();
+				this.mClips.removeItem(clip.getName());
+				if(clipIndex >= id){
+					if(clipIndex == 0){
+						this.mClips.setSelectedIndex(0);
+					} else {
+						this.mClips.setSelectedIndex(clipIndex-1);
+					}
+				}
+			}
+			this.mAnimation.removeClip(clip);
 		}
 	}
 	
 	public int getClipCount(){
 		return this.mAnimation.getClipCount();
+	}
+	
+	private class JointDisplay{
+		Joint mJoint;
+		public JointDisplay(Joint joint){
+			this.mJoint = joint;
+		}
+		
+		@Override
+		public String toString(){
+			return this.mJoint.getName();
+		}
 	}
 	
 	public void updateSkeletons(){
@@ -158,7 +226,10 @@ public class AnimationEditor extends TreeNodeEditor{
 	
 	private void updateSkeletons(Node node){
 		if(node instanceof Joint){
-			this.mSkeletons.addItem(node.getName());
+			Joint joint = (Joint)node;
+			if(joint.getChannelCount() == this.mAnimation.getChannelCount()){
+				this.mSkeletons.addItem(new JointDisplay((Joint)node));	
+			}
 		}
 		for(int i = 0; i < node.getChildCount(); i++){
 			this.updateSkeletons(node.getChild(i));
@@ -203,7 +274,12 @@ public class AnimationEditor extends TreeNodeEditor{
 	
 	@Override
 	public String toString(){
-		return Util.getClassName(this.mAnimation);
+		String name = this.mAnimation.getName();
+		if(name == null){
+			return Util.getClassName(this.mAnimation);
+		} else {
+			return Util.getClassName(this.mAnimation) + " " + name;
+		}
 	}
 
 	@Override
@@ -217,9 +293,7 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mName = null;
 		this.mSkeletons = null;
 		this.mNewClip = null;
-		for(Enumeration<TreeNodeEditor> children = this.children(); children.hasMoreElements();){
-			children.nextElement().recycle();
-		}
+		super.recycle();
 	}
 
 }
