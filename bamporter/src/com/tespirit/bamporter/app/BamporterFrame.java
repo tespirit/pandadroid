@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -19,6 +20,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -64,11 +66,8 @@ public class BamporterFrame extends JFrame{
 	
 	private static final String TITLE = "BAMporter";
 	
-	private Color mBackground;
-	
 	private BamporterFrame() {
 		this.mEditors = new ArrayList<Editor>();
-		this.mBackground = new Color(0xffffffff);
 		initComponents();
 	}
 
@@ -103,7 +102,24 @@ public class BamporterFrame extends JFrame{
 		menuBar.add(fileMenu);
 		
 		JMenu settingsMenu = new JMenu("Settings");
-		JMenuItem bgColorButton = new JMenuItem("Scene View Background Color");
+		JMenu themeMenu = new JMenu("Theme");
+		ActionListener themeAction = new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				JMenuItem themeButton = (JMenuItem)event.getSource();
+				Preferences.setLookAndFeel(themeButton.getText(), mEditor);
+			}
+		};
+		ButtonGroup group = new ButtonGroup();
+		for(String s : Preferences.getLookAndFeels()){
+			JRadioButtonMenuItem themeButton = new JRadioButtonMenuItem(s);
+			themeButton.setSelected(s.equals(Preferences.getLookAndFeel()));
+			group.add(themeButton);
+			themeButton.addActionListener(themeAction);
+			themeMenu.add(themeButton);
+		}
+		JMenuItem bgColorButton = new JMenuItem("Scene Background");
+		settingsMenu.add(themeMenu);
 		settingsMenu.add(bgColorButton);
 		
 		menuBar.add(settingsMenu);
@@ -123,7 +139,7 @@ public class BamporterFrame extends JFrame{
 		JScrollPane navScroll = new JScrollPane();
 		navScroll.setBorder(BorderFactory.createTitledBorder("Navigator"));
 		this.mNavigator = new JTree();
-		this.mNavigator.setBorder(BorderFactory.createLineBorder(new Color(0xff888888), 1));
+		Preferences.applySimpleBorder(this.mNavigator);
 		this.mNavigator.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Root")));
 		this.mNavigator.setRootVisible(false);
 		
@@ -136,9 +152,9 @@ public class BamporterFrame extends JFrame{
 		
 		JPanel renderBorder = new JPanel();
 		renderBorder.setLayout(new GridLayout(1,1));
-		renderBorder.setBorder(BorderFactory.createLineBorder(new Color(0xff888888), 1));
+		Preferences.applySimpleBorder(renderBorder);
 		
-		this.mRenderer = new Renderer(this.mBackground);
+		this.mRenderer = new Renderer(Preferences.getRenderBGColor());
 		
 		navScroll.setViewportView(this.mNavigator);
 		editSplitter.setTopComponent(navScroll);
@@ -220,10 +236,10 @@ public class BamporterFrame extends JFrame{
 		bgColorButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				Color bg = JColorChooser.showDialog(mEditor, "Scene View Background Color", mBackground);
+				Color bg = JColorChooser.showDialog(mEditor, "Scene View Background Color", Preferences.getRenderBGColor());
 				if(bg != null){
-					mBackground = bg;
-					mRenderer.setBackground(mBackground);
+					Preferences.setRenderBGColor(bg);
+					mRenderer.setBackground(bg);
 				}
 			}
 		});
@@ -240,6 +256,9 @@ public class BamporterFrame extends JFrame{
 		
 		this.mFileOpen = new JFileChooser();
 		this.mFileSave = new JFileChooser();
+		
+		this.mFileOpen.setCurrentDirectory(Preferences.getOpenDirectory());
+		this.mFileSave.setCurrentDirectory(Preferences.getSaveDirectory());
 		
 		this.mFileSave.setFileFilter(BambooHandler.getInstance().getFilter());
 		for(FileFilter filter : Assets.getFilters()){
@@ -288,6 +307,7 @@ public class BamporterFrame extends JFrame{
 				File file = this.mFileOpen.getSelectedFile();
 				this.mBamboo = Assets.open(file);
 				this.setTitle(TITLE + " - " + file.getName());
+				Preferences.setOpenDirectory(file);
 			} catch (Exception e){
 				e.printStackTrace();
 				Util.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
@@ -302,6 +322,7 @@ public class BamporterFrame extends JFrame{
 			try{
 				File file = this.mFileSave.getSelectedFile();
 				Assets.saveBamboo(this.mBamboo, file, type);
+				Preferences.setSaveDirectory(file);
 			} catch (Exception e){
 				e.printStackTrace();
 				Util.alertError("I couldn't save the file.");

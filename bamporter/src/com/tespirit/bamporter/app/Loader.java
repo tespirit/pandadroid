@@ -22,20 +22,22 @@ public class Loader{
 	 */
 	private static final long serialVersionUID = -8234262741882676492L;
 	private JFrame mFrame;
+	private Box mPanel;
 
 	private Loader(){
 		this.mFrame = new JFrame();
 		this.mFrame.setUndecorated(true);
 		
-		Box panel = Box.createVerticalBox();
+		this.mPanel = Box.createVerticalBox();
 		
 		ImagePanel imagePanel = Assets.openImagePanel(SPLASH_IMAGE);
 		JLabel loading = new JLabel("Loading...");
 		loading.setAlignmentX(0.5f);
-		panel.add(imagePanel);
-		panel.add(loading);
-		panel.add(Box.createVerticalStrut(5));
-		this.mFrame.getContentPane().add(panel);
+		this.mPanel.add(imagePanel);
+		this.mPanel.add(loading);
+		this.mPanel.add(Box.createVerticalStrut(5));
+		Preferences.applySimpleBorder(this.mPanel);
+		this.mFrame.getContentPane().add(this.mPanel);
 		this.mFrame.pack();
 		this.mFrame.setLocationRelativeTo(null);
 	}
@@ -45,6 +47,7 @@ public class Loader{
 	}
 	
 	public void close(){
+		Preferences.unapplySimpleBorder(this.mPanel);
 		this.mFrame.setVisible(false);
 		this.mFrame.dispose();
 		mLoader = null;

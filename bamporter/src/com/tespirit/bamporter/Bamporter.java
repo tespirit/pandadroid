@@ -2,32 +2,24 @@ package com.tespirit.bamporter;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import com.tespirit.bamporter.app.Assets;
 import com.tespirit.bamporter.app.BamporterFrame;
 import com.tespirit.bamporter.app.Loader;
+import com.tespirit.bamporter.app.Preferences;
 import com.tespirit.bamporter.opengl.Renderer;
 
 public class Bamporter {
 	
-	private static final String NIMBUS = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-	
-	public static void setDefaultTheme(){
-		try{
-			UIManager.setLookAndFeel(NIMBUS);
-		} catch (Exception e){
-			
-		}
-	}
+
 
 	/**
 	 * Main entry of the class.
 	 */
 	public static void main(String[] args) {
 		Renderer.initGl();
+		Preferences.init();
 		Assets.init();
-		setDefaultTheme();
 
 		Loader.getInstance().show();
 		

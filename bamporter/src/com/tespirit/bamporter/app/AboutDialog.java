@@ -19,6 +19,7 @@ public class AboutDialog extends JDialog{
 	 */
 	private static final long serialVersionUID = 5983220572539995513L;
 
+	private Box mPanel;
 	public AboutDialog(JFrame parent) {
 		super(parent, "About", true);
 		if (parent != null) {
@@ -26,9 +27,9 @@ public class AboutDialog extends JDialog{
 			Point p = parent.getLocation(); 
 			setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
 		}
-		Box panel = Box.createVerticalBox();
+		this.mPanel = Box.createVerticalBox();
 		ImagePanel logo = Assets.openImagePanel("bamporter.png");
-		panel.add(logo);
+		this.mPanel.add(logo);
 		JScrollPane scrolly = new JScrollPane();
 		JTextArea text = Assets.openTextPanel("about.txt");
 		text.setMinimumSize(new Dimension(logo.getWidth(), 100));
@@ -37,12 +38,15 @@ public class AboutDialog extends JDialog{
 		scrolly.setPreferredSize(new Dimension(logo.getWidth()+100, 150));
 		scrolly.setMaximumSize(new Dimension(logo.getWidth()+100, 200));
 		scrolly.setViewportView(text);
-		panel.add(scrolly);
+		this.mPanel.add(scrolly);
+		Preferences.applySimpleBorder(this.mPanel);
 		
 		JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				Preferences.unapplySimpleBorder(mPanel);
+				mPanel = null;
 				setVisible(false);
 				dispose();
 			}
@@ -50,12 +54,12 @@ public class AboutDialog extends JDialog{
 		
 		button.setAlignmentX(0.5f);
 		
-		panel.add(Box.createVerticalStrut(5));
-		panel.add(button);
-		panel.add(Box.createVerticalStrut(5));
+		this.mPanel.add(Box.createVerticalStrut(5));
+		this.mPanel.add(button);
+		this.mPanel.add(Box.createVerticalStrut(5));
 
 		this.setUndecorated(true);
-		this.getContentPane().add(panel);
+		this.getContentPane().add(this.mPanel);
 		this.pack();
 		
 		this.setVisible(true);
