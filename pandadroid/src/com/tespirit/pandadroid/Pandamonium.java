@@ -24,8 +24,8 @@ import com.tespirit.bamboo.vectors.Matrix3d;
 
 import com.tespirit.pandadroid.R;
 import com.tespirit.pandadroid.app.Assets;
+import com.tespirit.pandadroid.app.DefaultTouchHandler;
 import com.tespirit.pandadroid.app.PandadroidView;
-import com.tespirit.pandadroid.app.MoveTouchController2d;
 import com.tespirit.pandadroid.debug.Debug;
 
 import android.view.*;
@@ -48,12 +48,11 @@ public class Pandamonium extends Activity {
         view.setFocusableInTouchMode(true);
         Debug.setConsole((TextView)findViewById(R.id.console));
 
-
-    	view.createTouchRotateCamera(-2);
-    	
-    	view.setTouchClickController(new MoveTouchController2d(view));
-    	
-    	view.createDefaultLight();
+        view.createDefaultLight();
+        
+        DefaultTouchHandler touchHandler = new DefaultTouchHandler(view);
+        touchHandler.makeCameraRotatable();
+        touchHandler.makeNodesDraggable();
     	
     	//try{
     	//	Player player = view.addBambooSingleAnimation(Assets.loadBamboo("candy.bam"));

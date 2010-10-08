@@ -39,7 +39,7 @@ public class MoveController2d extends MatrixController2d{
 	}
 	
 	@Override
-	protected void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
+	public void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
 		Ray ray = this.mRenderManager.getCamera().createRay(x, y);
 		ray.transformBy(this.mInverter);
 		this.mPlane.setNormal(ray.getPosition());

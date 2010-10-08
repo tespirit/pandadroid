@@ -40,6 +40,10 @@ public class Channel implements Externalizable{
 			this.mTime = keyFrame.mTime + timeOffset;
 		}
 		
+		public void setTime(long time){
+			this.mTime = time;
+		}
+		
 		public float getValue(){
 			return this.mValue;
 		}
@@ -47,6 +51,18 @@ public class Channel implements Externalizable{
 		public long getTime(){
 			return this.mTime;
 		}
+	}
+	
+	public void removeKeyFrames(long start, long end){
+		ArrayList<KeyFrame> frames = new ArrayList<KeyFrame>();
+		
+		for(KeyFrame frame : this.mKeys){
+			if(frame.mTime > start && frame.mTime < end){
+				frames.add(frame);
+			}
+		}
+		
+		this.mKeys.removeAll(frames);
 	}
 	
 	public int getKeyFrameCount(){

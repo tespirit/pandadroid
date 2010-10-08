@@ -5,13 +5,6 @@ import java.util.List;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Player;
-import com.tespirit.bamboo.controllers.AccelerationController3d;
-import com.tespirit.bamboo.controllers.Controller2d;
-import com.tespirit.bamboo.controllers.ControllerDummy;
-import com.tespirit.bamboo.controllers.Dof3;
-import com.tespirit.bamboo.controllers.EulerController3d;
-import com.tespirit.bamboo.controllers.RotateController2d;
-import com.tespirit.bamboo.controllers.TranslateController2d;
 import com.tespirit.bamboo.creation.Lights;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.render.Updater;
@@ -24,28 +17,24 @@ import com.tespirit.pandadroid.debug.Debug;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 
 public class PandadroidView extends GLSurfaceView {
-	private com.tespirit.bamboo.render.RenderManager renderer;
-	private Controller2d touchClickController;
-	private Controller2d touchMoveController;
-	private boolean debug;
-	private Context context;
+	private com.tespirit.bamboo.render.RenderManager mRenderer;
+	private boolean mDebug;
+	@SuppressWarnings("unused")
+	private Context mContext;
 
 	public PandadroidView(Context context){
 		super(context);
-		this.debug = false;
+		this.mDebug = false;
 		this.init(context, new Color4());
 	}
 	
 	public PandadroidView(Context context, boolean debug){
 		super(context);
-		this.debug = debug;
+		this.mDebug = debug;
 		this.init(context, new Color4());
 	}
 	
@@ -54,7 +43,7 @@ public class PandadroidView extends GLSurfaceView {
 		
 		//setup custom attributes
 		TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.PandadroidView);
-		this.debug = a.getBoolean(R.styleable.PandadroidView_debug, false);
+		this.mDebug = a.getBoolean(R.styleable.PandadroidView_debug, false);
 		int color = a.getColor(R.styleable.PandadroidView_background_color, 0x000000FF);
 		
 		Color4 bgColor = new Color4();
@@ -65,190 +54,59 @@ public class PandadroidView extends GLSurfaceView {
 		a.recycle();
 		
 		this.init(context, bgColor);
+		this.mRenderer.setCamera(new Camera());
+		this.getCamera().zoom(-2);//a simple default setting.
 	}
 	
 	private void init(Context context, Color4 bgColor){
 		Assets.init(context);
-		this.context = context;
+		this.mContext = context;
 		
 		//TODO:smartly create a renderer based on the availible graphics api.
 		this.initOpenGl1x(bgColor);
-		
-		this.touchClickController = ControllerDummy.getInstance();
-		this.touchMoveController = ControllerDummy.getInstance();
 	}
 	
 	private void initOpenGl1x(Color4 bgColor){
 		com.tespirit.pandadroid.opengl1x.Renderer gl1x;
-		if(this.debug){
+		if(this.mDebug){
 			gl1x = Debug.init(this);
 		} else {
 			gl1x = new com.tespirit.pandadroid.opengl1x.Renderer(bgColor);
 		}
-		this.renderer = gl1x;
+		this.mRenderer = gl1x;
 		this.setRenderer(gl1x);
 	}
 	
 	public com.tespirit.bamboo.render.RenderManager getRenderer(){
-		return this.renderer;
+		return this.mRenderer;
 	}
 	
-	/**
-	 * The controller is passed in the total distance travel and total time from
-	 * when the first touchDown event is called.
-	 * @param m
-	 */
-	public void setTouchClickController(Controller2d m){
-		this.touchClickController = m;
-		this.renderer.registerUpdater(m);
-	}
-	
-	/**
-	 * This controller is passed in the change in position and time from the last
-	 * touch event.
-	 * @param m
-	 */
-	public void setTouchMoveController(Controller2d m){
-		this.touchMoveController = m;
-		this.renderer.registerUpdater(m);
-	}
-	
-	public Controller2d getTouchClickController(){
-		return this.touchClickController;
-	}
-	
-	public Controller2d getTouchMoveController(){
-		return this.touchMoveController;
-	}
-	
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		this.requestFocus();
-		float x = event.getX();
-		float y = event.getY();
-		long time = event.getEventTime();
-		
-		switch(event.getAction()){
-		case MotionEvent.ACTION_UP:
-			this.touchClickController.set(x, y, time);
-			break;
-		case MotionEvent.ACTION_DOWN:
-			this.touchMoveController.init(x, y, time);
-			this.touchClickController.init(x, y, time);
-			break;
-		case MotionEvent.ACTION_MOVE:
-			this.touchMoveController.set(x, y, time);
-			break;
-		default:
-			break;
-		}
-		
-		return true;
-	}
-	
-	//some autogeneration functions
-	public Camera createTouchRotateCamera(){
-		return this.createTouchRotateCamera(0.0f);
-	}
-	
-	public Camera createTouchRotateCamera(float zoomDistance){
-		Camera camera = new Camera();
-		camera.zoom(zoomDistance);
-		this.renderer.setCamera(camera);
-		
-		RotateController2d m = new RotateController2d(Dof3.Y, Dof3.X);
-		m.setControlled(camera.getPivotTransform());
-		m.setScale(0.25f);
-		this.setTouchMoveController(m);
-		
-		return camera;
-	}
-	
-	public Camera createTouchPanCamera(){
-		return this.createTouchPanCamera(0.0f);
-	}
-	
-	public Camera createTouchPanCamera(float zoomDistance){
-		Camera camera = new Camera();
-		camera.zoom(zoomDistance);
-		this.renderer.setCamera(camera);
-		
-		TranslateController2d m = new TranslateController2d(Dof3.negativeX, Dof3.Y);
-		m.setControlled(camera);
-		m.setScale(0.01f);
-		this.setTouchMoveController(m);
-		
-		return camera;
-	}
-	
-	/**
-	 * 
-	 * @return null if the device does not support motion sensors.
-	 */
-	public Camera createMotionSensorCamera(){
-		return this.createMotionSensorCamera(0.0f);
-	}
-	
-	/**
-	 * 
-	 * @param zoomDistance
-	 * @return null if the device does not support motion sensors.
-	 */
-	public Camera createMotionSensorCamera(float zoomDistance){
-		SensorManager s = (SensorManager)this.context.getSystemService(Context.SENSOR_SERVICE);
-		Sensor accelerometer = s.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER);
-		Sensor geoMagnetic = s.getDefaultSensor(SensorManager.SENSOR_MAGNETIC_FIELD);
-		if(accelerometer == null || geoMagnetic == null){
-			return null;
-		}
-		
-		Camera camera = new Camera();
-		camera.zoom(zoomDistance);
-		
-		EulerController3d e = new EulerController3d(EulerController3d.Euler.ZXY);
-		e.setControlled(camera);
-		
-		AccelerationController3d a = new AccelerationController3d();
-		a.setControlled(camera);
-		
-		MotionSensor3d motionSensor = new MotionSensor3d(e, a);
-		
-		//register the motion sensor!		
-		if(!s.registerListener(motionSensor, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)){
-			return null;
-		}
-		if(!s.registerListener(motionSensor, geoMagnetic, SensorManager.SENSOR_DELAY_GAME)){
-			return null;
-		}
-		this.renderer.setCamera(camera);
-		return camera;
-	}
 	
 	public Camera getCamera(){
-		return this.renderer.getCamera();
+		return this.mRenderer.getCamera();
 	}
 	
 	public void setCamera(Camera camera){
-		this.renderer.setCamera(camera);
+		this.mRenderer.setCamera(camera);
 	}
 	
-	public void addUpdater(Updater updater){
-		this.renderer.addUpdater(updater);
+	public void addSingleUpdater(Updater updater){
+		this.mRenderer.addSingleUpdater(updater);
 	}
 	
-	public void removeUpdater(Updater updater){
-		this.renderer.removeUpdater(updater);
+	public void removeSingleUpdater(Updater updater){
+		this.mRenderer.removeSingleUpdater(updater);
 	}
 	
 	public Player addAnimation(Animation animation){
 		Player player = new Player();
 		player.setAnimation(animation);
-		this.renderer.addUpdater(player);
+		this.mRenderer.addUpdater(player);
 		return player;
 	}
 	
 	public void addSceneNode(Node node){
-		this.renderer.addScene(node);
+		this.mRenderer.addScene(node);
 	}
 	
 	/**
@@ -257,7 +115,7 @@ public class PandadroidView extends GLSurfaceView {
 	 * @return
 	 */
 	public Player addBambooSingleAnimation(BambooAsset bamboo){
-		this.renderer.addScenes(bamboo.getScenes());
+		this.mRenderer.addScenes(bamboo.getScenes());
 		return this.addAnimation(bamboo.getAnimations().get(0));
 	}
 	
@@ -276,6 +134,6 @@ public class PandadroidView extends GLSurfaceView {
 	}
 	
 	public void createDefaultLight(){
-		Lights.addDefaultLight(this.renderer);
+		Lights.addDefaultLight(this.mRenderer);
 	}
 }

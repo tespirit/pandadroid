@@ -31,6 +31,10 @@ public abstract class BaseController2d implements Controller2d{
 		mUpdateManager.addSingleUpdater(this);
 	}
 	
+	public void sendUpdate(){
+		mUpdateManager.addSingleUpdater(this);
+	}
+	
 	@Override
 	public void update(){
 		//TODO: syncronize this
@@ -45,6 +49,6 @@ public abstract class BaseController2d implements Controller2d{
 		this.mUpdateManager = updateManager;
 	}
 	
-	protected abstract void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime);
+	public abstract void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime);
 	
 }
