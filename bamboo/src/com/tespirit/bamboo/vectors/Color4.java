@@ -32,12 +32,7 @@ public class Color4 {
 	}
 	
 	public Color4(float r, float g, float b){
-		this.c = new float[Vector3d.SIZE];
-		this.c[0] = r;
-		this.c[1] = g;
-		this.c[2] = b;
-		this.c[3] = 1.0f;
-		this.offset = 0;
+		this(r,g,b,1);
 	}
 	
 	public Color4(float r, float g, float b, float a){
@@ -47,6 +42,10 @@ public class Color4 {
 		this.c[2] = b;
 		this.c[3] = a;
 		this.offset = 0;
+	}
+	
+	public Color4(int r, int g, int b){
+		this(r,g,b,Color4.MAX_INT);
 	}
 	
 	public Color4(int r, int g, int b, int a){

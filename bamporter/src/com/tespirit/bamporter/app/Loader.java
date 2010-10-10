@@ -37,6 +37,7 @@ public class Loader{
 		this.mPanel.add(loading);
 		this.mPanel.add(Box.createVerticalStrut(5));
 		Preferences.applySimpleBorder(this.mPanel);
+		Preferences.unapplySimpleBorder(this.mPanel);//remove this from the updator.
 		this.mFrame.getContentPane().add(this.mPanel);
 		this.mFrame.pack();
 		this.mFrame.setLocationRelativeTo(null);
@@ -47,7 +48,6 @@ public class Loader{
 	}
 	
 	public void close(){
-		Preferences.unapplySimpleBorder(this.mPanel);
 		this.mFrame.setVisible(false);
 		this.mFrame.dispose();
 		mLoader = null;

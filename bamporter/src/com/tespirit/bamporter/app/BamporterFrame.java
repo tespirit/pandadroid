@@ -33,6 +33,7 @@ import javax.swing.tree.TreePath;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamboo.render.UpdateManager;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.app.Assets.SaveTypes;
 import com.tespirit.bamporter.editor.*;
@@ -107,13 +108,16 @@ public class BamporterFrame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				JMenuItem themeButton = (JMenuItem)event.getSource();
-				Preferences.setLookAndFeel(themeButton.getText(), mEditor);
+				Preferences.setTheme(themeButton.getText());
+				Preferences.refreshComponent(mEditor);
+				Preferences.refreshComponent(mEditor.mFileOpen);
+				Preferences.refreshComponent(mEditor.mFileSave);
 			}
 		};
 		ButtonGroup group = new ButtonGroup();
 		for(String s : Preferences.getLookAndFeels()){
 			JRadioButtonMenuItem themeButton = new JRadioButtonMenuItem(s);
-			themeButton.setSelected(s.equals(Preferences.getLookAndFeel()));
+			themeButton.setSelected(s.equals(Preferences.getTheme()));
 			group.add(themeButton);
 			themeButton.addActionListener(themeAction);
 			themeMenu.add(themeButton);
@@ -402,5 +406,9 @@ public class BamporterFrame extends JFrame{
 	
 	public void selectNode(TreeNodeEditor node){
 		this.mNavigator.setSelectionPath(new TreePath(node.getPath()));
+	}
+	
+	public UpdateManager getUpdateManager(){
+		return this.mRenderer;
 	}
 }

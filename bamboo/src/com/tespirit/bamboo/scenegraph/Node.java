@@ -81,19 +81,25 @@ public abstract class Node {
 	
 	
 	public final void recycle(){
-		this.mRenderManager.addUpdater(new Recycler());
+		this.mRenderManager.addSingleUpdater(new Recycler(this));
 	}
 	
 	private class Recycler implements Updater{
+		Node mNode;
+		
+		Recycler(Node node){
+			this.mNode = node;
+		}
 
 		@Override
 		public void update() {
-			recycleInternal();
-			mRenderManager.removeScene(Node.this);
+			this.mNode.recycleInternal();
+			mRenderManager.removeScene(this.mNode);
 			if(Node.nameLookup.containsKey(mName)){
 				Node.nameLookup.remove(mName);
 			}
 			mName = null;
+			this.mNode = null;
 		}
 
 		@Override

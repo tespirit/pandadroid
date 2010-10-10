@@ -17,16 +17,6 @@ public class ChannelEditor extends TreeNodeEditor{
 		this.mChannel = channel;
 	}
 	
-	
-	@Override
-	public Component getPropertyPanel() {
-		String output = "Bamboo Channel Info\n\n";
-		output += "Type: " + this.mChannel.toString() + "\n";
-		output += "Key Frame Count: " + this.mChannel.getKeyFrameCount();
-		Util.getTextInfo().setText(output);
-		return Util.getTextInfo();
-	}
-	
 	@Override
 	public String toString(){
 		return Util.getClassName(this.mChannel);
@@ -36,6 +26,13 @@ public class ChannelEditor extends TreeNodeEditor{
 	@Override
 	public void recycle() {
 		this.mChannel = null;
+	}
+
+
+	@Override
+	protected Component generatePanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

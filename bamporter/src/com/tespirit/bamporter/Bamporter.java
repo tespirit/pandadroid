@@ -18,14 +18,15 @@ public class Bamporter {
 	 */
 	public static void main(String[] args) {
 		Renderer.initGl();
-		Preferences.init();
 		Assets.init();
+		Preferences.init();
 
 		Loader.getInstance().show();
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				Preferences.load();
 				BamporterFrame.getInstance().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				BamporterFrame.getInstance().setLocationRelativeTo(null);
 				BamporterFrame.getInstance().setVisible(true);

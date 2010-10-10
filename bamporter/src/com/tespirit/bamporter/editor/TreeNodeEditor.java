@@ -1,8 +1,11 @@
 package com.tespirit.bamporter.editor;
 
+import java.awt.Component;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.tespirit.bamporter.app.BamporterFrame;
+import com.tespirit.bamporter.app.Preferences;
 
 public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements Editor {
 
@@ -10,6 +13,8 @@ public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements E
 	 * 
 	 */
 	private static final long serialVersionUID = 2041667420816532942L;
+	private Object mTheme;
+	private Component mPropertyPanel;
 
 	
 	/**
@@ -54,11 +59,28 @@ public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements E
 		BamporterFrame.getInstance().refreshNode(this);
 	}
 	
+	
+	
+	@Override
+	public Component getPropertyPanel() {
+		if(this.mPropertyPanel == null){
+			this.mPropertyPanel = this.generatePanel();
+		} else if(!this.mTheme.equals(Preferences.getTheme())){
+			Preferences.refreshComponent(this.mPropertyPanel);
+		}
+		this.mTheme = Preferences.getTheme();
+		return this.mPropertyPanel;
+	}
+	
+	protected abstract Component generatePanel() ;
+
 	@Override
 	public void recycle(){
-		for(Object child : this.children){
-			if(child instanceof TreeNodeEditor){
-				((TreeNodeEditor)child).recycle();
+		if(this.children != null){
+			for(Object child : this.children){
+				if(child instanceof TreeNodeEditor){
+					((TreeNodeEditor)child).recycle();
+				}
 			}
 		}
 	}

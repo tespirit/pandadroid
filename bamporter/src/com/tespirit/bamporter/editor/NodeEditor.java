@@ -18,7 +18,6 @@ public class NodeEditor extends TreeNodeEditor{
 	private static final long serialVersionUID = 1L;
 	Node mNode;
 	RenderManager mRenderManager;
-	SimplePanel mPropertyPanel;
 	
 	public NodeEditor(Node node, RenderManager renderManager){
 		this.mRenderManager = renderManager;
@@ -28,9 +27,10 @@ public class NodeEditor extends TreeNodeEditor{
 		}
 	}
 	
-	private void generatePanel(){
-		this.mPropertyPanel = new SimplePanel();
-		JTextField name = this.mPropertyPanel.createTextField("Name");
+	@Override
+	protected Component generatePanel(){
+		SimplePanel panel = new SimplePanel();
+		JTextField name = panel.createTextField("Name");
 		if(this.mNode.getName() != null){
 			name.setText(this.mNode.getName());
 		}
@@ -42,19 +42,12 @@ public class NodeEditor extends TreeNodeEditor{
 				updateEditor();
 			}
 		});
+		return panel;
 	}
 	
 	@Override
 	public String toString(){
 		return Util.getClassName(this.mNode)+" "+this.mNode.getName();
-	}
-
-	@Override
-	public Component getPropertyPanel() {
-		if(this.mPropertyPanel == null){
-			this.generatePanel();
-		}
-		return this.mPropertyPanel;
 	}
 
 	@Override

@@ -29,7 +29,6 @@ public class AnimationEditor extends TreeNodeEditor{
 	private RenderManager mRenderManager;
 	private Animation mAnimation;
 	private Player mPlayer;
-	private SimplePanel mPropertyPanel;
 	private JTextField mName;
 	private JComboBox mClips;
 	private JButton mNewClip;
@@ -52,18 +51,19 @@ public class AnimationEditor extends TreeNodeEditor{
 		}
 	}
 	
-	private void generatePanel(){
-		this.mPropertyPanel = new SimplePanel();
-		this.mName = this.mPropertyPanel.createTextField("Name");
+	@Override
+	protected Component generatePanel(){
+		SimplePanel panel = new SimplePanel();
+		this.mName = panel.createTextField("Name");
 		
-		this.mPropertyPanel.createLabel("Channels", String.valueOf(this.mAnimation.getChannelCount()));
+		panel.createLabel("Channels", String.valueOf(this.mAnimation.getChannelCount()));
 		
-		this.mClips = this.mPropertyPanel.createComboBox("Clips");
-		this.mNewClip = this.mPropertyPanel.createButton("New Clip");
-		this.mSkeletons = this.mPropertyPanel.createComboBox("Skeleton");
+		this.mClips = panel.createComboBox("Clips");
+		this.mNewClip = panel.createButton("New Clip");
+		this.mSkeletons = panel.createComboBox("Skeleton");
 		
-		this.mPlay = this.mPropertyPanel.createToggleButton("Play");
-		JButton restart = this.mPropertyPanel.createButton("Restart");
+		this.mPlay = panel.createToggleButton("Play");
+		JButton restart = panel.createButton("Restart");
 		
 		for(int i = 0; i < this.mAnimation.getClipCount(); i++){
 			this.mClips.addItem(this.mAnimation.getClip(i).getName());
@@ -143,6 +143,8 @@ public class AnimationEditor extends TreeNodeEditor{
 		} else {
 			this.mPlay.setEnabled(false);
 		}
+		
+		return panel;
 	}
 	
 	public void addNewClip(Clip clip){
@@ -263,15 +265,6 @@ public class AnimationEditor extends TreeNodeEditor{
 		else return null;
 	}
 	
-
-	@Override
-	public Component getPropertyPanel() {
-		if(this.mPropertyPanel == null){
-			this.generatePanel();
-		}
-		return this.mPropertyPanel;
-	}
-	
 	@Override
 	public String toString(){
 		String name = this.mAnimation.getName();
@@ -288,7 +281,6 @@ public class AnimationEditor extends TreeNodeEditor{
 		this.mRenderManager = null;
 		this.mAnimation = null;
 		this.mPlayer = null;
-		this.mPropertyPanel = null;
 		this.mClips = null;
 		this.mName = null;
 		this.mSkeletons = null;

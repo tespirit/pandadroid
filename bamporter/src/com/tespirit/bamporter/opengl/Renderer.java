@@ -85,7 +85,6 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.createRenderers();
 		
 		this.mTextures = new ArrayList<com.jogamp.opengl.util.texture.Texture>();
-		this.mTextures.add(null); // this makes it easier to deal with textures that have not been initialized.
 		
 		//create a default camera!
 		Camera camera = new Camera();
@@ -356,7 +355,8 @@ public class Renderer extends RenderManager implements GLEventListener{
 		public void render(Texture texture) {
 			int id = texture.getDiffuseTextureId();
 			if(id != -1){
-				com.jogamp.opengl.util.texture.Texture t = mTextures.get(id);				mGl.glColor4f(1,1,1,1);
+				com.jogamp.opengl.util.texture.Texture t = mTextures.get(id);
+				mGl.glColor4f(1,1,1,1);
 				t.enable();
 				t.bind();
 			}

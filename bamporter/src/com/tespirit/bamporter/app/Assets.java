@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.io.ColladaHandler;
 import com.tespirit.bamporter.io.FileHandler;
+import com.tespirit.bamporter.editor.Util;
 
 public class Assets {
 	
@@ -35,11 +38,103 @@ public class Assets {
 	private static Map<String, FileHandler> mFileHandlers = new HashMap<String, FileHandler>();
 	private static List<FileFilter> mFilters = new ArrayList<FileFilter>();
 	
-	private static final String ASSET_DIR = "assets";
+	private static String ASSET_DIR;
+	private static String HOME_DIR;
+	private static String APP_DIR;
+	private static String USER_DATA_DIR;
 	
 	public static void init(){
 		BambooHandler.init();
 		ColladaHandler.init();
+		try{
+			Assets.APP_DIR = new File(".").getCanonicalPath();
+		} catch (Exception e){
+			e.printStackTrace();
+			Assets.APP_DIR = new File(".").getAbsolutePath();
+		}
+		Assets.ASSET_DIR = new File(Assets.APP_DIR,"assets").getPath();
+		Assets.HOME_DIR = System.getProperty("user.home");
+		Assets.USER_DATA_DIR = new File(Assets.HOME_DIR, "bamporter").getPath();
+		if(new File(Assets.USER_DATA_DIR).isFile()){
+			Util.alertError("Preferences cannot be saved because a file is named the same as the preference folder: " + Assets.USER_DATA_DIR);
+		}
+	}
+	
+	/**
+	 * returns null if the file could not be opened.
+	 * @param fileName
+	 * @return
+	 */
+	public static Object openUserObject(String id) {
+		Object object = null;
+		File file = new File(Assets.USER_DATA_DIR, id);
+		if(file.isFile()){
+			FileInputStream stream;
+			try{
+				stream = new FileInputStream(file);
+				object = new ObjectInputStream(stream).readObject();
+			} catch(Exception e){
+				return null;
+			}
+			try{
+			} catch(Exception e){
+				//VOID
+			}
+			if(stream != null){
+				try{
+					stream.close();
+				} catch(Exception ex){
+					//VOID
+				}
+				stream = null;
+			}
+		}
+		return object;
+	}
+	
+	public static void deleteUserObject(String id){
+		File file = new File(id);
+		if(file.isFile()){
+			try{
+				file.delete();
+			} catch(Exception e){
+				//VOID
+			}
+		}
+	}
+	
+	public static void saveUserObject(Object data, String id){
+		File userData = new File(Assets.USER_DATA_DIR);
+		if(!userData.exists()){
+			userData.mkdir();
+		} else if(userData.isFile()){
+			return;
+		}
+		File file = new File(Assets.USER_DATA_DIR, id);
+		FileOutputStream stream = null;
+		try{
+			stream = new FileOutputStream(file);
+			ObjectOutputStream ostream = new ObjectOutputStream(stream);
+			ostream.writeObject(data);
+		} catch(Exception e){
+			//VOID
+		} 
+		
+		if(stream != null){
+			try{
+				stream.close();
+			} catch (Exception e){
+				//VOID
+			}
+		}
+	}
+	
+	public static String getHomeDir(){
+		return Assets.HOME_DIR;
+	}
+	
+	public static String getAppDir(){
+		return Assets.APP_DIR;
 	}
 	
 	public static ImagePanel openImagePanel(String name){

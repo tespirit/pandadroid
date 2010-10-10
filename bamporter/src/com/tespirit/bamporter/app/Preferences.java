@@ -1,11 +1,8 @@
 package com.tespirit.bamporter.app;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +10,6 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -23,28 +19,45 @@ public class Preferences implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 3846220277697146862L;
-	private static Preferences mPrefs;
-	private static final String FILE = "preferences";
-	private static Set<JComponent> mSimpleBorderComponents = new HashSet<JComponent>();
-	private static HashMap<String, String> mLookAndFeels = new HashMap<String, String>();
-	private static final String DEFAULT_LAF = "Nimbus";
+	transient private static Preferences mPrefs;
+	transient private static final String ID = "preferences";
+	transient private static Set<JComponent> mSimpleBorderComponents = new HashSet<JComponent>();
+	transient private static HashMap<String, Theme> mLookAndFeels = new HashMap<String, Theme>();
+	transient private static final String DEFAULT_THEME = "Pretty";
 	
-	
-	private String mLookAndFeel;
-	private Border mSimpleBorder;
 	private Color mRenderBGColor;
 	private String mOpenDirectory;
 	private String mSaveDirectory;
+	private String mThemeName;
+	transient private Theme mTheme; 
 	
 	public static void init(){
-		mLookAndFeels.put("Nimbus", "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-		mLookAndFeels.put("Metal", "javax.swing.plaf.metal.MetalLookAndFeel");
-		mLookAndFeels.put("System", "system");
-		mLookAndFeels.put("Motif", "com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-		mLookAndFeels.put("GTK", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+		Border simpleBorder = BorderFactory.createLineBorder(new Color(0xff888888), 1);
+		addTheme(new Theme("Pretty", "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel", simpleBorder));
+		addTheme(new Theme("Ugly", "com.sun.java.swing.plaf.motif.MotifLookAndFeel", simpleBorder));
+		addTheme(new Theme("Flakey OS", UIManager.getSystemLookAndFeelClassName(), simpleBorder));
+		addTheme(new Theme("Java-y", "javax.swing.plaf.metal.MetalLookAndFeel", simpleBorder));
+		addTheme(new Theme("Linux-y", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel", simpleBorder));
+		Preferences.mPrefs = new Preferences();
+		Preferences.applyTheme();
+		Preferences.applyLookAndFeel();
+	}
+	
+	public static void addTheme(Theme theme){
+		mLookAndFeels.put(theme.mName, theme);
+	}
+	
+	private static class Theme implements Serializable{
+		private static final long serialVersionUID = -4901932410829285428L;
+		private String mName;
+		private String mLookAndFeelId;
+		private Border mSimpleBorder;
 		
-		Preferences.openTheme();
-		Preferences.setLookAndFeel();
+		private Theme(String name, String lookAndFeelId, Border simpleBorder){
+			this.mName = name;
+			this.mLookAndFeelId = lookAndFeelId;
+			this.mSimpleBorder = simpleBorder;
+		}
 	}
 	
 	public static String[] getLookAndFeels(){
@@ -52,95 +65,48 @@ public class Preferences implements Serializable{
 		return Preferences.mLookAndFeels.keySet().toArray(laf);
 	}
 	
-	private static void refreshTheme(JFrame frame){
-		Preferences.setLookAndFeel();
-		SwingUtilities.updateComponentTreeUI(frame);
+	public static void refreshComponent(Component component){
+		SwingUtilities.updateComponentTreeUI(component);
 	}
 	
-	private static void setLookAndFeel(){
-		String val = Preferences.mLookAndFeels.get(Preferences.mPrefs.mLookAndFeel);
-		if(val == null){
-			val = Preferences.mLookAndFeels.get(DEFAULT_LAF);
-		}
-		if(val == "system"){
-			val = UIManager.getSystemLookAndFeelClassName();
-		}
+	private static boolean applyLookAndFeel(){
 		try{
-		UIManager.setLookAndFeel(val);
+			UIManager.setLookAndFeel(Preferences.mPrefs.mTheme.mLookAndFeelId);
+			return true;
 		} catch (Exception e){
-			//VOID;
+			return false;
 		}
 	}
 	
 	private static void save(){
-		FileOutputStream stream = null;
-		try{
-			stream = new FileOutputStream(new File(FILE));
-			ObjectOutputStream ostream = new ObjectOutputStream(stream);
-			ostream.writeObject(Preferences.mPrefs);
-		} catch(Exception e){
-			//VOID
-		} finally {
-			if(stream != null){
-				try{
-					stream.close();
-				} catch (Exception e){
-					//VOID
-				}
-			}
-		}
+		Assets.saveUserObject(Preferences.mPrefs, Preferences.ID);
 	}
 	
-	private static void openTheme(){
-		File file = new File(FILE);
-		if(file.exists()){
-			FileInputStream stream = null;
-			try{
-				stream = new FileInputStream(file);
-				ObjectInputStream ostream = new ObjectInputStream(stream);
-				Preferences.mPrefs = (Preferences)ostream.readObject();
-			} catch (Exception e) {
-				//VOID
-			} finally {
-				if(stream != null){
-					try{
-						stream.close();
-					} catch (Exception e){
-						//VOID
-					}
-					if(Preferences.mPrefs == null){
-						file.delete();
-					}
-				}	
-			}
-		}
-		if(Preferences.mPrefs == null){
+	public static void load(){
+		Object obj = Assets.openUserObject(Preferences.ID);
+		if(obj instanceof Preferences){
+			Preferences.mPrefs = (Preferences)obj;
+		} else {
 			Preferences.mPrefs = new Preferences();
 		}
+		Preferences.applyTheme();
+		Preferences.applyLookAndFeel();
 	}
 	
 	public Preferences() {
-		this.mLookAndFeel = DEFAULT_LAF;
+		this.mThemeName = Preferences.DEFAULT_THEME;
 		this.mRenderBGColor = new Color(0xffffffff);
-		this.mSimpleBorder = BorderFactory.createLineBorder(new Color(0xff888888), 1);
 	}
 	
 	public static void applySimpleBorder(JComponent component){
-		component.setBorder(Preferences.mPrefs.mSimpleBorder);
+		component.setBorder(Preferences.mPrefs.mTheme.mSimpleBorder);
 		Preferences.mSimpleBorderComponents.add(component);
 	}
 	
 	public static void unapplySimpleBorder(JComponent component){
 		Preferences.mSimpleBorderComponents.remove(component);
 	}
-	/*
-	private static void setSimpleBorder(Border simpleBorder){
-		Preferences.mPrefs.mSimpleBorder = simpleBorder;
-		for(JComponent component : Preferences.mSimpleBorderComponents){
-			component.setBorder(simpleBorder);
-		}
-	}
-	*/
+	
 	public static Color getRenderBGColor(){
 		return Preferences.mPrefs.mRenderBGColor;
 	}
@@ -152,14 +118,23 @@ public class Preferences implements Serializable{
 		}
 	}
 	
-	public static String getLookAndFeel(){
-		return Preferences.mPrefs.mLookAndFeel;
+	public static String getTheme(){
+		return Preferences.mPrefs.mTheme.mName;
 	}
 	
-	public static void setLookAndFeel(String lookAndFeel, JFrame frame){
-		if(Preferences.mPrefs.mLookAndFeel != lookAndFeel){
-			Preferences.mPrefs.mLookAndFeel = lookAndFeel;
-			Preferences.refreshTheme(frame);
+	private static void applyTheme(){
+		if(Preferences.mLookAndFeels.containsKey(Preferences.mPrefs.mThemeName)){
+			Preferences.mPrefs.mTheme = Preferences.mLookAndFeels.get(Preferences.mPrefs.mThemeName);
+		} else {
+			Preferences.mPrefs.mTheme = Preferences.mLookAndFeels.get(Preferences.DEFAULT_THEME);
+		}
+	}
+	
+	public static void setTheme(String theme){
+		if(Preferences.mPrefs.mThemeName != theme){
+			Preferences.mPrefs.mThemeName = theme;
+			Preferences.applyTheme();
+			Preferences.applyLookAndFeel();
 			Preferences.save();
 		}
 	}

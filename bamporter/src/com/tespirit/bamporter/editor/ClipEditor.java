@@ -21,7 +21,6 @@ public class ClipEditor extends TreeNodeEditor{
 	 */
 	private static final long serialVersionUID = 4480406979875461348L;
 	private Clip mClip;
-	private SimplePanel mPropertyPanel;
 	private JTextField  mName;
 	private JButton mDeleteClip;
 	private JToggleButton mPlay;
@@ -41,21 +40,22 @@ public class ClipEditor extends TreeNodeEditor{
 		return this.mClip;
 	}
 	
-	private void generatePanel(){
-		this.mPropertyPanel = new SimplePanel();
+	@Override
+	protected Component generatePanel(){
+		SimplePanel panel = new SimplePanel();
 		
-		this.mName = this.mPropertyPanel.createTextField("Name");
-		JSpinner start = this.mPropertyPanel.createLongSpinner("Start", Long.MIN_VALUE, Long.MAX_VALUE, 30);
-		JSpinner end = this.mPropertyPanel.createLongSpinner("End", Long.MIN_VALUE, Long.MAX_VALUE, 30);
-		this.mPlay = this.mPropertyPanel.createToggleButton("Play Clip");
-		this.mDeleteClip = this.mPropertyPanel.createButton("Delete");
+		this.mName = panel.createTextField("Name");
+		JSpinner start = panel.createLongSpinner("Start", Long.MIN_VALUE, Long.MAX_VALUE, 30);
+		JSpinner end = panel.createLongSpinner("End", Long.MIN_VALUE, Long.MAX_VALUE, 30);
+		this.mPlay = panel.createToggleButton("Play Clip");
+		this.mDeleteClip = panel.createButton("Delete");
 		
 		if(this.mClip.getName() != null){
 			this.mName.setText(this.mClip.getName());
 		}
 		
-		start.getModel().setValue(this.mClip.getStart());
-		end.getModel().setValue(this.mClip.getEnd());
+		start.getModel().setValue(new Double(this.mClip.getStart()));
+		end.getModel().setValue(new Double(this.mClip.getEnd()));
 		
 		this.mName.addActionListener(new ActionListener(){
 			@Override
@@ -107,6 +107,8 @@ public class ClipEditor extends TreeNodeEditor{
 				deleteClip();
 			}
 		});
+		
+		return panel;
 	}
 	
 	public void setPlayState(boolean state){
@@ -115,21 +117,18 @@ public class ClipEditor extends TreeNodeEditor{
 
 	@Override
 	public Component getPropertyPanel() {
-		if(this.mPropertyPanel == null){
-			this.generatePanel();
-		}
+		Component panel = super.getPropertyPanel();
 		this.mPlay.getModel().setSelected(this.mPlayState);
-		
 		AnimationEditor parent = (AnimationEditor)this.getParent();
 		this.mDeleteClip.setEnabled(parent.getClipCount()  > 1);
-		return this.mPropertyPanel;
+		return panel;
 	}
 
 	@Override
 	public void recycle() {
-		this.mPropertyPanel = null;
 		this.mClip = null;
 		this.mDeleteClip = null;
+		super.recycle();
 	}
 	
 	@Override
