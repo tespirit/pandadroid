@@ -7,7 +7,7 @@ import com.tespirit.bamboo.vectors.Plane;
 import com.tespirit.bamboo.vectors.Ray;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class MoveController2d extends MatrixController2d{
+public class MoveController2d extends BaseMatrixController2d{
 	private RenderManager mRenderManager;
 	private Plane mPlane;
 	private Matrix3d mInitialWorldMatrix;

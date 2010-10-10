@@ -3,7 +3,7 @@ package com.tespirit.pandadroid.app;
 import com.tespirit.bamboo.controllers.Controller2d;
 import com.tespirit.bamboo.controllers.ControllerDummy;
 import com.tespirit.bamboo.controllers.Dof3;
-import com.tespirit.bamboo.controllers.MatrixController2d;
+import com.tespirit.bamboo.controllers.BaseMatrixController2d;
 import com.tespirit.bamboo.controllers.MoveController2d;
 import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
@@ -24,7 +24,7 @@ import android.view.View.OnTouchListener;
 public class DefaultTouchHandler implements OnTouchListener{
 	private Controller2d mCurrent;
 	private Controller2d mDefault;
-	private MatrixController2d mSelected;
+	private BaseMatrixController2d mSelected;
 
 	RenderManager mRenderManager;
 	
@@ -49,7 +49,7 @@ public class DefaultTouchHandler implements OnTouchListener{
 		this.mDefault.setUpdateManager(this.mRenderManager);
 	}
 	
-	public void setSelectedController(MatrixController2d selectedController){
+	public void setSelectedController(BaseMatrixController2d selectedController){
 		this.mSelected = selectedController;
 		this.mSelected.setUpdateManager(this.mRenderManager);
 	}

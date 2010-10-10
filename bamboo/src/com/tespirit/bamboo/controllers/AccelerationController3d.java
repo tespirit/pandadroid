@@ -1,6 +1,6 @@
 package com.tespirit.bamboo.controllers;
 
-public class AccelerationController3d extends MatrixController3d{
+public class AccelerationController3d extends BaseMatrixController3d{
 	
 	private float xScale;
 	private float yScale;

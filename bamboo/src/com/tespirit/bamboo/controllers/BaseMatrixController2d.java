@@ -3,7 +3,7 @@ package com.tespirit.bamboo.controllers;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 
-public abstract class MatrixController1d extends BaseController1d{
+public abstract class BaseMatrixController2d extends BaseController2d{
 	protected Matrix3d mControlled;
 
 	public void setControlled(Matrix3d matrix) {
@@ -11,13 +11,13 @@ public abstract class MatrixController1d extends BaseController1d{
 	}
 
 	public void setControlled(Node node) {
-		this.mControlled = node.getTransform();
+		this.setControlled(node.getTransform());
 	}
 
 	public void setControlled(String nodeName) {
 		Node n = Node.getNode(nodeName);
 		if(n != null){
-			this.mControlled = n.getTransform();
+			this.setControlled(n);
 		}
 	}
 }

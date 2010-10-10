@@ -2,7 +2,7 @@ package com.tespirit.bamboo.controllers;
 
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public abstract class AxisController2d extends MatrixController2d{
+public abstract class AxisController2d extends BaseMatrixController2d{
 	protected Vector3d mXAxis;
 	protected Vector3d mYAxis;
 	protected float mScale;

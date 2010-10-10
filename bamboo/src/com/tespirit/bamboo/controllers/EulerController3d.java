@@ -5,7 +5,7 @@ package com.tespirit.bamboo.controllers;
  * @author Todd Espiritu Santo
  *
  */
-public class EulerController3d extends MatrixController3d{
+public class EulerController3d extends BaseMatrixController3d{
 	private float xScale;
 	private float yScale;
 	private float zScale;
