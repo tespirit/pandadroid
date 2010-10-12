@@ -33,6 +33,8 @@ import javax.swing.tree.TreePath;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamboo.particles.SpriteParticleEmitter;
+import com.tespirit.bamboo.particles.RandomParticleGenerator;
 import com.tespirit.bamboo.render.UpdateManager;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.app.Assets.SaveTypes;
@@ -83,6 +85,7 @@ public class BamporterFrame extends JFrame{
 		//initialize the menus!
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+		JMenuItem newParticleButton = new JMenuItem("New ParticleGenerator");
 		JMenuItem openButton = new JMenuItem("Open");
 		this.mSaveAllButton = new JMenuItem("Save All");
 		this.mSaveScenesButton = new JMenuItem("Save Scenes");
@@ -90,6 +93,7 @@ public class BamporterFrame extends JFrame{
 		JMenuItem mergeAnimationsButton = new JMenuItem("Merge Animations");
 		JMenuItem exitButton = new JMenuItem("Exit");
 		
+		fileMenu.add(newParticleButton);
 		fileMenu.add(openButton);
 		fileMenu.addSeparator();
 		fileMenu.add(this.mSaveAllButton);
@@ -195,6 +199,13 @@ public class BamporterFrame extends JFrame{
 			
 		});
 		
+		newParticleButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				createSpriteParticles();
+			}
+		});
+		
 		openButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -271,6 +282,36 @@ public class BamporterFrame extends JFrame{
 		
 	}
 	
+	protected void createSpriteParticles() {
+		RandomParticleGenerator spp = new RandomParticleGenerator();
+		Node p = new SpriteParticleEmitter(spp);
+		this.mRenderer.addScene(p);
+		
+		for(Editor e : this.mEditors){
+			e.recycle();
+		}
+		this.mEditors.clear();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)this.mNavigator.getModel().getRoot();
+		root.removeAllChildren();
+		
+		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("Scenes");
+		DefaultMutableTreeNode particles = new DefaultMutableTreeNode("Particles");
+		NodeEditor ne = new NodeEditor(p, this.mRenderer);
+		this.mEditors.add(ne);
+		sceneGraph.add(ne);
+		
+		ParticleEditor pe = new ParticleEditor(spp);
+		this.mEditors.add(pe);
+		particles.add(pe);
+		
+		root.add(sceneGraph);
+		root.add(particles);
+		
+		this.enableSaves();
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.reload();
+	}
+
 	public void close(){
 		if (this.isActive())
 		{

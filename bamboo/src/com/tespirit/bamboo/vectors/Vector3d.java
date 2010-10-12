@@ -130,6 +130,13 @@ public class Vector3d {
 		v.v[v.offset+3] = this.v[this.offset+3];
 		return v;
 	}
+	
+	public Vector3d addScale(Vector3d v, float scale){
+		this.v[this.offset] += v.v[v.offset]*scale;
+		this.v[this.offset+1] += v.v[v.offset+1]*scale;
+		this.v[this.offset+2] += v.v[v.offset+2]*scale;
+		return this;
+	}
 		
 	public Vector3d add(Vector3d v){
 		this.v[this.offset] += v.v[v.offset];
@@ -227,6 +234,16 @@ public class Vector3d {
 	public Vector3d projectOnTo(Vector3d v){
 		this.scale(v.dot(this)/v.magnitude2());
 		return v;
+	}
+	
+	/*
+	 * this scales the vector according to the acceleration it represents given deltaTime.
+	 */
+	public void computeForce(float mass, float deltaTime){
+		deltaTime = mass*2/(deltaTime*deltaTime);
+		this.v[this.offset] *= deltaTime;
+		this.v[this.offset+1] *= deltaTime;
+		this.v[this.offset+2] *= deltaTime;
 	}
 	
 	@Override 

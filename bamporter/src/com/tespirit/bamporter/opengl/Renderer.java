@@ -411,8 +411,8 @@ public class Renderer extends RenderManager implements GLEventListener{
 
 		@Override
 		public void render(VertexIndices vi) {
-			mGl.glFrontFace(GL2.GL_CCW);
-			mGl.glEnable(GL2.GL_CULL_FACE);
+			//mGl.glFrontFace(GL2.GL_CCW);
+			//mGl.glEnable(GL2.GL_CULL_FACE);
 			
 			renderVertexBuffer(vi.getVertexBuffer());
 			
@@ -427,15 +427,15 @@ public class Renderer extends RenderManager implements GLEventListener{
 			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
 			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
 			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			mGl.glDisable(GL2.GL_CULL_FACE);
+			//mGl.glDisable(GL2.GL_CULL_FACE);
 		}
 	}
 
 	protected class VertexListRenderer extends VertexList.Renderer{
 		@Override
 		public void render(VertexList vl) {
-			mGl.glFrontFace(GL2.GL_CCW);
-			mGl.glEnable(GL2.GL_CULL_FACE);
+			//mGl.glFrontFace(GL2.GL_CCW);
+			//mGl.glEnable(GL2.GL_CULL_FACE);
 			
 			renderVertexBuffer(vl.getVertexBuffer());
 			mGl.glDrawArrays(mPrimitiveTypes[vl.getType()], 0, vl.getVertexBuffer().getCount());
@@ -444,7 +444,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
 			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
 			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			mGl.glDisable(GL2.GL_CULL_FACE);
+			//mGl.glDisable(GL2.GL_CULL_FACE);
 		}
 	}
 }

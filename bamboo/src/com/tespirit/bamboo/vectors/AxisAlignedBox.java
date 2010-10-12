@@ -32,6 +32,12 @@ public class AxisAlignedBox{
 		this.max.copy(v);
 	}
 	
+	public float getVolumn(){
+		return Math.abs((this.max.getX()-this.min.getX())*
+						(this.max.getY()-this.min.getY())*
+						(this.max.getZ()-this.min.getZ()));
+	}
+	
 	public boolean pointInside(Vector3d point){
 		return this.min.getX() <= point.getX() && 
 			   this.min.getY() <= point.getY() && 

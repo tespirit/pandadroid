@@ -41,8 +41,11 @@ public class MoveController2d extends BaseMatrixController2d{
 	@Override
 	public void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
 		Ray ray = this.mRenderManager.getCamera().createRay(x, y);
+		Vector3d planeNormal = this.mRenderManager.getCamera().getWorldTransform().getZAxis().clone();
+		//planeNormal.scale(-1);
 		ray.transformBy(this.mInverter);
-		this.mPlane.setNormal(ray.getPosition());
+		this.mInverter.transform(planeNormal);
+		this.mPlane.setNormal(planeNormal);
 		Vector3d intersect = mPlane.rayIntersectsAt(ray);
 		if(intersect != null){
 			//push the position as a translation onto the node.

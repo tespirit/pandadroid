@@ -94,4 +94,12 @@ public class SimplePanel extends JPanel{
 		spinner.setModel(model);
 		return spinner;
 	}
+	
+	public JSpinner createFloatSpinner(String label, float min, float max, float step){
+		JSpinner spinner = new JSpinner();
+		this.addComponent(label, spinner);
+		SpinnerModel model = new SpinnerNumberModel(0, min, max, step);
+		spinner.setModel(model);
+		return spinner;
+	}
 }

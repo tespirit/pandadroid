@@ -3,11 +3,12 @@ package com.tespirit.pandadroid.app;
 import com.tespirit.bamboo.controllers.Controller2d;
 import com.tespirit.bamboo.controllers.ControllerDummy;
 import com.tespirit.bamboo.controllers.Dof3;
-import com.tespirit.bamboo.controllers.BaseMatrixController2d;
 import com.tespirit.bamboo.controllers.MatrixController2d;
 import com.tespirit.bamboo.controllers.MoveController2d;
 import com.tespirit.bamboo.controllers.RotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
+import com.tespirit.bamboo.physics.ForceController2d;
+import com.tespirit.bamboo.physics.MoveForce;
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -24,8 +25,10 @@ import android.view.View.OnTouchListener;
  */
 public class DefaultTouchHandler implements OnTouchListener{
 	private Controller2d mCurrent;
+	private Controller2d mRelease;
 	private Controller2d mDefault;
 	private MatrixController2d mSelected;
+	private MatrixController2d mReleaseSelected;
 
 	RenderManager mRenderManager;
 	
@@ -42,6 +45,7 @@ public class DefaultTouchHandler implements OnTouchListener{
 		this.mRenderManager = renderManager;
 		this.mCurrent = ControllerDummy.getInstance();
 		this.mDefault = ControllerDummy.getInstance();
+		this.mRelease = ControllerDummy.getInstance();
 		this.mSelected = null;
 	}
 	
@@ -54,6 +58,11 @@ public class DefaultTouchHandler implements OnTouchListener{
 		this.mSelected = selectedController;
 		this.mSelected.setUpdateManager(this.mRenderManager);
 	}
+	
+	public void setReleaseSelectedController(MatrixController2d releaseSelectedController){
+		this.mReleaseSelected = releaseSelectedController;
+		this.mReleaseSelected.setUpdateManager(this.mRenderManager);
+	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
@@ -65,12 +74,20 @@ public class DefaultTouchHandler implements OnTouchListener{
 		case MotionEvent.ACTION_UP:
 			this.mCurrent.set(x, y, time);
 			this.mCurrent = this.mDefault;
+			this.mRelease.set(x, y, time);
+			this.mRelease = ControllerDummy.getInstance();
 			break;
 		case MotionEvent.ACTION_DOWN:
 			Node selected = this.mRenderManager.selectModel(x, y);
-			if(selected != null && this.mSelected != null){
-				this.mSelected.setControlled(selected);
-				this.mCurrent = this.mSelected;
+			if(selected != null){
+				if(this.mSelected != null){
+					this.mSelected.setControlled(selected);
+					this.mCurrent = this.mSelected;
+				}
+				if(this.mReleaseSelected != null){
+					this.mReleaseSelected.setControlled(selected);
+					this.mRelease = this.mReleaseSelected;
+				}
 			} else {
 				this.mCurrent = this.mDefault;
 			}
@@ -78,6 +95,7 @@ public class DefaultTouchHandler implements OnTouchListener{
 			break;
 		case MotionEvent.ACTION_MOVE:
 			this.mCurrent.set(x, y, time);
+			this.mRelease.init(x, y, time);
 			break;
 		default:
 			break;
@@ -113,6 +131,11 @@ public class DefaultTouchHandler implements OnTouchListener{
 	 */
 	public void makeNodesDraggable(){
 		this.setSelectedController(new MoveController2d(this.mRenderManager));
+	}
+	
+	public void makeNodesFlingable(){
+		this.makeNodesDraggable();
+		this.setReleaseSelectedController(new ForceController2d(new MoveForce(this.mRenderManager)));
 	}
 	
 }

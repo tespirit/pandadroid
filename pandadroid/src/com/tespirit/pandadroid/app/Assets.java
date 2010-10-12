@@ -77,7 +77,7 @@ public class Assets {
 		return bitmap;
 	}
 	
-	public List<Node> loadNodes(String name) throws Exception{
+	public static List<Node> loadNodes(String name) throws Exception{
 		InputStream stream = Assets.openStream(name);
 		try{
 			List<Node> nodes = Bamboo.loadNodes(stream);
@@ -89,7 +89,7 @@ public class Assets {
 		}
 	}
 	
-	public List<Animation> loadAnimations(String name) throws Exception{
+	public static List<Animation> loadAnimations(String name) throws Exception{
 		InputStream stream = Assets.openStream(name);
 		try{
 			List<Animation> animations = Bamboo.loadAnimations(stream);
@@ -101,7 +101,7 @@ public class Assets {
 		}
 	}
 	
-	public BambooAsset loadBamboo(String name) throws Exception{
+	public static BambooAsset loadBamboo(String name) throws Exception{
 		InputStream stream = Assets.openStream(name);
 		try{
 			BambooAsset asset = new Bamboo(stream);
@@ -113,7 +113,7 @@ public class Assets {
 		}
 	}
 	
-	public BambooAsset loadCollada(String name) throws Exception{
+	public static BambooAsset loadCollada(String name) throws Exception{
 		InputStream stream = Assets.openStream(name);
 		try{
 			XmlPullParser parser = Xml.newPullParser();

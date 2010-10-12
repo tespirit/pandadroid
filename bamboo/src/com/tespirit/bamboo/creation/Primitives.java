@@ -9,14 +9,20 @@ import com.tespirit.bamboo.vectors.Vector3d;
 public class Primitives {
 	
 	public static class Plane extends VertexIndices{
+		float mHalfWidth;
+		float mHalfHeight;
+		Vector3d mCenter;
+		
 		public Plane(){
+			this(1.0f, 1.0f);
+		}
+		
+		public Plane(float width, float height){
 			super(6, 4, new int[]{VertexBuffer.POSITION, VertexBuffer.NORMAL, VertexBuffer.TEXCOORD});
-			this.mVertexBuffer.lock();
+			this.setSize(width, height);
+			this.mCenter = new Vector3d();
 			
-			this.mVertexBuffer.addPosition(-0.5f,  0.5f, 0.0f);
-			this.mVertexBuffer.addPosition(-0.5f, -0.5f, 0.0f);
-			this.mVertexBuffer.addPosition(0.5f, -0.5f, 0.0f);
-			this.mVertexBuffer.addPosition(0.5f,  0.5f, 0.0f);
+			this.mVertexBuffer.lock();
 			
 			this.mVertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
 			this.mVertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
@@ -36,6 +42,28 @@ public class Primitives {
 			this.mIndexBuffer.addTriangle(0, 2, 3);
 			
 			this.mIndexBuffer.unlock();
+			
+			this.update();
+		}
+		
+		public void setSize(float width, float height){
+			this.mHalfWidth = 0.5f*width;
+			this.mHalfHeight = 0.5f*height;
+		}
+		
+		public void setCenter(Vector3d center){
+			this.mCenter.copy(center);
+		}
+		
+		public void update(){
+			super.update();
+			
+			this.mVertexBuffer.lock();
+			this.mVertexBuffer.addPosition(this.mCenter.getX()-this.mHalfWidth, this.mCenter.getY()+this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.addPosition(this.mCenter.getX()-this.mHalfWidth, this.mCenter.getY()-this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.addPosition(this.mCenter.getX()+this.mHalfWidth, this.mCenter.getY()-this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.addPosition(this.mCenter.getX()+this.mHalfWidth, this.mCenter.getY()+this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.unlock();
 		}
 	}
 	

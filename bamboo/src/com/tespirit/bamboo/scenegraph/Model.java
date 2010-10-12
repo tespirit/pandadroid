@@ -27,9 +27,8 @@ public class Model extends RenderableNode implements Externalizable{
 	public Model(String name){
 		super(name);
 		this.mBoundingBox = new AxisAlignedBox();
-		float[] m = new float[Matrix3d.SIZE*2];
+		float[] m = Matrix3d.createBuffer(2);
 		this.mTransform = new Matrix3d(m);
-		this.mTransform.identity();
 		this.mWorldTransform = new Matrix3d(m, Matrix3d.SIZE);
 		this.mSurface = Surface.getDefaultSurface();
 	}

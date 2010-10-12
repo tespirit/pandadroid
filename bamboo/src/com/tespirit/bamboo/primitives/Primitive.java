@@ -17,42 +17,42 @@ public abstract class Primitive implements Resource{
 	
 	public static final int TYPE_COUNT = 6;
 	
-	private int type;
+	private int mType;
 	
 	public int getType(){
-		return this.type;
+		return this.mType;
 	}
 	
 	public void renderAsTriangles(){
-		this.type = Primitive.TRIANGLES;
+		this.mType = Primitive.TRIANGLES;
 	}
 	
 	public void renderAsTriangleStrip(){
-		this.type = Primitive.TRIANGLE_STRIP;
+		this.mType = Primitive.TRIANGLE_STRIP;
 	}
 	
 	public void renderAsTriangleFan(){
-		this.type = Primitive.TRIANGLE_FAN;
+		this.mType = Primitive.TRIANGLE_FAN;
 	}
 	
 	public void renderAsLines(){
-		this.type = Primitive.LINES;
+		this.mType = Primitive.LINES;
 	}
 	
 	public void renderAsLineStrip(){
-		this.type = Primitive.LINE_STRIP;
+		this.mType = Primitive.LINE_STRIP;
 	}
 	
 	public void renderAsPoints(){
-		this.type = Primitive.POINTS;
+		this.mType = Primitive.POINTS;
 	}
 	
 	protected void write(ObjectOutput out) throws IOException{
-		out.writeInt(this.type);
+		out.writeInt(this.mType);
 	}
 	
 	protected void read(ObjectInput input) throws IOException{
-		this.type = input.readInt();
+		this.mType = input.readInt();
 	}
 	
 	abstract public void computeBoundingBox(AxisAlignedBox boundingBox);

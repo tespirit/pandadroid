@@ -77,6 +77,7 @@ public abstract class RenderManager implements UpdateManager {
 	
 	List<Node> mScene;
 	List<RenderableNode> mRenderables;
+	List<SpriteNode> mSprites;
 	
 	ThreadBufferSet<Updater> mSingleUpdaters;
 	ThreadBufferList<Node> mNewNodes;
@@ -112,6 +113,7 @@ public abstract class RenderManager implements UpdateManager {
 		this.mStoredResources = new HashSet<Resource>();
 		this.mScene = new ArrayList<Node>();
 		this.mRenderables = new ArrayList<RenderableNode>();
+		this.mSprites = new ArrayList<SpriteNode>();
 		this.mUpdaters = new ArrayList<Updater>();
 	}
 	
@@ -234,6 +236,10 @@ public abstract class RenderManager implements UpdateManager {
 		this.mRenderables.add(node);
 	}
 	
+	void addSprite(SpriteNode node){
+		this.mSprites.add(node);
+	}
+	
 	public void setCamera(Camera camera){
 		this.mCamera = camera;
 		this.mRenderSort.setView(camera);
@@ -241,6 +247,10 @@ public abstract class RenderManager implements UpdateManager {
 	
 	public Camera getCamera(){
 		return this.mCamera;
+	}
+	
+	public Clock getClock(){
+		return this.mClock;
 	}
 	
 	protected void updateScene(){
@@ -257,6 +267,7 @@ public abstract class RenderManager implements UpdateManager {
 		for(Updater u : this.mUpdaters){
 			u.update();
 		}
+		this.mSprites.clear();
 		this.mRenderables.clear();
 		this.mCamera.update(Matrix3d.IDENTITY);
 		for(Node n : this.mScene){
@@ -267,6 +278,10 @@ public abstract class RenderManager implements UpdateManager {
 	protected void renderScene(){
 		this.mCamera.render();
 		Collections.sort(this.mRenderables, this.mRenderSort);
+		for(SpriteNode node : this.mSprites){
+			node.render();
+		}
+		this.mCamera.render();
 		for(RenderableNode node : this.mRenderables){
 			this.pushMatrix(node.getWorldTransform());
 			node.render();
