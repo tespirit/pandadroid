@@ -50,6 +50,7 @@ public class ConstantForceParticleSystemList extends ConstantForceParticleSystem
 		}
 		
 		protected void update(float deltaTime){
+			this.mParticle.applyForce(mForce);
 			this.mParticle.update(deltaTime);
 		}
 		
