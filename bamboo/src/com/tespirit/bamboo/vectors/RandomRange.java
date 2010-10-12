@@ -12,4 +12,20 @@ public class RandomRange {
 	public float generateValue(){
 		return (float)Math.random()*(this.mMax - this.mMin) + this.mMin;
 	}
+	
+	public void setMin(float min){
+		this.mMin = min;
+	}
+	
+	public void setMax(float max){
+		this.mMax = max;
+	}
+	
+	public float getMin(){
+		return this.mMin;
+	}
+	
+	public float getMax(){
+		return this.mMax;
+	}
 }

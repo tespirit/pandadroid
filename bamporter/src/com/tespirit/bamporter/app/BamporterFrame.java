@@ -284,7 +284,7 @@ public class BamporterFrame extends JFrame{
 	
 	protected void createSpriteParticles() {
 		RandomParticleGenerator spp = new RandomParticleGenerator();
-		Node p = new SpriteParticleEmitter(spp);
+		SpriteParticleEmitter p = new SpriteParticleEmitter(spp);
 		this.mRenderer.addScene(p);
 		
 		for(Editor e : this.mEditors){
@@ -300,9 +300,13 @@ public class BamporterFrame extends JFrame{
 		this.mEditors.add(ne);
 		sceneGraph.add(ne);
 		
-		ParticleEditor pe = new ParticleEditor(spp);
+		ParticleGeneratorEditor pe = new ParticleGeneratorEditor(spp);
 		this.mEditors.add(pe);
 		particles.add(pe);
+		
+		ParticleSystemEditor pse = new ParticleSystemEditor(p.getParticleSysetm());
+		this.mEditors.add(pse);
+		particles.add(pse);
 		
 		root.add(sceneGraph);
 		root.add(particles);

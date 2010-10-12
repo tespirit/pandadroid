@@ -7,7 +7,7 @@ package com.tespirit.bamboo.particles;
  * @author Todd Espiritu Santo
  *
  */
-public class ParticleSystemList extends ParticleSystem{
+public class ConstantForceParticleSystemList extends ConstantForceParticleSystem{
 	private class ListNode{
 		private ListNode mNext;
 		private ListNode mPrev;
@@ -65,7 +65,7 @@ public class ParticleSystemList extends ParticleSystem{
 	private ListNode mHead;
 	private ListNode mEnd;
 	
-	public ParticleSystemList(){
+	public ConstantForceParticleSystemList(){
 		this.mHead = new ListNode();
 		this.mEnd = new ListNode();
 		this.mHead.mNext = this.mEnd;

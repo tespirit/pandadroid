@@ -15,41 +15,41 @@ public class RandomParticleGenerator extends ParticleGenerator{
 	private float mBirthRemainder;
 	
 	public RandomParticleGenerator(){
-		this.setAngleRange(0, 0);
-		this.setBirthRateRange(1, 1);
-		this.setLifeSpanRange(1, 1);
-		this.setSpeedRange(0, 0);
-		this.setScaleRange(1, 1);
-		this.setDecayPercentRange(0, 0);
-		this.setMassRange(1, 1);
+		this.mAngle = new RandomRange(0,0);
+		this.mBirthRate = new RandomRange(1,1);
+		this.mSpeed = new RandomRange(0,0);
+		this.mLifeSpan = new RandomRange(1,1);
+		this.mDecayPercent = new RandomRange(0,0);
+		this.mMass = new RandomRange(1,1);
+		this.mScale = new RandomRange(1,1);
 	}
 	
-	public void setSpeedRange(float min, float max){
-		this.mSpeed = new RandomRange(min, max);
+	public RandomRange getAngleRange(){
+		return this.mAngle;
 	}
 	
-	public void setAngleRange(float min, float max){
-		this.mAngle = new RandomRange(min, max);
+	public RandomRange getBirthRateRange(){
+		return this.mBirthRate;
 	}
 	
-	public void setBirthRateRange(float min, float max){
-		this.mBirthRate = new RandomRange(min, max);
+	public RandomRange getSpeedRange(){
+		return this.mSpeed;
 	}
 	
-	public void setLifeSpanRange(float min, float max){
-		this.mLifeSpan = new RandomRange(min, max);
+	public RandomRange getLifeSpanRange(){
+		return this.mLifeSpan;
 	}
 	
-	public void setScaleRange(float min, float max){
-		this.mScale = new RandomRange(min, max);
+	public RandomRange getDecayPercentRange(){
+		return this.mDecayPercent;
 	}
 	
-	public void setDecayPercentRange(float min, float max){
-		this.mDecayPercent = new RandomRange(min, max);
+	public RandomRange getMassRange(){
+		return this.mMass;
 	}
 	
-	public void setMassRange(float min, float max){
-		this.mMass = new RandomRange(min, max);
+	public RandomRange getScaleRange(){
+		return this.mScale;
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class RandomParticleGenerator extends ParticleGenerator{
 		float y = ry*(float)Math.sin(angle);
 		float z = ry*(float)Math.cos(angle);
 		
-		Vector3d velocity = new Vector3d(x, y, z); //flip the values so that the default orientation is up
+		Vector3d velocity = new Vector3d(y, x, z); //flip the values so that the default orientation is up
 		
 		return velocity;
 	}

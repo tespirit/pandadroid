@@ -14,18 +14,21 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	
 	private Surface mSurface;
 	private ParticleGenerator mGenerator;
-	private ParticleSystem mParticles;
+	private ConstantForceParticleSystem mParticles;
 	
 	protected class SpriteParticle extends StandardParticle{
 		private Primitives.Plane mSprite;
+		private Vector3d mPosition;
 		
 		protected SpriteParticle(){
 			this.mSprite = new Primitives.Plane();
+			this.mPosition = new Vector3d();
 		}
 
 		@Override
 		public void update(Vector3d position, float scale){
-			this.mSprite.setCenter(position);
+			getRenderManager().getCamera().getWorldTransform().transform(position, this.mPosition);
+			this.mSprite.setCenter(this.mPosition);
 			this.mSprite.setSize(scale, scale);
 			this.mSprite.update();
 		}
@@ -37,11 +40,11 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	}
 	
 	public SpriteParticleEmitter(ParticleGenerator generator){
-		this(generator, new ParticleSystemList());
+		this(generator, new ConstantForceParticleSystemList());
 	}
 	
-	public SpriteParticleEmitter(ParticleGenerator generator, ParticleSystem particles){
-		this.mParticles = new ParticleSystemList();
+	public SpriteParticleEmitter(ParticleGenerator generator, ConstantForceParticleSystem particles){
+		this.mParticles = new ConstantForceParticleSystemList();
 		this.mGenerator = generator;
 		this.mSurface = Surface.getDefaultSurface();
 		float[] m = Matrix3d.createBuffer(2);
@@ -99,7 +102,7 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	}
 
 	@Override
-	public ParticleSystem getParticleSysetm() {
+	public ConstantForceParticleSystem getParticleSysetm() {
 		return this.mParticles;
 	}
 

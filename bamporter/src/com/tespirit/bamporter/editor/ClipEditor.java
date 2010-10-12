@@ -14,6 +14,7 @@ import javax.swing.event.ChangeListener;
 
 
 import com.tespirit.bamboo.animation.Clip;
+import com.tespirit.bamporter.properties.SimplePanel;
 
 public class ClipEditor extends TreeNodeEditor{
 	/**

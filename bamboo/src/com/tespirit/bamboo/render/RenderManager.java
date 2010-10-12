@@ -276,7 +276,6 @@ public abstract class RenderManager implements UpdateManager {
 	}
 	
 	protected void renderScene(){
-		this.mCamera.render();
 		Collections.sort(this.mRenderables, this.mRenderSort);
 		for(SpriteNode node : this.mSprites){
 			node.render();

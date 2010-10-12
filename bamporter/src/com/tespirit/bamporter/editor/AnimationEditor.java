@@ -19,6 +19,7 @@ import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamporter.properties.SimplePanel;
 
 public class AnimationEditor extends TreeNodeEditor{
 	
