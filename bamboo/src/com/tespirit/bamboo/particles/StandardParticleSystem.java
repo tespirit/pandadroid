@@ -1,9 +1,14 @@
 package com.tespirit.bamboo.particles;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StandardParticleSystem implements ParticleSystem{	
+public class StandardParticleSystem implements ParticleSystem, Externalizable{
+
 	private class ListNode{
 		private ListNode mNext;
 		private ListNode mPrev;
@@ -133,5 +138,26 @@ public class StandardParticleSystem implements ParticleSystem{
 	@Override
 	public void remove(Particle p) {
 		//TODO: implement this.
+	}
+
+
+	//IO
+	private static final long serialVersionUID = -372026429838597827L;
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(this.mForces.size());
+		for(ParticleForce force : this.mForces){
+			out.writeObject(force);
+		}
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		int size = in.readInt();
+		for(int i = 0; i < size; i++){
+			this.mForces.add((ParticleForce)in.readObject());
+		}
+		
 	}
 }

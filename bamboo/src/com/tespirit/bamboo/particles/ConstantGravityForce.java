@@ -1,8 +1,13 @@
 package com.tespirit.bamboo.particles;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class ConstantGravityForce implements ParticleForce{
+public class ConstantGravityForce implements ParticleForce, Externalizable{
 	private Vector3d mAcceleration;
 	private Vector3d mTempAccel;
 	
@@ -26,5 +31,20 @@ public class ConstantGravityForce implements ParticleForce{
 	
 	public void setAcceleration(Vector3d acceleration){
 		this.mAcceleration.copy(acceleration);
+	}
+	
+	//IO
+	private static final long serialVersionUID = 267022522616565056L;
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeFloat(this.mAcceleration.getX());
+		out.writeFloat(this.mAcceleration.getY());
+		out.writeFloat(this.mAcceleration.getZ());
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.mAcceleration.set(in.readFloat(), in.readFloat(), in.readFloat());
 	}
 }

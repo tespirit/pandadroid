@@ -1,9 +1,14 @@
 package com.tespirit.bamboo.particles;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import com.tespirit.bamboo.vectors.RandomRange;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class RandomParticleGenerator extends ParticleGenerator{
+public class RandomParticleGenerator extends ParticleGenerator implements Externalizable{
 	private RandomRange mSpeed;
 	private RandomRange mAngle;
 	private RandomRange mBirthRate;
@@ -121,5 +126,44 @@ public class RandomParticleGenerator extends ParticleGenerator{
 	@Override
 	public float getLengthOffset() {
 		return mLength*((float)Math.random()-0.5f);
+	}
+
+	//IO
+	private static final long serialVersionUID = -3813429521787814637L;
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		this.writeRange(out, this.mSpeed);
+		this.writeRange(out, this.mAngle);
+		this.writeRange(out, this.mBirthRate);
+		this.writeRange(out, this.mLifeSpan);
+		this.writeRange(out, this.mScale);
+		this.writeRange(out, this.mDecayPercent);
+		this.writeRange(out, this.mMass);
+		out.writeFloat(this.mLength);
+		out.writeFloat(this.mWidth);
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		this.readRange(in, this.mSpeed);
+		this.readRange(in, this.mAngle);
+		this.readRange(in, this.mBirthRate);
+		this.readRange(in, this.mLifeSpan);
+		this.readRange(in, this.mScale);
+		this.readRange(in, this.mDecayPercent);
+		this.readRange(in, this.mMass);
+		this.mLength = in.readFloat();
+		this.mWidth = in.readFloat();
+	}
+	
+	public void writeRange(ObjectOutput out, RandomRange range) throws IOException{
+		out.writeFloat(range.getMin());
+		out.writeFloat(range.getMax());
+	}
+	
+	public void readRange(ObjectInput in, RandomRange range) throws IOException{
+		range.setMin(in.readFloat());
+		range.setMax(in.readFloat());
 	}
 }

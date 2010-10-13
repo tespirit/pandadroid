@@ -50,16 +50,16 @@ public class ParticleForceEditor extends TreeNodeEditor{
 	private SimplePanel generatePanel(GravityForce force){
 		SimplePanel panel = new SimplePanel();
 		panel.addProperty("Position", force.getPosition(), 1f);
-		panel.addProperty("Mass", new FloatProperty.Property() {
+		panel.addProperty("Strength", new FloatProperty.Property() {
 			@Override
 			public void setValue(float value) {
-				((GravityForce)mForce).setMass(value);
+				((GravityForce)mForce).setStrength(value);
 			}
 			@Override
 			public float getValue() {
-				return 	((GravityForce)mForce).getMass();
+				return 	((GravityForce)mForce).getStrength();
 			}
-		}, -Float.MAX_VALUE, Float.MAX_VALUE, 10e10f);
+		}, -Float.MAX_VALUE, Float.MAX_VALUE, 0.1f);
 		return panel;
 	}
 	
