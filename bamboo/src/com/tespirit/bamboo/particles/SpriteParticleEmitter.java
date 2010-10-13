@@ -44,6 +44,7 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	}
 	
 	public SpriteParticleEmitter(ParticleGenerator generator, ParticleSystem particles){
+		super(null);
 		this.mParticles = new StandardParticleSystem();
 		this.mGenerator = generator;
 		this.mSurface = Surface.getDefaultSurface();

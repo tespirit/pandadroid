@@ -8,8 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -68,12 +67,16 @@ public class BamporterFrame extends JFrame{
 	private JFileChooser mFileOpen;
 	private JFileChooser mFileSave;
 	private BambooAsset mBamboo;
-	private List<Editor> mEditors;
+	
+	//BAMporter objects
+	private DefaultMutableTreeNode mRoot;
+	private DefaultMutableTreeNode mSceneNodes;
+	private DefaultMutableTreeNode mAnimations;
+	private DefaultMutableTreeNode mParticles;
 	
 	private static final String TITLE = "BAMporter";
 	
 	private BamporterFrame() {
-		this.mEditors = new ArrayList<Editor>();
 		initComponents();
 	}
 
@@ -151,7 +154,16 @@ public class BamporterFrame extends JFrame{
 		navScroll.setBorder(BorderFactory.createTitledBorder("Navigator"));
 		this.mNavigator = new JTree();
 		Preferences.applySimpleBorder(this.mNavigator);
-		this.mNavigator.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Root")));
+		this.mRoot = new DefaultMutableTreeNode("root");
+		this.mSceneNodes = new DefaultMutableTreeNode("Scenes");
+		this.mAnimations = new DefaultMutableTreeNode("Animations");
+		this.mParticles = new DefaultMutableTreeNode("Particles");
+		this.mRoot.add(this.mSceneNodes);
+		this.mRoot.add(this.mAnimations);
+		this.mRoot.add(this.mParticles);
+		
+
+		this.mNavigator.setModel(new DefaultTreeModel(this.mRoot));
 		this.mNavigator.setRootVisible(false);
 		
 		this.mPropertyPane = new JScrollPane();
@@ -290,40 +302,43 @@ public class BamporterFrame extends JFrame{
 		
 	}
 	
+	public void clearAll(){
+		@SuppressWarnings("unchecked")
+		Enumeration<DefaultMutableTreeNode> current = this.mRoot.children();
+		while(current.hasMoreElements()){
+			this.clear(current.nextElement());
+		}
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.reload();
+	}
+	
+	private void clear(DefaultMutableTreeNode parent){
+		@SuppressWarnings("unchecked")
+		Enumeration<DefaultMutableTreeNode> current = parent.children();
+		while(current.hasMoreElements()){
+			DefaultMutableTreeNode node = current.nextElement();
+			if(node instanceof TreeNodeEditor){
+				((TreeNodeEditor)node).recycle();
+			}
+		}
+		parent.removeAllChildren();
+	}
+	
 	protected void createSpriteParticles() {
 		RandomParticleGenerator spp = new RandomParticleGenerator();
 		SpriteParticleEmitter p = new SpriteParticleEmitter(spp);
 		this.mRenderer.addScene(p);
 		
-		for(Editor e : this.mEditors){
-			e.recycle();
-		}
-		this.mEditors.clear();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode)this.mNavigator.getModel().getRoot();
-		root.removeAllChildren();
-		
-		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("Scenes");
-		DefaultMutableTreeNode particles = new DefaultMutableTreeNode("Particles");
 		NodeEditor ne = new NodeEditor(p, this.mRenderer);
-		this.mEditors.add(ne);
-		sceneGraph.add(ne);
+		this.addNodeTo(ne, this.mSceneNodes);
 		
 		ParticleGeneratorEditor pe = new ParticleGeneratorEditor(spp);
-		this.mEditors.add(pe);
-		particles.add(pe);
+		this.addNodeTo(pe, this.mParticles);
 		
 		if(p.getParticleSysetm() instanceof StandardParticleSystem){
 			ParticleSystemEditor pse = new ParticleSystemEditor((StandardParticleSystem)p.getParticleSysetm());
-			this.mEditors.add(pse);
-			particles.add(pse);
+			this.addNodeTo(pse, this.mParticles);
 		}
-		
-		root.add(sceneGraph);
-		root.add(particles);
-		
-		this.enableSaves();
-		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
-		treeModel.reload();
 	}
 
 	public void close(){
@@ -395,12 +410,14 @@ public class BamporterFrame extends JFrame{
 				File file = this.mFileOpen.getSelectedFile();
 				BambooAsset merge = Assets.open(file);
 				AnimationEdit.mergeAnimation(merge, this.mBamboo);
-				for(Editor e : this.mEditors){
-					if(e instanceof AnimationEditor){
-						((AnimationEditor)e).refreshClips();
+				@SuppressWarnings("unchecked")
+				Enumeration<DefaultMutableTreeNode> current = this.mAnimations.children();
+				while(current.hasMoreElements()){
+					DefaultMutableTreeNode node = current.nextElement();
+					if(node instanceof AnimationEditor){
+						((AnimationEditor)node).refreshClips();
 					}
 				}
-				
 			} catch (Exception e){
 				e.printStackTrace();
 				Util.alertError("I couldn't open the file. Either there's a bug or the file is not a valid format.");
@@ -409,34 +426,16 @@ public class BamporterFrame extends JFrame{
 	}
 	
 	private void loadBamboo(){
-		for(Editor e : this.mEditors){
-			e.recycle();
-		}
-		this.mEditors.clear();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode)this.mNavigator.getModel().getRoot();
-		root.removeAllChildren();
-		
+		this.clearAll();
 		this.mRenderer.addScenes(this.mBamboo.getScenes());
 		
-		DefaultMutableTreeNode sceneGraph = new DefaultMutableTreeNode("Scenes");
-		DefaultMutableTreeNode animations = new DefaultMutableTreeNode("Animations");
 		for(Node node : this.mBamboo.getScenes()){
 			NodeEditor ne = new NodeEditor(node, this.mRenderer);
-			this.mEditors.add(ne);
-			sceneGraph.add(ne);
+			this.mSceneNodes.add(ne);
 		}
 		for(Animation animation : this.mBamboo.getAnimations()){
 			AnimationEditor ae = new AnimationEditor(animation, this.mRenderer);
-			this.mEditors.add(ae);
-			animations.add(ae);
-		}
-		
-		if(this.mBamboo.getScenes().size() > 0){
-			root.add(sceneGraph);
-		}
-		
-		if(this.mBamboo.getAnimations().size() > 0){
-			root.add(animations);
+			this.mAnimations.add(ae);
 		}
 		
 		this.enableSaves();
@@ -449,9 +448,14 @@ public class BamporterFrame extends JFrame{
 		treeModel.nodeChanged(node);
 	}
 	
-	public void insertNodeTo(TreeNodeEditor child, TreeNodeEditor parent, int index){
+	public void addNodeTo(TreeNodeEditor child, DefaultMutableTreeNode mSceneNodes2){
 		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
-		treeModel.insertNodeInto(child, parent, parent.getChildCount());
+		treeModel.insertNodeInto(child, mSceneNodes2, mSceneNodes2.getChildCount());
+	}
+	
+	public void insertNodeTo(TreeNodeEditor child, DefaultMutableTreeNode parent, int index){
+		DefaultTreeModel treeModel = (DefaultTreeModel)this.mNavigator.getModel();
+		treeModel.insertNodeInto(child, parent, index);
 	}
 	
 	public void removeNode(TreeNodeEditor child){
