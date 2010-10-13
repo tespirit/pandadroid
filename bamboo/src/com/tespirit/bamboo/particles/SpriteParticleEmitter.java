@@ -14,21 +14,21 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	
 	private Surface mSurface;
 	private ParticleGenerator mGenerator;
-	private ConstantForceParticleSystem mParticles;
+	private ParticleSystem mParticles;
 	
 	protected class SpriteParticle extends StandardParticle{
-		private Primitives.Plane mSprite;
-		private Vector3d mPosition;
+		private Primitives.Rectangle mSprite;
+		private Vector3d mFinalPosition;
 		
 		protected SpriteParticle(){
-			this.mSprite = new Primitives.Plane();
-			this.mPosition = new Vector3d();
+			this.mSprite = new Primitives.Rectangle();
+			this.mFinalPosition = new Vector3d();
 		}
 
 		@Override
 		public void update(Vector3d position, float scale){
-			getRenderManager().getCamera().getWorldTransform().transform(position, this.mPosition);
-			this.mSprite.setCenter(this.mPosition);
+			getRenderManager().getCamera().getWorldTransform().transform(position, this.mFinalPosition);
+			this.mSprite.setCenter(this.mFinalPosition);
 			this.mSprite.setSize(scale, scale);
 			this.mSprite.update();
 		}
@@ -40,11 +40,11 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	}
 	
 	public SpriteParticleEmitter(ParticleGenerator generator){
-		this(generator, new ConstantForceParticleSystemList());
+		this(generator, new StandardParticleSystem());
 	}
 	
-	public SpriteParticleEmitter(ParticleGenerator generator, ConstantForceParticleSystem particles){
-		this.mParticles = new ConstantForceParticleSystemList();
+	public SpriteParticleEmitter(ParticleGenerator generator, ParticleSystem particles){
+		this.mParticles = new StandardParticleSystem();
 		this.mGenerator = generator;
 		this.mSurface = Surface.getDefaultSurface();
 		float[] m = Matrix3d.createBuffer(2);
@@ -102,7 +102,7 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	}
 
 	@Override
-	public ConstantForceParticleSystem getParticleSysetm() {
+	public ParticleSystem getParticleSysetm() {
 		return this.mParticles;
 	}
 

@@ -42,6 +42,14 @@ public abstract class Particle {
 		return this.mPosition;
 	}
 	
+	public Vector3d getVelocity(){
+		return this.mVelocity;
+	}
+	
+	public float getMass(){
+		return this.mMass;
+	}
+	
 	public abstract void render();
 	
 	public abstract boolean isAlive();

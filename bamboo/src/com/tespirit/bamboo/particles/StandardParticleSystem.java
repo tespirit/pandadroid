@@ -1,13 +1,9 @@
 package com.tespirit.bamboo.particles;
 
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Use this to create a dynamic amount of particles. This is a good particle system for testing and tuning particle properties
- * for particle generators.
- * @author Todd Espiritu Santo
- *
- */
-public class ConstantForceParticleSystemList extends ConstantForceParticleSystem{
+public class StandardParticleSystem implements ParticleSystem{	
 	private class ListNode{
 		private ListNode mNext;
 		private ListNode mPrev;
@@ -50,7 +46,9 @@ public class ConstantForceParticleSystemList extends ConstantForceParticleSystem
 		}
 		
 		protected void update(float deltaTime){
-			this.mParticle.applyForce(mForce);
+			for(ParticleForce force : mForces){
+				force.apply(this.mParticle);
+			}
 			this.mParticle.update(deltaTime);
 		}
 		
@@ -65,12 +63,34 @@ public class ConstantForceParticleSystemList extends ConstantForceParticleSystem
 	
 	private ListNode mHead;
 	private ListNode mEnd;
+	private List<ParticleForce> mForces;
 	
-	public ConstantForceParticleSystemList(){
+	public StandardParticleSystem(){
+		this.mForces = new ArrayList<ParticleForce>();
 		this.mHead = new ListNode();
 		this.mEnd = new ListNode();
 		this.mHead.mNext = this.mEnd;
 		this.mEnd.mPrev = this.mHead;
+	}
+	
+	public void addForce(ParticleForce force){
+		this.mForces.add(force);
+	}
+	
+	public void removeForce(ParticleForce force){
+		this.mForces.remove(force);
+	}
+	
+	public void clearForces(){
+		this.mForces.clear();
+	}
+	
+	public int getForceCount(){
+		return this.mForces.size();
+	}
+	
+	public ParticleForce getForce(int i){
+		return this.mForces.get(i);
 	}
 	
 	public void update(float deltaTime){

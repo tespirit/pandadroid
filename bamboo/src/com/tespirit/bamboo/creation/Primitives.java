@@ -8,10 +8,71 @@ import com.tespirit.bamboo.vectors.Vector3d;
 
 public class Primitives {
 	
-	public static class Plane extends VertexIndices{
+	public static class Rectangle extends VertexList{
 		float mHalfWidth;
 		float mHalfHeight;
 		Vector3d mCenter;
+		
+		public Rectangle(){
+			this(false);
+		}
+		
+		public Rectangle(boolean normals){
+			this(normals?new int[]{VertexBuffer.POSITION, VertexBuffer.TEXCOORD, VertexBuffer.NORMAL}:
+				new int[]{VertexBuffer.POSITION, VertexBuffer.TEXCOORD});
+		}
+		
+		public Rectangle(int[] bufferType){
+			super(4, bufferType);
+			this.setSize(1, 1);
+			this.mCenter = new Vector3d();
+			
+			this.mVertexBuffer.lock();
+			
+			if(this.mVertexBuffer.hasType(VertexBuffer.NORMAL)){
+				this.mVertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+				this.mVertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+				this.mVertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+				this.mVertexBuffer.addNormal(0.0f, 0.0f, 1.0f);
+			}
+
+			if(this.mVertexBuffer.hasType(VertexBuffer.TEXCOORD)){
+				this.mVertexBuffer.addTexcoord(1.0f, 0.0f);
+				this.mVertexBuffer.addTexcoord(0.0f, 0.0f);
+				this.mVertexBuffer.addTexcoord(1.0f, 1.0f);
+				this.mVertexBuffer.addTexcoord(0.0f, 1.0f);
+			}
+			
+			this.mVertexBuffer.unlock();
+			
+			this.update();
+		}
+		
+		public void setSize(float width, float height){
+			this.mHalfWidth = 0.5f*width;
+			this.mHalfHeight = 0.5f*height;
+		}
+		
+		public void setCenter(Vector3d center){
+			this.mCenter.copy(center);
+		}
+		
+		public void update(){
+			super.update();
+			
+			this.mVertexBuffer.lock();
+			this.mVertexBuffer.addPosition(this.mCenter.getX()+this.mHalfWidth, this.mCenter.getY()+this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.addPosition(this.mCenter.getX()-this.mHalfWidth, this.mCenter.getY()+this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.addPosition(this.mCenter.getX()+this.mHalfWidth, this.mCenter.getY()-this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.addPosition(this.mCenter.getX()-this.mHalfWidth, this.mCenter.getY()-this.mHalfHeight, this.mCenter.getZ());
+			this.mVertexBuffer.unlock();
+		}
+	}
+	
+	public static class Plane extends VertexIndices{
+		private float mHalfWidth;
+		private float mHalfHeight;
+		private Vector3d mCenter;
 		
 		public Plane(){
 			this(1.0f, 1.0f);

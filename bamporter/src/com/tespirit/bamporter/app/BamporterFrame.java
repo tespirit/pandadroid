@@ -32,10 +32,13 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.particles.SpriteParticleEmitter;
 import com.tespirit.bamboo.particles.RandomParticleGenerator;
+import com.tespirit.bamboo.particles.StandardParticleSystem;
 import com.tespirit.bamboo.render.UpdateManager;
+import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.app.Assets.SaveTypes;
 import com.tespirit.bamporter.editor.*;
@@ -163,6 +166,11 @@ public class BamporterFrame extends JFrame{
 		Preferences.applySimpleBorder(renderBorder);
 		
 		this.mRenderer = new Renderer(Preferences.getRenderBGColor());
+		
+		Model axis = new Model();
+		axis.getTransform().scale(0.25f);
+		axis.setPrimative(new Primitives.Axis());
+		this.mRenderer.addScene(axis);
 		
 		navScroll.setViewportView(this.mNavigator);
 		editSplitter.setTopComponent(navScroll);
@@ -304,9 +312,11 @@ public class BamporterFrame extends JFrame{
 		this.mEditors.add(pe);
 		particles.add(pe);
 		
-		ParticleSystemEditor pse = new ParticleSystemEditor(p.getParticleSysetm());
-		this.mEditors.add(pse);
-		particles.add(pse);
+		if(p.getParticleSysetm() instanceof StandardParticleSystem){
+			ParticleSystemEditor pse = new ParticleSystemEditor((StandardParticleSystem)p.getParticleSysetm());
+			this.mEditors.add(pse);
+			particles.add(pse);
+		}
 		
 		root.add(sceneGraph);
 		root.add(particles);

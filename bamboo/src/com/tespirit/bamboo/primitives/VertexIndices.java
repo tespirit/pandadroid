@@ -23,10 +23,12 @@ public class VertexIndices extends VertexList implements Externalizable{
 	public VertexIndices(VertexBuffer vb, IndexBuffer ib){
 		super(vb);
 		this.mIndexBuffer = ib;
+		this.renderAsTriangles();
 	}
 	
 	public VertexIndices(){
 		super();
+		this.renderAsTriangles();
 	}
 	
 	public IndexBuffer getIndexBuffer(){

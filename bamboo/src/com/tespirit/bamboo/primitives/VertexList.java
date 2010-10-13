@@ -33,7 +33,7 @@ public class VertexList extends Primitive implements Externalizable{
 	 */
 	public VertexList(){
 		this.mModifierStack = new ArrayList<Modifier>();
-		this.renderAsTriangles();
+		this.renderAsTriangleStrip();
 	}
 	
 	public VertexBuffer getVertexBuffer(){

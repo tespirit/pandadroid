@@ -11,6 +11,8 @@ public class RandomParticleGenerator extends ParticleGenerator{
 	private RandomRange mScale;
 	private RandomRange mDecayPercent;
 	private RandomRange mMass;
+	private float mLength;
+	private float mWidth;
 	
 	private float mBirthRemainder;
 	
@@ -50,6 +52,22 @@ public class RandomParticleGenerator extends ParticleGenerator{
 	
 	public RandomRange getScaleRange(){
 		return this.mScale;
+	}
+	
+	public void setWidth(float width){
+		this.mWidth = width;
+	}
+	
+	public float getWidth(){
+		return this.mWidth;
+	}
+	
+	public void setLength(float length){
+		this.mLength = length;
+	}
+	
+	public float getLength(){
+		return this.mLength;
 	}
 	
 	@Override
@@ -93,5 +111,15 @@ public class RandomParticleGenerator extends ParticleGenerator{
 	@Override
 	public float getScale() {
 		return this.mScale.generateValue();
+	}
+
+	@Override
+	public float getWidthOffset() {
+		return mWidth*((float)Math.random()-0.5f);
+	}
+
+	@Override
+	public float getLengthOffset() {
+		return mLength*((float)Math.random()-0.5f);
 	}
 }

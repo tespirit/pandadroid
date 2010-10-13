@@ -9,11 +9,18 @@ import com.tespirit.bamboo.vectors.Vector3d;
  *
  */
 public abstract class ParticleGenerator{
+	private Vector3d mOffsetPosition;
+	
+	public ParticleGenerator(){
+		this.mOffsetPosition = new Vector3d();
+	}
 	
 	public void update(ParticleEmitter emitter, float deltaTime){
 		for(int i = 0; i < this.getBirthAmount(deltaTime); i++){
 			Particle p = emitter.createParticle();
-			p.setInitialPosition(emitter.getWorldTransform().getTranslation());
+			this.mOffsetPosition.set(this.getWidthOffset(), 0.0f, this.getLengthOffset());
+			this.mOffsetPosition.add(emitter.getWorldTransform().getTranslation());
+			p.setInitialPosition(this.mOffsetPosition);
 			p.setInitialVelocity(emitter.getWorldTransform().transform(this.getVelocity()));
 			p.setMass(this.getMass());
 			if(p instanceof StandardParticle){
@@ -30,4 +37,6 @@ public abstract class ParticleGenerator{
 	public abstract int getBirthAmount(float deltaTime);
 	public abstract Vector3d getVelocity();
 	public abstract float getMass();
+	public abstract float getWidthOffset();
+	public abstract float getLengthOffset();
 }
