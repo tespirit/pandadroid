@@ -23,10 +23,7 @@ public abstract class Node {
 	}
 	
 	public Node(String name){
-		this.mName = name;
-		if(this.mName != null){
-			Node.nameLookup.put(this.mName, this);
-		}
+		this.setName(name);
 	}
 	
 	public String getName() {

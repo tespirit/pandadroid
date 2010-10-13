@@ -5,5 +5,6 @@ import com.tespirit.bamboo.vectors.Matrix3d;
 public interface ParticleEmitter {
 	public Particle createParticle();
 	public ParticleSystem getParticleSysetm();
+	public ParticleGenerator getParticleGenerator();
 	public Matrix3d getWorldTransform();
 }

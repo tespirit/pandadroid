@@ -8,7 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -33,10 +35,12 @@ import javax.swing.tree.TreePath;
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.BambooAsset;
+import com.tespirit.bamboo.particles.ParticleEmitter;
 import com.tespirit.bamboo.particles.SpriteParticleEmitter;
 import com.tespirit.bamboo.particles.RandomParticleGenerator;
 import com.tespirit.bamboo.particles.StandardParticleSystem;
 import com.tespirit.bamboo.render.UpdateManager;
+import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.app.Assets.SaveTypes;
@@ -324,21 +328,52 @@ public class BamporterFrame extends JFrame{
 		parent.removeAllChildren();
 	}
 	
+	public void registerParticles(ParticleEmitter particle){
+		if(particle.getParticleGenerator() instanceof RandomParticleGenerator){
+			ParticleGeneratorEditor pe = new ParticleGeneratorEditor((RandomParticleGenerator)particle.getParticleGenerator());
+			this.addNodeTo(pe, this.mParticles);
+		}
+		
+		if(particle.getParticleSysetm() instanceof StandardParticleSystem){
+			ParticleSystemEditor pse = new ParticleSystemEditor((StandardParticleSystem)particle.getParticleSysetm());
+			this.addNodeTo(pse, this.mParticles);
+		}
+	}
+	
 	protected void createSpriteParticles() {
+		if(this.mBamboo == null){
+			this.mBamboo = new BambooAsset(){
+				ArrayList<Camera> mCameras = new ArrayList<Camera>();
+				ArrayList<Node> mNodes = new ArrayList<Node>();
+				ArrayList<Animation> mAnimations = new ArrayList<Animation>();
+				
+				@Override
+				public List<Camera> getCameras() {
+					return this.mCameras;
+				}
+
+				@Override
+				public List<Node> getScenes() {
+					return this.mNodes;
+				}
+
+				@Override
+				public List<Animation> getAnimations() {
+					return this.mAnimations;
+				}
+				
+			};
+		}
+		
 		RandomParticleGenerator spp = new RandomParticleGenerator();
 		SpriteParticleEmitter p = new SpriteParticleEmitter(spp);
+		this.mBamboo.getScenes().add(p);
 		this.mRenderer.addScene(p);
 		
 		NodeEditor ne = new NodeEditor(p, this.mRenderer);
 		this.addNodeTo(ne, this.mSceneNodes);
 		
-		ParticleGeneratorEditor pe = new ParticleGeneratorEditor(spp);
-		this.addNodeTo(pe, this.mParticles);
-		
-		if(p.getParticleSysetm() instanceof StandardParticleSystem){
-			ParticleSystemEditor pse = new ParticleSystemEditor((StandardParticleSystem)p.getParticleSysetm());
-			this.addNodeTo(pse, this.mParticles);
-		}
+		this.enableSaves();
 	}
 
 	public void close(){

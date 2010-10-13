@@ -7,8 +7,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JTextField;
 
 
+import com.tespirit.bamboo.particles.ParticleEmitter;
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamporter.app.BamporterFrame;
 import com.tespirit.bamporter.properties.SimplePanel;
 
 public class NodeEditor extends TreeNodeEditor{
@@ -25,6 +27,9 @@ public class NodeEditor extends TreeNodeEditor{
 		this.mNode = node;
 		for(int i = 0; i < node.getChildCount(); i++){
 			this.addNewEditor(new NodeEditor(node.getChild(i), renderManager));
+		}
+		if(node instanceof ParticleEmitter){
+			BamporterFrame.getInstance().registerParticles((ParticleEmitter)node);
 		}
 	}
 	

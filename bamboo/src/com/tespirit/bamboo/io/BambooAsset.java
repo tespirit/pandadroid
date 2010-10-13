@@ -7,7 +7,6 @@ import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
 
 public interface BambooAsset {
-
 	public List<Camera> getCameras();
 	public List<Node> getScenes();
 	public List<Animation> getAnimations();

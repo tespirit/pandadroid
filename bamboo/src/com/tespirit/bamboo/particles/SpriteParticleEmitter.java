@@ -116,6 +116,11 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	public ParticleSystem getParticleSysetm() {
 		return this.mParticles;
 	}
+	
+	@Override
+	public ParticleGenerator getParticleGenerator(){
+		return this.mGenerator;
+	}
 
 	@Override
 	public Particle createParticle() {
