@@ -1,12 +1,15 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import java.awt.Component;
 
 import com.tespirit.bamboo.particles.RandomParticleGenerator;
+import com.tespirit.bamporter.editor.Factory;
+import com.tespirit.bamporter.editor.TreeNodeEditor;
+import com.tespirit.bamporter.editor.Util;
 import com.tespirit.bamporter.properties.FloatProperty;
 import com.tespirit.bamporter.properties.SimplePanel;
 
-public class ParticleGeneratorEditor implements EditorFactory.Factory{
+public class ParticleGeneratorEditor implements Factory{
 	
 	@Override
 	public Editor createEditor(Object object) {

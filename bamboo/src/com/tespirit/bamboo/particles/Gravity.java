@@ -7,7 +7,7 @@ import java.io.ObjectOutput;
 
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class GravityForce implements ParticleForce, Externalizable{
+public class Gravity implements ParticleForce, Externalizable{
 
 	public static final float GRAVITATIONAL_CONSTANT = 6.673e-11f;
 	
@@ -15,7 +15,7 @@ public class GravityForce implements ParticleForce, Externalizable{
 	private Vector3d mForce;
 	private float mStrength;
 	
-	public GravityForce(){
+	public Gravity(){
 		this.mPosition = new Vector3d();
 		this.mForce = new Vector3d();
 		this.mStrength = 0;

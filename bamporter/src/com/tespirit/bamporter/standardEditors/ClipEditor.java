@@ -1,4 +1,4 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -13,9 +13,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.tespirit.bamboo.animation.Clip;
+import com.tespirit.bamporter.editor.Factory;
+import com.tespirit.bamporter.editor.TreeNodeEditor;
 import com.tespirit.bamporter.properties.SimplePanel;
 
-public class ClipEditor implements EditorFactory.Factory{
+public class ClipEditor implements Factory{
 	@Override
 	public Editor createEditor(Object object) {
 		return new ClipEditor.Editor((Clip)object);

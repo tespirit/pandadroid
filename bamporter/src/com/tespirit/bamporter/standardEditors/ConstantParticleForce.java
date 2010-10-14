@@ -1,9 +1,10 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import java.awt.Component;
 
 import com.tespirit.bamboo.particles.ConstantForce;
 import com.tespirit.bamboo.particles.ParticleForce;
+import com.tespirit.bamporter.editor.ParticleForceEditor;
 import com.tespirit.bamporter.properties.SimplePanel;
 
 public class ConstantParticleForce extends ParticleForceEditor{

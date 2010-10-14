@@ -1,4 +1,4 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -7,9 +7,14 @@ import java.util.List;
 
 import com.tespirit.bamboo.particles.ParticleForce;
 import com.tespirit.bamboo.particles.StandardParticleSystem;
+import com.tespirit.bamporter.editor.EditorFactory;
+import com.tespirit.bamporter.editor.Factory;
+import com.tespirit.bamporter.editor.ParticleForceEditor;
+import com.tespirit.bamporter.editor.TreeNodeEditor;
+import com.tespirit.bamporter.editor.Util;
 import com.tespirit.bamporter.properties.SimplePanel;
 
-public class ParticleSystemEditor implements EditorFactory.Factory{
+public class ParticleSystemEditor implements Factory{
 	@Override
 	public Editor createEditor(Object object) {
 		return new ParticleSystemEditor.Editor((StandardParticleSystem)object);
@@ -30,7 +35,7 @@ public class ParticleSystemEditor implements EditorFactory.Factory{
 		
 		private class OnNewForce implements ActionListener{
 			ParticleForceEditor mEditor;
-			private OnNewForce(EditorFactory.Factory factory){
+			private OnNewForce(Factory factory){
 				this.mEditor = (ParticleForceEditor)factory;
 			}
 			@Override
@@ -48,8 +53,8 @@ public class ParticleSystemEditor implements EditorFactory.Factory{
 		protected Component generatePanel() {
 			SimplePanel panel = new SimplePanel();
 			
-			List<EditorFactory.Factory> factories = EditorFactory.getEditorFactoriesOf(ParticleForceEditor.class);
-			for(EditorFactory.Factory ef : factories){
+			List<Factory> factories = EditorFactory.getEditorFactoriesOf(ParticleForceEditor.class);
+			for(Factory ef : factories){
 				panel.createButton("New " + Util.getClassName(ef.getDataClass())).addActionListener(new OnNewForce(ef));
 			}
 			return panel;

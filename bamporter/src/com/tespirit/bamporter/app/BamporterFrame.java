@@ -48,6 +48,15 @@ import com.tespirit.bamporter.app.Assets.SaveTypes;
 import com.tespirit.bamporter.editor.*;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.opengl.Renderer;
+import com.tespirit.bamporter.standardEditors.AnimationEditor;
+import com.tespirit.bamporter.standardEditors.ClipEditor;
+import com.tespirit.bamporter.standardEditors.ConstantParticleForce;
+import com.tespirit.bamporter.standardEditors.ConstantParticleGravity;
+import com.tespirit.bamporter.standardEditors.NodeEditor;
+import com.tespirit.bamporter.standardEditors.ParticleEmitterNode;
+import com.tespirit.bamporter.standardEditors.ParticleGeneratorEditor;
+import com.tespirit.bamporter.standardEditors.ParticleGravity;
+import com.tespirit.bamporter.standardEditors.ParticleSystemEditor;
 import com.tespirit.bamporter.tools.AnimationEdit;
 
 public class BamporterFrame extends JFrame{
@@ -525,6 +534,7 @@ public class BamporterFrame extends JFrame{
 	}
 	
 	private void loadStandardEditors(){
+		
 		EditorFactory.registerFactory(new AnimationEditor());
 		EditorFactory.registerFactory(new ClipEditor());
 		EditorFactory.registerFactory(new NodeEditor());

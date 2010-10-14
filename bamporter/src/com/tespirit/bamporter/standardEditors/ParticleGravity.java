@@ -1,9 +1,10 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import java.awt.Component;
 
-import com.tespirit.bamboo.particles.GravityForce;
+import com.tespirit.bamboo.particles.Gravity;
 import com.tespirit.bamboo.particles.ParticleForce;
+import com.tespirit.bamporter.editor.ParticleForceEditor;
 import com.tespirit.bamporter.properties.FloatProperty;
 import com.tespirit.bamporter.properties.SimplePanel;
 
@@ -11,12 +12,12 @@ public class ParticleGravity extends ParticleForceEditor{
 
 	@Override
 	public Editor createEditor(Object object) {
-		return new Editor((GravityForce)object);
+		return new Editor((Gravity)object);
 	}
 
 	@Override
 	public Class<?> getDataClass() {
-		return GravityForce.class;
+		return Gravity.class;
 	}
 	
 	public class Editor extends ParticleForceEditor.Editor{
@@ -24,9 +25,9 @@ public class ParticleGravity extends ParticleForceEditor{
 		 * 
 		 */
 		private static final long serialVersionUID = 4071087075565823735L;
-		GravityForce mForce;
+		Gravity mForce;
 		
-		protected Editor(GravityForce force){
+		protected Editor(Gravity force){
 			super(force, false);
 			this.mForce = force;
 		}
@@ -51,6 +52,6 @@ public class ParticleGravity extends ParticleForceEditor{
 
 	@Override
 	public ParticleForce createForce() {
-		return new GravityForce();
+		return new Gravity();
 	}
 }

@@ -1,4 +1,4 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 import javax.swing.JTextField;
 
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamporter.editor.Factory;
+import com.tespirit.bamporter.editor.TreeNodeEditor;
 import com.tespirit.bamporter.properties.SimplePanel;
 
-public class NodeEditor implements EditorFactory.Factory{
+public class NodeEditor implements Factory{
 	
 	@Override
 	public Editor createEditor(Object object) {

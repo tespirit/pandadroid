@@ -2,7 +2,7 @@ package com.tespirit.bamporter.editor;
 
 import com.tespirit.bamboo.particles.ParticleForce;
 
-public abstract class ParticleForceEditor implements EditorFactory.Factory {
+public abstract class ParticleForceEditor implements Factory {
 	public abstract ParticleForce createForce();
 	
 	public abstract class Editor extends TreeNodeEditor{

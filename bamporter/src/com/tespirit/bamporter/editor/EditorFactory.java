@@ -6,11 +6,6 @@ import java.util.List;
 
 public class EditorFactory {
 	
-	public static interface Factory{
-		Editor createEditor(Object object);
-		Class<?> getDataClass();
-	}
-	
 	public static void registerFactory(Factory factory){
 		EditorFactory.mEditorMap.put(factory.getDataClass().getName(), factory);
 	}
@@ -27,9 +22,9 @@ public class EditorFactory {
 		}
 	}
 	
-	public static List<EditorFactory.Factory> getEditorFactoriesOf(Class<?> classy){
-		ArrayList<EditorFactory.Factory> factories = new ArrayList<EditorFactory.Factory>(mEditorMap.values().size());
-		for(EditorFactory.Factory ef : mEditorMap.values()){
+	public static List<Factory> getEditorFactoriesOf(Class<?> classy){
+		ArrayList<Factory> factories = new ArrayList<Factory>(mEditorMap.values().size());
+		for(Factory ef : mEditorMap.values()){
 			if(classy.isInstance(ef)){
 				factories.add(ef);
 			}

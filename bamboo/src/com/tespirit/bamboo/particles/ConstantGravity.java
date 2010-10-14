@@ -7,13 +7,13 @@ import java.io.ObjectOutput;
 
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class ConstantGravityForce implements ParticleForce, Externalizable{
+public class ConstantGravity implements ParticleForce, Externalizable{
 	private Vector3d mAcceleration;
 	private Vector3d mTempAccel;
 	
 	private static final float EARTH_GRAVITY = -9.8f;
 	
-	public ConstantGravityForce(){
+	public ConstantGravity(){
 		this.mAcceleration = new Vector3d(0, EARTH_GRAVITY, 0);
 		this.mTempAccel = new Vector3d();
 	}

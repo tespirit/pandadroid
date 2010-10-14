@@ -1,4 +1,4 @@
-package com.tespirit.bamporter.editor;
+package com.tespirit.bamporter.standardEditors;
 
 import com.tespirit.bamboo.particles.SpriteParticleEmitter;
 import com.tespirit.bamporter.app.BamporterFrame;
