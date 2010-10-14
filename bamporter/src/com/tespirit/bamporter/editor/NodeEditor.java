@@ -6,60 +6,65 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JTextField;
 
-
-import com.tespirit.bamboo.particles.ParticleEmitter;
-import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Node;
-import com.tespirit.bamporter.app.BamporterFrame;
 import com.tespirit.bamporter.properties.SimplePanel;
 
-public class NodeEditor extends TreeNodeEditor{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	Node mNode;
-	RenderManager mRenderManager;
-	
-	public NodeEditor(Node node, RenderManager renderManager){
-		this.mRenderManager = renderManager;
-		this.mNode = node;
-		for(int i = 0; i < node.getChildCount(); i++){
-			this.addNewEditor(new NodeEditor(node.getChild(i), renderManager));
-		}
-		if(node instanceof ParticleEmitter){
-			BamporterFrame.getInstance().registerParticles((ParticleEmitter)node);
-		}
-	}
+public class NodeEditor implements EditorFactory.Factory{
 	
 	@Override
-	protected Component generatePanel(){
-		SimplePanel panel = new SimplePanel();
-		JTextField name = panel.createTextField("Name");
-		if(this.mNode.getName() != null){
-			name.setText(this.mNode.getName());
-		}
-		
-		name.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mNode.setName(((JTextField)e.getSource()).getText());
-				updateEditor();
-			}
-		});
-		return panel;
-	}
-	
-	@Override
-	public String toString(){
-		return Util.getClassName(this.mNode)+" "+this.mNode.getName();
+	public Editor createEditor(Object object) {
+		return new NodeEditor.Editor((Node)object);
 	}
 
 	@Override
-	public void recycle() {
-		this.mNode.recycle();
-		this.mNode = null;
-		super.recycle();
+	public Class<?> getDataClass() {
+		return Node.class;
+	}
+	
+	public class Editor extends TreeNodeEditor{
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		Node mNode;
+		
+		protected Editor(Node node){
+			super(node);
+			this.mNode = node;
+			for(int i = 0; i < node.getChildCount(); i++){
+				this.addNewEditor(node.getChild(i));
+			}
+		}
+		
+		@Override
+		protected Component generatePanel(){
+			SimplePanel panel = new SimplePanel();
+			JTextField name = panel.createTextField("Name");
+			if(this.mNode.getName() != null){
+				name.setText(this.mNode.getName());
+			}
+			
+			name.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					mNode.setName(((JTextField)e.getSource()).getText());
+					updateEditor();
+				}
+			});
+			return panel;
+		}
+		
+		@Override
+		public String getNodeName(){
+			return this.mNode.getName();
+		}
+	
+		@Override
+		public void recycle() {
+			this.mNode.recycle();
+			this.mNode = null;
+			super.recycle();
+		}
 	}
 }

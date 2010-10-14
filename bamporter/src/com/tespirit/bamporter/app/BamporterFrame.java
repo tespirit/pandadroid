@@ -39,6 +39,7 @@ import com.tespirit.bamboo.particles.ParticleEmitter;
 import com.tespirit.bamboo.particles.SpriteParticleEmitter;
 import com.tespirit.bamboo.particles.RandomParticleGenerator;
 import com.tespirit.bamboo.particles.StandardParticleSystem;
+import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.render.UpdateManager;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Model;
@@ -81,6 +82,7 @@ public class BamporterFrame extends JFrame{
 	private static final String TITLE = "BAMporter";
 	
 	private BamporterFrame() {
+		loadStandardEditors();
 		initComponents();
 	}
 
@@ -103,7 +105,6 @@ public class BamporterFrame extends JFrame{
 		JMenuItem mergeAnimationsButton = new JMenuItem("Merge Animations");
 		JMenuItem exitButton = new JMenuItem("Exit");
 		
-		fileMenu.add(newParticleButton);
 		fileMenu.add(openButton);
 		fileMenu.addSeparator();
 		fileMenu.add(this.mSaveAllButton);
@@ -115,6 +116,10 @@ public class BamporterFrame extends JFrame{
 		fileMenu.add(exitButton);
 		
 		menuBar.add(fileMenu);
+		
+		JMenu createMenu = new JMenu("Create");
+		createMenu.add(newParticleButton);
+		menuBar.add(createMenu);
 		
 		JMenu settingsMenu = new JMenu("Settings");
 		JMenu themeMenu = new JMenu("Theme");
@@ -330,13 +335,17 @@ public class BamporterFrame extends JFrame{
 	
 	public void registerParticles(ParticleEmitter particle){
 		if(particle.getParticleGenerator() instanceof RandomParticleGenerator){
-			ParticleGeneratorEditor pe = new ParticleGeneratorEditor((RandomParticleGenerator)particle.getParticleGenerator());
-			this.addNodeTo(pe, this.mParticles);
+			Editor pe = EditorFactory.createEditor(particle.getParticleGenerator());
+			if(pe instanceof TreeNodeEditor){
+				this.addNodeTo((TreeNodeEditor)pe, this.mParticles);
+			}
 		}
 		
 		if(particle.getParticleSysetm() instanceof StandardParticleSystem){
-			ParticleSystemEditor pse = new ParticleSystemEditor((StandardParticleSystem)particle.getParticleSysetm());
-			this.addNodeTo(pse, this.mParticles);
+			Editor pse = EditorFactory.createEditor(particle.getParticleSysetm());
+			if(pse instanceof TreeNodeEditor){
+				this.addNodeTo((TreeNodeEditor)pse, this.mParticles);
+			}
 		}
 	}
 	
@@ -365,13 +374,13 @@ public class BamporterFrame extends JFrame{
 			};
 		}
 		
-		RandomParticleGenerator spp = new RandomParticleGenerator();
-		SpriteParticleEmitter p = new SpriteParticleEmitter(spp);
+		SpriteParticleEmitter p = new SpriteParticleEmitter(new RandomParticleGenerator());
 		this.mBamboo.getScenes().add(p);
 		this.mRenderer.addScene(p);
 		
-		NodeEditor ne = new NodeEditor(p, this.mRenderer);
-		this.addNodeTo(ne, this.mSceneNodes);
+		Editor editor = EditorFactory.createEditor(p);
+		if(editor instanceof TreeNodeEditor)
+		this.addNodeTo((TreeNodeEditor)editor, this.mSceneNodes);
 		
 		this.enableSaves();
 	}
@@ -449,8 +458,8 @@ public class BamporterFrame extends JFrame{
 				Enumeration<DefaultMutableTreeNode> current = this.mAnimations.children();
 				while(current.hasMoreElements()){
 					DefaultMutableTreeNode node = current.nextElement();
-					if(node instanceof AnimationEditor){
-						((AnimationEditor)node).refreshClips();
+					if(node instanceof AnimationEditor.Editor){
+						((AnimationEditor.Editor)node).refreshClips();
 					}
 				}
 			} catch (Exception e){
@@ -465,12 +474,16 @@ public class BamporterFrame extends JFrame{
 		this.mRenderer.addScenes(this.mBamboo.getScenes());
 		
 		for(Node node : this.mBamboo.getScenes()){
-			NodeEditor ne = new NodeEditor(node, this.mRenderer);
-			this.mSceneNodes.add(ne);
+			Editor editor = EditorFactory.createEditor(node);
+			if(editor instanceof TreeNodeEditor){
+				this.mSceneNodes.add((TreeNodeEditor)editor);
+			}
 		}
 		for(Animation animation : this.mBamboo.getAnimations()){
-			AnimationEditor ae = new AnimationEditor(animation, this.mRenderer);
-			this.mAnimations.add(ae);
+			Editor editor = EditorFactory.createEditor(animation);
+			if(editor instanceof TreeNodeEditor){
+				this.mAnimations.add((TreeNodeEditor)editor);
+			}
 		}
 		
 		this.enableSaves();
@@ -504,5 +517,22 @@ public class BamporterFrame extends JFrame{
 	
 	public UpdateManager getUpdateManager(){
 		return this.mRenderer;
+	}
+
+	public RenderManager getRenderManger() {
+		// TODO Auto-generated method stub
+		return this.mRenderer;
+	}
+	
+	private void loadStandardEditors(){
+		EditorFactory.registerFactory(new AnimationEditor());
+		EditorFactory.registerFactory(new ClipEditor());
+		EditorFactory.registerFactory(new NodeEditor());
+		EditorFactory.registerFactory(new ParticleEmitterNode());
+		EditorFactory.registerFactory(new ConstantParticleForce());
+		EditorFactory.registerFactory(new ConstantParticleGravity());
+		EditorFactory.registerFactory(new ParticleGravity());
+		EditorFactory.registerFactory(new ParticleGeneratorEditor());
+		EditorFactory.registerFactory(new ParticleSystemEditor());
 	}
 }

@@ -140,7 +140,6 @@ public class StandardParticleSystem implements ParticleSystem, Externalizable{
 		//TODO: implement this.
 	}
 
-
 	//IO
 	private static final long serialVersionUID = -372026429838597827L;
 	@Override

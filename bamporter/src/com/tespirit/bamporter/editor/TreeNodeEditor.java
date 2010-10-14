@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamporter.app.BamporterFrame;
 import com.tespirit.bamporter.app.Preferences;
 
@@ -15,34 +16,55 @@ public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements E
 	private static final long serialVersionUID = 2041667420816532942L;
 	private Object mTheme;
 	private Component mPropertyPanel;
-
 	
 	/**
 	 * Default constructor allows children.
 	 */
-	protected TreeNodeEditor(){
-		this(true);
+	protected TreeNodeEditor(Object data){
+		this(data, true);
 	}
 	
-	protected TreeNodeEditor(boolean allowChildren){
+	protected TreeNodeEditor(Object data, boolean allowChildren){
 		this.allowsChildren = allowChildren;
+		this.userObject = data;
+	}
+	
+	protected String getNodeName(){
+		return null;
+	}
+	
+	@Override
+	public String toString(){
+		String nodeName = this.getNodeName();
+		if(nodeName != null){
+			return Util.getClassName(this.userObject)+" "+nodeName;
+		} else {
+			return Util.getClassName(this.userObject);
+		}
 	}
 	
 	/**
 	 * use this for initialization as it does not call insertEditor.
 	 * @param node
 	 */
-	public void addNewEditor(TreeNodeEditor node){
-		super.insert(node, this.getChildCount());
+	public void addNewEditor(Object object){
+		Editor editor = EditorFactory.createEditor(object);
+		if(editor instanceof TreeNodeEditor){
+			super.insert((TreeNodeEditor)editor, this.getChildCount());
+		}
 	}
 	
-	public void addEditor(TreeNodeEditor node){
-		this.insertEditor(node, this.getChildCount());
+	public void addEditor(Object object){
+		this.insertEditor(object, this.getChildCount());
 		
 	}
 	
-	public void insertEditor(TreeNodeEditor newChild, int childIndex){
-		BamporterFrame.getInstance().insertNodeTo(newChild, this, childIndex);
+	public void insertEditor(Object object, int childIndex){
+		Editor editor = EditorFactory.createEditor(object);
+		if(editor instanceof TreeNodeEditor){
+			BamporterFrame.getInstance().insertNodeTo((TreeNodeEditor)editor, this, childIndex);
+		}
+		
 	}
 	
 	public void removeEditor(TreeNodeEditor node){
@@ -59,7 +81,9 @@ public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements E
 		BamporterFrame.getInstance().refreshNode(this);
 	}
 	
-	
+	public RenderManager getRenderManager(){
+		return BamporterFrame.getInstance().getRenderManger();
+	}
 	
 	@Override
 	public Component getPropertyPanel() {
