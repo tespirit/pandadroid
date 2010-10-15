@@ -1,101 +1,99 @@
 package com.tespirit.bamporter.properties;
 
-import javax.swing.JSpinner;
+import java.awt.GridLayout;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class Vector3dProperty{
-	public static interface Property{
-		public void setX(float x);
-		public void setY(float y);
-		public void setZ(float z);
-		
-		public float getX();
-		public float getY();
-		public float getZ();
-	}
+public abstract class Vector3dProperty extends Property<Vector3d>{
 	
-	private static class VectorProperty implements Property{
+	public static class Bind extends Vector3dProperty{
 		Vector3d mVector;
-		VectorProperty(Vector3d vector){
-			this.mVector = vector;
+
+		public Bind(String name, Vector3d v) {
+			this(name, v, 1f);
+		}
+		
+		public Bind(String name, Vector3d v, Float step){
+			super(name, step);
+			this.mVector = v;
 		}
 
 		@Override
-		public void setX(float x) {
-			this.mVector.setX(x);
+		public void setValue(Vector3d value) {
+			//VOID
 		}
 
 		@Override
-		public void setY(float y) {
-			this.mVector.setY(y);
-		}
-
-		@Override
-		public void setZ(float z) {
-			this.mVector.setZ(z);
-		}
-
-		@Override
-		public float getX() {
-			return this.mVector.getX();
-		}
-
-		@Override
-		public float getY() {
-			return this.mVector.getY();
-		}
-
-		@Override
-		public float getZ() {
-			return this.mVector.getZ();
+		public Vector3d getValue() {
+			return this.mVector;
 		}
 		
 	}
 	
-	FloatProperty mX;
-	FloatProperty mY;
-	FloatProperty mZ;
-	Property mProperty;
+	private FloatProperty mX;
+	private FloatProperty mY;
+	private FloatProperty mZ;
 	
-	Vector3dProperty(JSpinner x, JSpinner y, JSpinner z, Vector3d vector){
-		this(x, y, z, new VectorProperty(vector));
+	public Vector3dProperty(String name){
+		this(name, 1f);
 	}
-	
-	Vector3dProperty(JSpinner x, JSpinner y, JSpinner z, Property property){
-		this.mProperty = property;
-		this.mX = new FloatProperty(x, new FloatProperty.Property() {
+
+	public Vector3dProperty(String name, Float step) {
+		super(name);
+		this.mX = new FloatProperty("x", step){
 			@Override
-			public void setValue(float value) {
-				mProperty.setX(value);
+			public void setValue(Float value) {
+				Vector3d v = Vector3dProperty.this.getValue();
+				v.setX(value);
+				Vector3dProperty.this.setValue(v);
 			}
 			@Override
-			public float getValue() {
-				return mProperty.getX();
+			public Float getValue() {
+				return Vector3dProperty.this.getValue().getX();
 			}
-		});
+			
+		};
 		
-		this.mY = new FloatProperty(y, new FloatProperty.Property() {
+		this.mY = new FloatProperty("y", step){
 			@Override
-			public void setValue(float value) {
-				mProperty.setY(value);
+			public void setValue(Float value) {
+				Vector3d v = Vector3dProperty.this.getValue();
+				v.setY(value);
+				Vector3dProperty.this.setValue(v);
 			}
 			@Override
-			public float getValue() {
-				return mProperty.getY();
+			public Float getValue() {
+				return Vector3dProperty.this.getValue().getY();
 			}
-		});
+			
+		};
 		
-		this.mZ = new FloatProperty(z, new FloatProperty.Property() {
+		this.mZ = new FloatProperty("z", step){
 			@Override
-			public void setValue(float value) {
-				mProperty.setZ(value);
+			public void setValue(Float value) {
+				Vector3d v = Vector3dProperty.this.getValue();
+				v.setZ(value);
+				Vector3dProperty.this.setValue(v);
 			}
 			@Override
-			public float getValue() {
-				return mProperty.getZ();
+			public Float getValue() {
+				return Vector3dProperty.this.getValue().getZ();
 			}
-		});
+			
+		};
+	}
+
+	@Override
+	public JComponent getEditor() {
+		JPanel panel = new JPanel(new GridLayout(1,3));
+		panel.add(this.mX.getEditor());
+		panel.add(this.mY.getEditor());
+		panel.add(this.mZ.getEditor());
+		
+		return panel;
 	}
 	
 }

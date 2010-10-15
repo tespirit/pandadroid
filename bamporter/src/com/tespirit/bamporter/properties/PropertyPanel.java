@@ -5,21 +5,11 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 
-import com.tespirit.bamboo.vectors.RandomRange;
-import com.tespirit.bamboo.vectors.Vector3d;
-
-public class SimplePanel extends JPanel{
+public class PropertyPanel extends JPanel{
 	/**
 	 * 
 	 */
@@ -34,33 +24,48 @@ public class SimplePanel extends JPanel{
 	private static final Dimension mLabelSizePref = new Dimension(75,25);
 	private static final Dimension mLabelSizeMax = new Dimension(1000, 25);
 	
-	public SimplePanel() {
-		this.mLabelPanel = Box.createVerticalBox();
-		this.mInputPanel = Box.createVerticalBox();
+	public PropertyPanel() {
+		this(false);
+	}
+	
+	public PropertyPanel(boolean noLabels){
+		if(noLabels){
+			this.mInputPanel = Box.createVerticalBox();
 		
-	    this.setLayout(new BorderLayout());
-	    this.add(this.mLabelPanel, BorderLayout.WEST);
-	    this.add(this.mInputPanel, BorderLayout.CENTER);
+			this.setLayout(new GridLayout());
+			this.add(this.mInputPanel);
+		} else {
+			this.mLabelPanel = Box.createVerticalBox();
+			this.mInputPanel = Box.createVerticalBox();
+			
+		    this.setLayout(new BorderLayout());
+		    this.add(this.mLabelPanel, BorderLayout.WEST);
+		    this.add(this.mInputPanel, BorderLayout.CENTER);
+		}
 	}
 	
 	public void addComponent(String label, JComponent input){
-		JLabel labelField = new JLabel(label);
-		labelField.setMinimumSize(mLabelSizeMin);
-		labelField.setPreferredSize(mLabelSizePref);
-		labelField.setMaximumSize(mLabelSizeMax);
+		if(this.mLabelPanel != null){
+			JLabel labelField = new JLabel(label);
+			labelField.setMinimumSize(mLabelSizeMin);
+			labelField.setPreferredSize(mLabelSizePref);
+			labelField.setMaximumSize(mLabelSizeMax);
+			labelField.setAlignmentX(RIGHT_ALIGNMENT);
+			this.mLabelPanel.add(labelField);
+			this.mLabelPanel.add(Box.createVerticalStrut(5));
+		}
+		input.setAlignmentX(LEFT_ALIGNMENT);
 		input.setMinimumSize(mInputSizeMin);
 		input.setPreferredSize(mInputSizePref);
 		input.setMaximumSize(mInputSizeMax);
-		
-		labelField.setAlignmentX(RIGHT_ALIGNMENT);
-		input.setAlignmentX(LEFT_ALIGNMENT);
-		
-		this.mLabelPanel.add(labelField);
 		this.mInputPanel.add(input);
-		this.mLabelPanel.add(Box.createVerticalStrut(5));
 		this.mInputPanel.add(Box.createVerticalStrut(5));
 	}
-
+	
+	public void addProperty(Property<?> property){
+		this.addComponent(property.getName(), property.getEditor());
+	}
+/*
 	public JLabel createLabel(String label, String value){
 		JLabel valueLabel = new JLabel(value);
 		this.addComponent(label, valueLabel);
@@ -193,5 +198,5 @@ public class SimplePanel extends JPanel{
 		panel.add(z);
 		new Vector3dProperty(x,y,z,vector);
 		this.addComponent(label, panel);
-	}
+	}*/
 }

@@ -93,7 +93,12 @@ public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements E
 			Preferences.refreshComponent(this.mPropertyPanel);
 		}
 		this.mTheme = Preferences.getTheme();
+		this.refresh();
 		return this.mPropertyPanel;
+	}
+	
+	protected void refresh(){
+		//VOID
 	}
 	
 	protected abstract Component generatePanel() ;

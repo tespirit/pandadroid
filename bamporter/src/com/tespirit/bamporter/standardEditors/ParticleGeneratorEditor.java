@@ -1,13 +1,11 @@
 package com.tespirit.bamporter.standardEditors;
 
-import java.awt.Component;
-
 import com.tespirit.bamboo.particles.RandomParticleGenerator;
 import com.tespirit.bamporter.editor.Factory;
-import com.tespirit.bamporter.editor.TreeNodeEditor;
+import com.tespirit.bamporter.editor.PropertyTreeNodeEditor;
 import com.tespirit.bamporter.editor.Util;
 import com.tespirit.bamporter.properties.FloatProperty;
-import com.tespirit.bamporter.properties.SimplePanel;
+import com.tespirit.bamporter.properties.FloatRangeProperty;
 
 public class ParticleGeneratorEditor implements Factory{
 	
@@ -21,7 +19,7 @@ public class ParticleGeneratorEditor implements Factory{
 		return RandomParticleGenerator.class;
 	}
 
-	public class Editor extends TreeNodeEditor{
+	public class Editor extends PropertyTreeNodeEditor{
 		/**
 		 * 
 		 */
@@ -33,45 +31,36 @@ public class ParticleGeneratorEditor implements Factory{
 		public Editor(RandomParticleGenerator particleGenerator){
 			super(particleGenerator, false);
 			this.mParticles = particleGenerator;
-		}
-		
-		@Override
-		protected Component generatePanel() {
-			SimplePanel panel = new SimplePanel();
 			
-			panel.addProperty("Width", new FloatProperty.Property() {
+			this.addProperty(new FloatProperty("Width", 0.1f, 0f, Float.MAX_VALUE){
 				@Override
-				public void setValue(float value) {
+				public void setValue(Float value) {
 					mParticles.setWidth(value);
 				}
-				
 				@Override
-				public float getValue() {
+				public Float getValue() {
 					return mParticles.getWidth();
 				}
-			}, 0, Float.MAX_VALUE, 0.1f);
+			});
 			
-			panel.addProperty("Length", new FloatProperty.Property() {
+			this.addProperty(new FloatProperty("Length", 0.1f, 0f, Float.MAX_VALUE){
 				@Override
-				public void setValue(float value) {
+				public void setValue(Float value) {
 					mParticles.setLength(value);
 				}
-				
 				@Override
-				public float getValue() {
+				public Float getValue() {
 					return mParticles.getLength();
 				}
-			}, 0, Float.MAX_VALUE, 0.1f);
+			});
 			
-			panel.addProperty("Birth Rate", this.mParticles.getBirthRateRange(), 0.0f, Float.MAX_VALUE, 1.0f);
-			panel.addProperty("Life Span", this.mParticles.getLifeSpanRange(), 0.0f, Float.MAX_VALUE, 0.1f);
-			panel.addProperty("Speed", this.mParticles.getSpeedRange(), 0.0f, Float.MAX_VALUE, 0.5f);
-			panel.addProperty("Angle", this.mParticles.getAngleRange(), 0.0f, Float.MAX_VALUE, 5.0f);
-			panel.addProperty("Scale", this.mParticles.getScaleRange(), 0.0f, Float.MAX_VALUE, 0.1f);
-			panel.addProperty("Decay", this.mParticles.getDecayPercentRange(), 0.0f, 1.0f, 0.1f);
-			panel.addProperty("Mass", this.mParticles.getMassRange(), 0.0f, Float.MAX_VALUE, 0.05f);
-			
-			return panel;
+			this.addProperty(new FloatRangeProperty.Bind("Birth Rate", this.mParticles.getBirthRateRange(), 1f, 0.0f, Float.MAX_VALUE));
+			this.addProperty(new FloatRangeProperty.Bind("Life Span", this.mParticles.getLifeSpanRange(), 0.1f, 0.0f, Float.MAX_VALUE));
+			this.addProperty(new FloatRangeProperty.Bind("Speed", this.mParticles.getSpeedRange(), 0.5f, 0.0f, Float.MAX_VALUE));
+			this.addProperty(new FloatRangeProperty.Bind("Angle", this.mParticles.getAngleRange(), 5.0f, 0.0f, Float.MAX_VALUE));
+			this.addProperty(new FloatRangeProperty.Bind("Scale", this.mParticles.getScaleRange(), 0.1f, 0.0f, Float.MAX_VALUE));
+			this.addProperty(new FloatRangeProperty.Bind("Decay", this.mParticles.getDecayPercentRange(), 0.1f, 0.0f, 1.0f));
+			this.addProperty(new FloatRangeProperty.Bind("Mass", this.mParticles.getMassRange(), 0.05f, 0.0f, Float.MAX_VALUE));
 		}
 		
 		@Override

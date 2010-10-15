@@ -1,8 +1,5 @@
 package com.tespirit.bamporter.standardEditors;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import com.tespirit.bamboo.particles.ParticleForce;
@@ -10,9 +7,10 @@ import com.tespirit.bamboo.particles.StandardParticleSystem;
 import com.tespirit.bamporter.editor.EditorFactory;
 import com.tespirit.bamporter.editor.Factory;
 import com.tespirit.bamporter.editor.ParticleForceEditor;
+import com.tespirit.bamporter.editor.PropertyTreeNodeEditor;
 import com.tespirit.bamporter.editor.TreeNodeEditor;
 import com.tespirit.bamporter.editor.Util;
-import com.tespirit.bamporter.properties.SimplePanel;
+import com.tespirit.bamporter.properties.ButtonProperty;
 
 public class ParticleSystemEditor implements Factory{
 	@Override
@@ -25,7 +23,7 @@ public class ParticleSystemEditor implements Factory{
 		return StandardParticleSystem.class;
 	}
 	
-	public class Editor extends TreeNodeEditor{
+	public class Editor extends PropertyTreeNodeEditor{
 		
 		/**
 		 * 
@@ -33,31 +31,29 @@ public class ParticleSystemEditor implements Factory{
 		private static final long serialVersionUID = -4329218305403186171L;
 		private StandardParticleSystem mParticleSystem;
 		
-		private class OnNewForce implements ActionListener{
+		private class ForceButton extends ButtonProperty{
 			ParticleForceEditor mEditor;
-			private OnNewForce(Factory factory){
+			
+			public ForceButton(Factory factory) {
+				super(Util.getClassName(factory.getDataClass()));
 				this.mEditor = (ParticleForceEditor)factory;
 			}
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void onClick() {
 				addForce(this.mEditor.createForce());
 			}
+			
 		}
 		
 		public Editor(StandardParticleSystem particleSystem){
-			super(particleSystem);
+			super(particleSystem, true);
 			this.mParticleSystem = particleSystem;
-		}
-	
-		@Override
-		protected Component generatePanel() {
-			SimplePanel panel = new SimplePanel();
 			
-			List<Factory> factories = EditorFactory.getEditorFactoriesOf(ParticleForceEditor.class);
+			List<Factory> factories = EditorFactory.getFactoriesOf(ParticleForce.class);
 			for(Factory ef : factories){
-				panel.createButton("New " + Util.getClassName(ef.getDataClass())).addActionListener(new OnNewForce(ef));
+				this.addProperty(new ForceButton(ef));
 			}
-			return panel;
 		}
 		
 		public void addForce(ParticleForce force){

@@ -3,8 +3,23 @@ package com.tespirit.bamporter.editor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
+import com.tespirit.bamporter.plugins.ReflectionUtil;
 
 public class EditorFactory {
+	
+	public static void loadPackage(String packagePath){
+		Set<Class<? extends Factory>> standardEditorClasses;
+		standardEditorClasses = ReflectionUtil.getSubClasses(packagePath, Factory.class);
+		for(Class<? extends Factory> standardEditorClass : standardEditorClasses){
+			try{
+				EditorFactory.registerFactory(standardEditorClass.newInstance());
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public static void registerFactory(Factory factory){
 		EditorFactory.mEditorMap.put(factory.getDataClass().getName(), factory);
@@ -18,14 +33,26 @@ public class EditorFactory {
 		if(f != null){
 			return f.createEditor(object);
 		} else {
+			System.err.print("Could not find an editor for " + object.toString());
 			return null;
 		}
 	}
 	
-	public static List<Factory> getEditorFactoriesOf(Class<?> classy){
+	public static List<Factory> getFactoriesOf(Class<?> classy){
 		ArrayList<Factory> factories = new ArrayList<Factory>(mEditorMap.values().size());
+		ArrayList<Factory> superFactories = new ArrayList<Factory>(mEditorMap.values().size());
 		for(Factory ef : mEditorMap.values()){
-			if(classy.isInstance(ef)){
+			Class<?> dataClass = ef.getDataClass();
+			if(classy == dataClass){
+				factories.add(ef);
+			} else {
+				superFactories.add(ef);
+			}
+		}
+		//second pass for super classes/interfaces
+		for(Factory ef : superFactories){
+			Class<?> dataClass = ef.getDataClass();
+			if(classy.isAssignableFrom(dataClass)){
 				factories.add(ef);
 			}
 		}

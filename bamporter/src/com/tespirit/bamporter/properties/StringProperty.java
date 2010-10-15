@@ -3,26 +3,40 @@ package com.tespirit.bamporter.properties;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-public class StringProperty implements ActionListener{
-	public interface Property{
-		public void setValue(String value);
-		public String getValue();
+public abstract class StringProperty extends Property<String>{
+	boolean mReadOnly;
+
+	public StringProperty(String name){
+		this(name, false);
 	}
 	
-	JTextField mValue;
-	Property mProperty;
-	
-	StringProperty(JTextField value, Property property){
-		this.mValue = value;
-		this.mProperty = property;
-		this.mValue.setText(this.mProperty.getValue());
-		this.mValue.addActionListener(this);
+	public StringProperty(String name, boolean readOnly) {
+		super(name);
+		this.mReadOnly = readOnly;
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		this.mProperty.setValue(this.mValue.getText());
+	public JComponent getEditor() {
+		if(this.mReadOnly){
+			return new JLabel(this.getValue());
+		} else {
+			JTextField text = new JTextField();
+			text.setText(this.getValue());
+			
+			text.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JTextField t = (JTextField)e.getSource();
+					setValue(t.getText());
+				}
+			});
+			
+			return text;
+		}
 	}
+	
 }

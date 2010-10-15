@@ -1,50 +1,29 @@
 package com.tespirit.bamporter.properties;
 
-import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-public class LongProperty implements ChangeListener{
-	public static interface Property{
-		public void setValue(long value);
-		public long getValue();
-	}
-	private JSpinner mValue;
-	private Property mProperty;
+
+public abstract class LongProperty extends NumberProperty<Long> {
 	
-	LongProperty(JSpinner value, Property property){
-		this.mProperty = property;
-		this.mValue = value;
-		SpinnerNumberModel numVal = (SpinnerNumberModel)this.mValue.getModel();
-		numVal.setValue(property.getValue());
-		this.mValue.addChangeListener(this);
+	public LongProperty(String name){
+		this(name, 1L);
+	}
+	
+	public LongProperty(String name, Long step){
+		this(name, step, Long.MIN_VALUE, Long.MAX_VALUE);
+	}
+
+	public LongProperty(String name, Long step, Long min, Long max) {
+		super(name, step, min, max);
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		// TODO Auto-generated method stub
-		SpinnerNumberModel value = (SpinnerNumberModel)this.mValue.getModel();
-		this.mProperty.setValue(value.getNumber().longValue());
+	protected SpinnerNumberModel getNumberModel(Long start, Long min, Long max, Long step) {
+		return new SpinnerNumberModel(start, min, max, step);
 	}
-	
-	public void setMinValue(long min){
-		SpinnerNumberModel value = (SpinnerNumberModel)this.mValue.getModel();
-		value.setMinimum(new Double(min));
-	}
-	
-	public void setMaxValue(long max){
-		SpinnerNumberModel value = (SpinnerNumberModel)this.mValue.getModel();
-		value.setMinimum(new Double(max));
-	}
-	
-	public long getValue(){
-		SpinnerNumberModel value = (SpinnerNumberModel)this.mValue.getModel();
-		return value.getNumber().longValue();
-	}
-	
-	public void setValue(long val){
-		SpinnerNumberModel value = (SpinnerNumberModel)this.mValue.getModel();
-		value.setValue(new Double(val));
+
+	@Override
+	protected void setValue(SpinnerNumberModel model) {
+		this.setValue(model.getNumber().longValue());
 	}
 }

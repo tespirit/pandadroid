@@ -107,7 +107,8 @@ public class Pandamonium extends Activity {
     	return g;
     }
     
-    private BambooAsset createDemoSkin(){
+    @SuppressWarnings("unused")
+	private BambooAsset createDemoSkin(){
 		VertexIndices mesh = new VertexIndices(18, 8, new int[]{VertexBuffer.POSITION,VertexBuffer.NORMAL});
 		
 		VertexBuffer vb = mesh.getVertexBuffer();

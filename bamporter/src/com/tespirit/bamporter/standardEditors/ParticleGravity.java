@@ -1,12 +1,11 @@
 package com.tespirit.bamporter.standardEditors;
 
-import java.awt.Component;
-
 import com.tespirit.bamboo.particles.Gravity;
 import com.tespirit.bamboo.particles.ParticleForce;
 import com.tespirit.bamporter.editor.ParticleForceEditor;
+import com.tespirit.bamporter.properties.ButtonProperty;
 import com.tespirit.bamporter.properties.FloatProperty;
-import com.tespirit.bamporter.properties.SimplePanel;
+import com.tespirit.bamporter.properties.Vector3dProperty;
 
 public class ParticleGravity extends ParticleForceEditor{
 
@@ -30,23 +29,23 @@ public class ParticleGravity extends ParticleForceEditor{
 		protected Editor(Gravity force){
 			super(force, false);
 			this.mForce = force;
-		}
-
-		@Override
-		protected Component generatePanel() {
-			SimplePanel panel = new SimplePanel();
-			panel.addProperty("Position", this.mForce.getPosition(), 1f);
-			panel.addProperty("Strength", new FloatProperty.Property() {
+			this.addProperty(new Vector3dProperty.Bind("Position", this.mForce.getPosition()));
+			this.addProperty(new FloatProperty("Strength", 0.1f){
 				@Override
-				public void setValue(float value) {
+				public void setValue(Float value) {
 					mForce.setStrength(value);
 				}
 				@Override
-				public float getValue() {
+				public Float getValue() {
 					return 	mForce.getStrength();
 				}
-			}, -Float.MAX_VALUE, Float.MAX_VALUE, 0.1f);
-			return panel;
+			});
+			this.addProperty(new ButtonProperty("Delete"){
+				@Override
+				public void onClick() {
+					removeEditorFromParent();
+				}
+			});
 		}
 	}
 

@@ -5,7 +5,7 @@ import com.tespirit.bamboo.particles.ParticleForce;
 public abstract class ParticleForceEditor implements Factory {
 	public abstract ParticleForce createForce();
 	
-	public abstract class Editor extends TreeNodeEditor{
+	public abstract class Editor extends PropertyTreeNodeEditor{
 		protected Editor(Object data, boolean allowChildren) {
 			super(data, allowChildren);
 		}

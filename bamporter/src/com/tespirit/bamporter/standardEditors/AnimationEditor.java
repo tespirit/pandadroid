@@ -1,17 +1,8 @@
 package com.tespirit.bamporter.standardEditors;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Clip;
@@ -19,9 +10,13 @@ import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.editor.Factory;
+import com.tespirit.bamporter.editor.PropertyTreeNodeEditor;
 import com.tespirit.bamporter.editor.TreeNodeEditor;
 import com.tespirit.bamporter.editor.Util;
-import com.tespirit.bamporter.properties.SimplePanel;
+import com.tespirit.bamporter.properties.BooleanProperty;
+import com.tespirit.bamporter.properties.ButtonProperty;
+import com.tespirit.bamporter.properties.ComboProperty;
+import com.tespirit.bamporter.properties.StringProperty;
 
 public class AnimationEditor implements Factory{
 	
@@ -35,7 +30,7 @@ public class AnimationEditor implements Factory{
 		return Animation.class;
 	}
 	
-	public class Editor extends TreeNodeEditor{
+	public class Editor extends PropertyTreeNodeEditor{
 	
 		/**
 		 * 
@@ -43,12 +38,8 @@ public class AnimationEditor implements Factory{
 		private static final long serialVersionUID = -1574225716204462101L;
 		private Animation mAnimation;
 		private Player mPlayer;
-		private JTextField mName;
-		private JComboBox mClips;
-		private JButton mNewClip;
-		private JToggleButton mPlay;
-		private JComboBox mSkeletons;
-		private ClipEditor.Editor mCurrentClip;
+		private ComboProperty<ClipDisplay> mClips;
+		private ComboProperty<JointDisplay> mSkeletons;
 		private Set<String> mClipLookup;
 		
 		protected Editor(Animation animation){
@@ -57,127 +48,97 @@ public class AnimationEditor implements Factory{
 			this.mPlayer = new Player();
 			this.mPlayer.setAnimation(this.mAnimation);
 			this.getRenderManager().addUpdater(this.mPlayer);
-			this.mClipLookup = new HashSet<String>();
 			
-			for(int i = 0; i < this.mAnimation.getClipCount(); i++){
-				this.addNewEditor(this.mAnimation.getClip(i));
-				this.mClipLookup.add(this.mAnimation.getClip(i).getName());
-			}
-		}
-		
-		@Override
-		protected Component generatePanel(){
-			SimplePanel panel = new SimplePanel();
-			this.mName = panel.createTextField("Name");
-			
-			panel.createLabel("Channels", String.valueOf(this.mAnimation.getChannelCount()));
-			
-			this.mClips = panel.createComboBox("Clips");
-			this.mNewClip = panel.createButton("New Clip");
-			this.mSkeletons = panel.createComboBox("Skeleton");
-			
-			this.mPlay = panel.createToggleButton("Play");
-			JButton restart = panel.createButton("Restart");
-			
-			for(int i = 0; i < this.mAnimation.getClipCount(); i++){
-				this.mClips.addItem(this.mAnimation.getClip(i).getName());
-			}
-			
-			this.mCurrentClip = this.getSelectedClipEditor();
-			
-			this.updateSkeletons();
-			
-			if(this.mAnimation.getName() != null){
-				this.mName.setText(this.mAnimation.getName());
-			}
-			
-			this.mName.addActionListener(new ActionListener(){
+			this.addProperty(new StringProperty("Name"){
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					mAnimation.setName(mName.getText());
+				public void setValue(String value) {
+					mAnimation.setName(value);
 					updateEditor();
 				}
-			});
-			
-			this.mClips.addActionListener(new ActionListener(){
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(mClips.getSelectedIndex() < getChildCount() && mClips.getSelectedIndex() > 0){	
-						mPlayer.setActiveClip(mClips.getSelectedIndex());
-						mCurrentClip.setPlayState(false);
-						mCurrentClip = getSelectedClipEditor();
-					}
+				public String getValue() {
+					return mAnimation.getName();
 				}
 			});
-			
-			this.mNewClip.addActionListener(new ActionListener(){
+			this.addProperty(new StringProperty("Channels", true){
 				@Override
-				public void actionPerformed(ActionEvent e){
+				public void setValue(String value) {
+					//VOID
+				}
+				@Override
+				public String getValue() {
+					return String.valueOf(mAnimation.getChannelCount());
+				}
+			});
+			this.mClips = this.addProperty(new ComboProperty<ClipDisplay>("Clips"){
+				@Override
+				public void setValue(ClipDisplay value) {
+					mPlayer.setActiveClip(value.mClip.getName());
+				}
+			});
+			this.addProperty(new ButtonProperty("New Clip"){
+				@Override
+				public void onClick() {
 					String name = Util.promptString("Please enter a clip name");
-					if(name != null && name.length() > 0){
+					if(name != null && name.length() > 0 && !mClipLookup.contains(name)){
 						addNewClip(new Clip(name, 0, 0));
 					}
 				}
 			});
-			
-			this.mSkeletons.addActionListener(new ActionListener(){
+			this.mSkeletons = this.addProperty(new ComboProperty<JointDisplay>("Skeleton"){
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(mSkeletons.getSelectedIndex() == 0){
-						mPlayer.removeSkeleton();
-						mPlay.setEnabled(false);
-					} else {
-						mPlayer.setSkeleton(((JointDisplay)mSkeletons.getSelectedItem()).mJoint);
-						mPlay.setEnabled(true);
-					}
+				public void setValue(JointDisplay value) {
+					mPlayer.setSkeleton(value.mJoint);
 				}
 			});
-			
-			this.mPlay.addActionListener(new ActionListener(){
+			this.addProperty(new BooleanProperty("Play", true){
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(mPlay.getModel().isSelected()){
+				public void setValue(Boolean value) {
+					if(value){
 						mPlayer.play();
 					} else {
 						mPlayer.pause();
 					}
-					mCurrentClip.setPlayState(mPlay.getModel().isSelected());
+				}
+
+				@Override
+				public Boolean getValue() {
+					mPlayer.pause();
+					return false;
 				}
 			});
-			
-			restart.addActionListener(new ActionListener(){
+			this.addProperty(new ButtonProperty("Restart"){
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void onClick() {
 					mPlayer.restart();
 				}
 			});
 			
-			if(this.mSkeletons.getItemCount() > 1){
-				this.mSkeletons.setSelectedIndex(1);
-			} else {
-				this.mPlay.setEnabled(false);
-			}
+			this.mClipLookup = new HashSet<String>();
 			
-			return panel;
+			for(int i = 0; i < this.mAnimation.getClipCount(); i++){
+				Clip clip = this.mAnimation.getClip(i);
+				this.addNewEditor(clip);
+				this.mClipLookup.add(clip.getName());
+				this.mClips.addItem(new ClipDisplay(clip));
+			}
 		}
 		
+		@Override
+		protected void initPanel(){
+			this.updateSkeletons();
+			this.mSkeletons.selectIndex(1);
+		}
+
 		public void addNewClip(Clip clip){
 			this.mAnimation.addClip(clip);
 			this.mClipLookup.add(clip.getName());
-			if(this.mClips != null){
-				this.mClips.addItem(clip.getName());
-			}
+			this.mClips.addItem(new ClipDisplay(clip));
 			this.addEditor(clip);
 		}
 		
 		public void insertClip(Clip clip, int index){
-			if(this.mClips != null){
-				if(index > this.mClips.getItemCount()){
-					this.mClips.addItem(clip.getName());
-				} else {
-					this.mClips.insertItemAt(clip.getName(), index);
-				}
-			}
+			this.mClips.insertItem(new ClipDisplay(clip), index);
 			this.mClipLookup.add(clip.getName());
 			this.insertEditor(clip, index);
 		}
@@ -197,24 +158,33 @@ public class AnimationEditor implements Factory{
 			if(node instanceof ClipEditor.Editor){
 				Clip clip = ((ClipEditor.Editor)node).getClip();
 				this.mClipLookup.remove(clip.getName());
-				int id = this.mPlayer.getClipId(clip.getName());
-				if(this.mClips != null){
-					int clipIndex = this.mClips.getSelectedIndex();
-					this.mClips.removeItem(clip.getName());
-					if(clipIndex >= id){
-						if(clipIndex == 0){
-							this.mClips.setSelectedIndex(0);
-						} else {
-							this.mClips.setSelectedIndex(clipIndex-1);
-						}
-					}
-				}
+				this.mClips.removeItem(new ClipDisplay(clip));
 				this.mAnimation.removeClip(clip);
 			}
 		}
 		
 		public int getClipCount(){
 			return this.mAnimation.getClipCount();
+		}
+		
+		private class ClipDisplay{
+			Clip mClip;
+			public ClipDisplay(Clip clip){
+				this.mClip = clip;
+			}
+			
+			@Override
+			public String toString(){
+				return this.mClip.getName();
+			}
+			
+			@Override
+			public boolean equals(Object o){
+				if(o instanceof ClipDisplay){
+					return ((ClipDisplay)o).mClip.getName().equals(this.mClip.getName());
+				}
+				return false;
+			}
 		}
 		
 		private class JointDisplay{
@@ -225,17 +195,19 @@ public class AnimationEditor implements Factory{
 			
 			@Override
 			public String toString(){
-				return this.mJoint.getName();
+				if(this.mJoint != null){
+					return this.mJoint.getName();
+				} else {
+					return "";
+				}
 			}
 		}
 		
 		public void updateSkeletons(){
-			if(this.mSkeletons != null){
-				this.mSkeletons.removeAllItems();
-				this.mSkeletons.addItem("");
-				for(Iterator<Node> i = this.getRenderManager().getSceneIterator(); i.hasNext();){
-					this.updateSkeletons(i.next());
-				}
+			this.mSkeletons.removeAllItems();
+			this.mSkeletons.addItem(new JointDisplay(null));
+			for(Iterator<Node> i = this.getRenderManager().getSceneIterator(); i.hasNext();){
+				this.updateSkeletons(i.next());
 			}
 		}
 		
@@ -251,33 +223,6 @@ public class AnimationEditor implements Factory{
 			}
 		}
 		
-		public boolean playClip(String name){
-			if(this.mPlayer.getSkeleton() != null){
-				this.mClips.setSelectedItem(name);
-				this.mPlayer.setActiveClip(name);
-				this.mPlayer.play();
-				this.mPlay.getModel().setSelected(true);
-				return true;
-			} else {
-				Util.alertError("Please set a skeleton to use in the player.");
-				return false;
-			}
-		}
-		
-		public void pauseClip(){
-			if(this.mPlay != null){
-				this.mPlayer.pause();
-				this.mPlay.getModel().setSelected(false);
-			}
-		}
-		
-		public ClipEditor.Editor getSelectedClipEditor(){
-			if(this.mClips != null){
-				return (ClipEditor.Editor)this.getChildAt(this.mClips.getSelectedIndex());
-			}
-			else return null;
-		}
-		
 		@Override
 		public String getNodeName(){
 			return this.mAnimation.getName();
@@ -289,9 +234,7 @@ public class AnimationEditor implements Factory{
 			this.mAnimation = null;
 			this.mPlayer = null;
 			this.mClips = null;
-			this.mName = null;
 			this.mSkeletons = null;
-			this.mNewClip = null;
 			super.recycle();
 		}
 	}

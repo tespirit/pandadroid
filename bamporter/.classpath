@@ -5,6 +5,5 @@
 	<classpathentry kind="lib" path="../external_lib/xpp3-1.1.3.4.C.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/bamboo"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogl"/>
-	<classpathentry kind="con" path="org.dyno.visual.swing.VS_LIBRARY/layoutext"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

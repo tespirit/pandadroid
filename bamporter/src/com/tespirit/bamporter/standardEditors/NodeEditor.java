@@ -1,15 +1,9 @@
 package com.tespirit.bamporter.standardEditors;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JTextField;
-
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.editor.Factory;
-import com.tespirit.bamporter.editor.TreeNodeEditor;
-import com.tespirit.bamporter.properties.SimplePanel;
+import com.tespirit.bamporter.editor.PropertyTreeNodeEditor;
+import com.tespirit.bamporter.properties.StringProperty;
 
 public class NodeEditor implements Factory{
 	
@@ -23,7 +17,7 @@ public class NodeEditor implements Factory{
 		return Node.class;
 	}
 	
-	public class Editor extends TreeNodeEditor{
+	public class Editor extends PropertyTreeNodeEditor{
 		
 		/**
 		 * 
@@ -34,27 +28,23 @@ public class NodeEditor implements Factory{
 		protected Editor(Node node){
 			super(node);
 			this.mNode = node;
+			
+			this.addProperty(new StringProperty("Name"){
+				@Override
+				public void setValue(String value) {
+					mNode.setName(value);
+					updateEditor();
+				}
+				@Override
+				public String getValue() {
+					return mNode.getName();
+				}
+				
+			});
+			
 			for(int i = 0; i < node.getChildCount(); i++){
 				this.addNewEditor(node.getChild(i));
 			}
-		}
-		
-		@Override
-		protected Component generatePanel(){
-			SimplePanel panel = new SimplePanel();
-			JTextField name = panel.createTextField("Name");
-			if(this.mNode.getName() != null){
-				name.setText(this.mNode.getName());
-			}
-			
-			name.addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					mNode.setName(((JTextField)e.getSource()).getText());
-					updateEditor();
-				}
-			});
-			return panel;
 		}
 		
 		@Override

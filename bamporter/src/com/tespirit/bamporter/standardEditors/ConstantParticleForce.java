@@ -1,11 +1,10 @@
 package com.tespirit.bamporter.standardEditors;
 
-import java.awt.Component;
-
 import com.tespirit.bamboo.particles.ConstantForce;
 import com.tespirit.bamboo.particles.ParticleForce;
 import com.tespirit.bamporter.editor.ParticleForceEditor;
-import com.tespirit.bamporter.properties.SimplePanel;
+import com.tespirit.bamporter.properties.ButtonProperty;
+import com.tespirit.bamporter.properties.Vector3dProperty;
 
 public class ConstantParticleForce extends ParticleForceEditor{
 
@@ -30,15 +29,14 @@ public class ConstantParticleForce extends ParticleForceEditor{
 		protected Editor(ConstantForce force){
 			super(force, false);
 			this.mForce = force;
+			this.addProperty(new Vector3dProperty.Bind("Force", this.mForce.getForce(), 0.1f));
+			this.addProperty(new ButtonProperty("Delete"){
+				@Override
+				public void onClick() {
+					removeEditorFromParent();
+				}
+			});
 		}
-
-		@Override
-		protected Component generatePanel() {
-			SimplePanel panel = new SimplePanel();
-			panel.addProperty("Force",this.mForce.getForce(), 0.1f);
-			return panel;
-		}
-		
 	}
 
 	@Override

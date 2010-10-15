@@ -1,45 +1,52 @@
 package com.tespirit.bamporter.properties;
 
-import javax.swing.JSpinner;
+import com.tespirit.bamboo.vectors.Range;
 
-public class LongRangeProperty {
-	public static interface Property{
-		public void setMin(long min);
-		public void setMax(long max);
-		public long getMin();
-		public long getMax();
+public abstract class LongRangeProperty extends RangeProperty<Long>{
+	
+	public LongRangeProperty(String name){
+		this(name, 1L);
+	}
+	
+	public LongRangeProperty(String name, Long step){
+		this(name, step, Long.MIN_VALUE, Long.MAX_VALUE);
 	}
 
-	LongProperty mMin;
-	LongProperty mMax;
-	Property mProperty;
+	public LongRangeProperty(String name, Long step, Long min, Long max) {
+		super(name, step, min, max);
+	}
+
+	@Override
+	protected NumberProperty<Long> createMinProperty(Long min, Long max, Long step) {
+		return new LongProperty("min", step, min, max){
+			@Override
+			public void setValue(Long value) {
+				Range<Long> r = LongRangeProperty.this.getValue();
+				r.setMin(value);
+				LongRangeProperty.this.setValue(r);
+			}
+
+			@Override
+			public Long getValue() {
+				return LongRangeProperty.this.getValue().getMin();
+			}
+		};
+	}
 	
-	LongRangeProperty(JSpinner min, JSpinner max, Property property){
-		this.mProperty = property;
-		this.mMin = new LongProperty(min, new LongProperty.Property() {
+	@Override
+	protected NumberProperty<Long> createMaxProperty(Long min, Long max, Long step) {
+		return new LongProperty("max", step, min, max){
 			@Override
-			public void setValue(long value) {
-				mProperty.setMin(value);
-				mMax.setMinValue(value);
-				if(value > mMax.getValue()){
-					mMax.setValue(value);
-				}
+			public void setValue(Long value) {
+				Range<Long> r = LongRangeProperty.this.getValue();
+				r.setMax(value);
+				LongRangeProperty.this.setValue(r);
 			}
+
 			@Override
-			public long getValue() {
-				return mProperty.getMin();
+			public Long getValue() {
+				return LongRangeProperty.this.getValue().getMax();
 			}
-		});
-		
-		this.mMax = new LongProperty(max, new LongProperty.Property() {
-			@Override
-			public void setValue(long value) {
-				mProperty.setMax(value);
-			}
-			@Override
-			public long getValue() {
-				return mProperty.getMax();
-			}
-		});
+		};
 	}
 }
