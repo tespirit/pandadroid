@@ -44,6 +44,23 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 		}
 	}
 	
+	@Override
+	public boolean alphaSort() {
+		return this.mSurface.hasAlpha();
+	}
+	
+	public Surface getSurface(){
+		return this.mSurface;
+	}
+	
+	public void setSurface(Surface surface){
+		if(surface != null)
+			this.mSurface = surface;
+		else
+			this.mSurface = Surface.getDefaultSurface();
+		this.registerDynamicLoader(this.mSurface);
+	}
+	
 	public SpriteParticleEmitter(ParticleGenerator generator){
 		this(generator, new StandardParticleSystem());
 	}
@@ -73,8 +90,9 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 
 	@Override
 	public void render() {
-		this.mSurface.render();
+		this.mSurface.renderStart();
 		this.mParticles.render();
+		this.mSurface.renderEnd();
 	}
 
 	@Override

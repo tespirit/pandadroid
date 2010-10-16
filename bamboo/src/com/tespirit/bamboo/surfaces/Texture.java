@@ -39,8 +39,13 @@ public class Texture extends Surface implements Externalizable{
 	}
 	
 	@Override
-	public void render() {
-		Texture.renderer.render(this);
+	public void renderStart() {
+		Texture.renderer.renderStart(this);
+	}
+	
+	@Override
+	public void renderEnd() {
+		Texture.renderer.renderEnd(this);
 	}
 	
 	private static Renderer renderer;
@@ -49,7 +54,8 @@ public class Texture extends Surface implements Externalizable{
 		public void activate(){
 			Texture.renderer = this;
 		}
-		public abstract void render(Texture material);
+		public abstract void renderStart(Texture texture);
+		public abstract void renderEnd(Texture texture);
 		public abstract void init(Texture material);
 	}
 	
@@ -59,11 +65,13 @@ public class Texture extends Surface implements Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		super.read(in);
     	this.mDiffuseTextureName = in.readUTF();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
+		super.write(out);
 		out.writeUTF(this.mDiffuseTextureName);
 	}
 }

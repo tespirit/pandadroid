@@ -92,11 +92,17 @@ public class Model extends RenderableNode implements Externalizable{
 			this.mSurface = Surface.getDefaultSurface();
 		this.registerDynamicLoader(this.mSurface);
 	}
+	
+	@Override
+	public boolean alphaSort() {
+		return this.mSurface.hasAlpha();
+	}
 
 	@Override
 	public void render() {
-		this.mSurface.render();
+		this.mSurface.renderStart();
 		this.mPrimitive.render();
+		this.mSurface.renderEnd();
 	}
 	
 	@Override

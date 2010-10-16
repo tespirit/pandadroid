@@ -29,6 +29,7 @@ import com.tespirit.bamboo.scenegraph.Light;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
+import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
@@ -48,6 +49,8 @@ public class Renderer extends RenderManager implements GLEventListener{
 	
 	private int[] mIndexTypes;
 	private int[] mPrimitiveTypes;
+	private int[] mBlendSource;
+	private int[] mBlendDest;
 	
 	private ArrayList<com.jogamp.opengl.util.texture.Texture> mTextures;
 	
@@ -81,6 +84,13 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.mPrimitiveTypes[Primitive.LINES] = GL2.GL_LINES;
 		this.mPrimitiveTypes[Primitive.LINE_STRIP] = GL2.GL_LINE_STRIP;
 		this.mPrimitiveTypes[Primitive.POINTS] = GL2.GL_POINTS;
+		
+		this.mBlendDest = new int[Surface.BLEND_TYPE_COUNT];
+		this.mBlendSource = new int[Surface.BLEND_TYPE_COUNT];
+		this.mBlendDest[Surface.BLEND_ALPHA] = GL2.GL_ONE_MINUS_SRC_ALPHA;
+		this.mBlendSource[Surface.BLEND_ALPHA] = GL2.GL_SRC_ALPHA;
+		this.mBlendDest[Surface.BLEND_ADD] = GL2.GL_ONE;
+		this.mBlendSource[Surface.BLEND_ADD] = GL2.GL_SRC_COLOR;
 		
 		this.createRenderers();
 		
@@ -216,7 +226,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		
 		if(node.getBoundingBox() != null && this.mRenderBoundingBox){
 			this.mBoundingBox.setBox(node.getBoundingBox());
-			this.mBoundingBoxColor.render();
+			this.mBoundingBoxColor.renderStart();
 			this.mBoundingBox.render();
 		}
 		
@@ -318,11 +328,25 @@ public class Renderer extends RenderManager implements GLEventListener{
 		}
 	}
 	
+	private void renderSurfaceStart(Surface surface){
+		if(surface.enableBlending()){
+			mGl.glEnable(GL2.GL_BLEND);
+			byte blendMethod = surface.getBlendMethod();
+			mGl.glBlendFunc(mBlendSource[blendMethod], mBlendDest[blendMethod]);
+			mGl.glDisable(GL2.GL_DEPTH_WRITEMASK);
+		}
+	}
+	
+	private void renderSurfaceEnd(Surface surface){
+		mGl.glDisable(GL2.GL_BLEND);
+		mGl.glEnable(GL2.GL_DEPTH_WRITEMASK);
+	}
+	
 	protected class ColorRenderer extends Color.Renderer{
 		@Override
-		public void render(Color color) {
-			mGl.glDisable(GL2.GL_TEXTURE_2D);
+		public void renderStart(Color color) {
 			mGl.glEnable(GL2.GL_COLOR_MATERIAL);
+			renderSurfaceStart(color);
 			Color4 c = color.getColor();
 			mGl.glColor4f(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
 		}
@@ -331,13 +355,18 @@ public class Renderer extends RenderManager implements GLEventListener{
 		public void setup(Color color) {
 			//VOID
 		}
+
+		@Override
+		public void renderEnd(Color color) {
+			renderSurfaceEnd(color);
+			mGl.glDisable(GL2.GL_COLOR_MATERIAL);
+		}
 	}
 
 	protected class MaterialRenderer extends Material.Renderer{
 		@Override
-		public void render(Material material) {
-			mGl.glDisable(GL2.GL_COLOR_MATERIAL);
-			mGl.glDisable(GL2.GL_TEXTURE_2D);
+		public void renderStart(Material material) {
+			renderSurfaceStart(material);
 			mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT, material.getAmbientBuffer());
 			mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_DIFFUSE, material.getDiffuseBuffer());
 			mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, material.getSpecularBuffer());
@@ -348,15 +377,22 @@ public class Renderer extends RenderManager implements GLEventListener{
 		public void init(Material material) {
 			//VOID
 		}
+
+		@Override
+		public void renderEnd(Material material) {
+			renderSurfaceEnd(material);
+		}
 	}
 
 	protected class TextureRenderer extends Texture.Renderer{
 		@Override
-		public void render(Texture texture) {
+		public void renderStart(Texture texture) {
 			int id = texture.getDiffuseTextureId();
 			if(id != -1){
 				com.jogamp.opengl.util.texture.Texture t = mTextures.get(id);
 				mGl.glColor4f(1,1,1,1);
+				mGl.glEnable(GL2.GL_COLOR_MATERIAL);
+				renderSurfaceStart(texture);
 				t.enable();
 				t.bind();
 			}
@@ -372,6 +408,13 @@ public class Renderer extends RenderManager implements GLEventListener{
 				texture.setDiffuseTextureId(-1);
 			}
 			
+		}
+
+		@Override
+		public void renderEnd(Texture texture) {
+			renderSurfaceEnd(texture);
+			mGl.glDisable(GL2.GL_COLOR_MATERIAL);
+			mGl.glDisable(GL2.GL_TEXTURE_2D);
 		}
 	}
 	
@@ -411,8 +454,6 @@ public class Renderer extends RenderManager implements GLEventListener{
 
 		@Override
 		public void render(VertexIndices vi) {
-			//mGl.glFrontFace(GL2.GL_CCW);
-			//mGl.glEnable(GL2.GL_CULL_FACE);
 			
 			renderVertexBuffer(vi.getVertexBuffer());
 			
@@ -427,24 +468,19 @@ public class Renderer extends RenderManager implements GLEventListener{
 			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
 			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
 			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			//mGl.glDisable(GL2.GL_CULL_FACE);
 		}
 	}
 
 	protected class VertexListRenderer extends VertexList.Renderer{
 		@Override
 		public void render(VertexList vl) {
-			//mGl.glFrontFace(GL2.GL_CCW);
-			//mGl.glEnable(GL2.GL_CULL_FACE);
-			
 			renderVertexBuffer(vl.getVertexBuffer());
 			mGl.glDrawArrays(mPrimitiveTypes[vl.getType()], 0, vl.getVertexBuffer().getCount());
-			
+
 			mGl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
 			mGl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
 			mGl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
 			mGl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-			//mGl.glDisable(GL2.GL_CULL_FACE);
 		}
 	}
 }

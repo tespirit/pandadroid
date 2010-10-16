@@ -77,6 +77,7 @@ public abstract class RenderManager implements UpdateManager {
 	
 	List<Node> mScene;
 	List<RenderableNode> mRenderables;
+	List<RenderableNode> mRenderableAlphas;
 	List<SpriteNode> mSprites;
 	
 	ThreadBufferSet<Updater> mSingleUpdaters;
@@ -95,6 +96,7 @@ public abstract class RenderManager implements UpdateManager {
 	private boolean mLightsEnabled;
 	
 	private Compare.RenderableSort mRenderSort;
+	private Compare.RenderableReverseSort mRenderReverseSort;
 	
 	public RenderManager(Clock clock){
 		this(clock, new Color4());
@@ -106,6 +108,7 @@ public abstract class RenderManager implements UpdateManager {
 		this.mRenderers = new ArrayList<ComponentRenderer>();
 		this.mLightsEnabled = true;
 		this.mRenderSort = new Compare.RenderableSort();
+		this.mRenderReverseSort = new Compare.RenderableReverseSort();
 		
 		this.mSingleUpdaters = new ThreadBufferSet<Updater>();
 		this.mNewNodes = new ThreadBufferList<Node>();
@@ -113,6 +116,7 @@ public abstract class RenderManager implements UpdateManager {
 		this.mStoredResources = new HashSet<Resource>();
 		this.mScene = new ArrayList<Node>();
 		this.mRenderables = new ArrayList<RenderableNode>();
+		this.mRenderableAlphas = new ArrayList<RenderableNode>();
 		this.mSprites = new ArrayList<SpriteNode>();
 		this.mUpdaters = new ArrayList<Updater>();
 	}
@@ -159,13 +163,11 @@ public abstract class RenderManager implements UpdateManager {
 	public void removeScene(Node scene){
 		scene.setRenderManager(null);
 		this.mScene.remove(scene);
-		this.mRenderables.remove(scene);
 		this.mNewNodes.remove(scene);
 	}
 	
 	public void removeNode(Collection<Node> scenes){
 		this.mScene.removeAll(scenes);
-		this.mRenderables.removeAll(scenes);
 		this.mNewNodes.removeAll(scenes);
 	}
 	
@@ -233,7 +235,11 @@ public abstract class RenderManager implements UpdateManager {
 	}
 	
 	void addRenderable(RenderableNode node){
-		this.mRenderables.add(node);
+		if(node.alphaSort()){
+			this.mRenderableAlphas.add(node);
+		} else {
+			this.mRenderables.add(node);
+		}
 	}
 	
 	void addSprite(SpriteNode node){
@@ -243,6 +249,7 @@ public abstract class RenderManager implements UpdateManager {
 	public void setCamera(Camera camera){
 		this.mCamera = camera;
 		this.mRenderSort.setView(camera);
+		this.mRenderReverseSort.setView(camera);
 	}
 	
 	public Camera getCamera(){
@@ -269,6 +276,7 @@ public abstract class RenderManager implements UpdateManager {
 		}
 		this.mSprites.clear();
 		this.mRenderables.clear();
+		this.mRenderableAlphas.clear();
 		this.mCamera.update(Matrix3d.IDENTITY);
 		for(Node n : this.mScene){
 			n.update(Matrix3d.IDENTITY);
@@ -276,15 +284,25 @@ public abstract class RenderManager implements UpdateManager {
 	}
 	
 	protected void renderScene(){
+		Collections.sort(this.mSprites, this.mRenderReverseSort);
+		Collections.sort(this.mRenderableAlphas, this.mRenderReverseSort);
 		Collections.sort(this.mRenderables, this.mRenderSort);
-		for(SpriteNode node : this.mSprites){
-			node.render();
-		}
-		this.mCamera.render();
+		
+		this.pushMatrix(this.mCamera.getWorldTransform());
 		for(RenderableNode node : this.mRenderables){
 			this.pushMatrix(node.getWorldTransform());
 			node.render();
 			this.popMatrix();
+		}
+		for(RenderableNode node : this.mRenderableAlphas){
+			this.pushMatrix(node.getWorldTransform());
+			node.render();
+			this.popMatrix();
+		}
+		this.popMatrix();
+		
+		for(SpriteNode node : this.mSprites){
+			node.render();
 		}
 	}
 	

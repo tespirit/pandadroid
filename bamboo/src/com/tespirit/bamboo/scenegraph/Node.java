@@ -26,6 +26,14 @@ public abstract class Node {
 		this.setName(name);
 	}
 	
+	/**
+	 * Override this to generate adjust the update priority (Mainly for joints)
+	 * @return
+	 */
+	public int updatePriority(){
+		return 0;
+	}
+	
 	public String getName() {
 		if(this.mName != null && this.mName.length() > 0)
 			return this.mName;

@@ -30,6 +30,8 @@ public abstract class RenderableNode extends Node{
 		}
 	}
 	
+	public abstract boolean alphaSort();
+	
 	
 	/**
 	 * This is called every frame in rendering the scene.

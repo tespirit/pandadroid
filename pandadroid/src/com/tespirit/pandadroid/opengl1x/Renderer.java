@@ -15,6 +15,7 @@ import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Light;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
+import com.tespirit.bamboo.surfaces.Surface;
 import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
@@ -29,6 +30,8 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 	
 	private int[] mIndexTypes;
 	private int[] mPrimitiveTypes;
+	private int[] mBlendSource;
+	private int[] mBlendDest;
 	
 	public Renderer() {
 		this(new AndroidClock());
@@ -58,6 +61,13 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		this.mPrimitiveTypes[Primitive.LINES] = GL10.GL_LINES;
 		this.mPrimitiveTypes[Primitive.LINE_STRIP] = GL10.GL_LINE_STRIP;
 		this.mPrimitiveTypes[Primitive.POINTS] = GL10.GL_POINTS;
+		
+		this.mBlendDest = new int[Surface.BLEND_TYPE_COUNT];
+		this.mBlendSource = new int[Surface.BLEND_TYPE_COUNT];
+		this.mBlendDest[Surface.BLEND_ALPHA] = GL10.GL_ONE_MINUS_SRC_ALPHA;
+		this.mBlendSource[Surface.BLEND_ALPHA] = GL10.GL_SRC_ALPHA;
+		this.mBlendDest[Surface.BLEND_ADD] = GL10.GL_ONE;
+		this.mBlendSource[Surface.BLEND_ADD] = GL10.GL_ONE;
 		
 		this.createRenderers();
 	}
@@ -190,11 +200,28 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		}
 	}
 	
+	private void renderSurfaceStart(Surface surface){
+		if(surface.enableBlending()){
+			mGl.glEnable(GL10.GL_BLEND);
+			byte blendMethod = surface.getBlendMethod();
+			mGl.glBlendFunc(mBlendSource[blendMethod], mBlendDest[blendMethod]);
+			if(blendMethod == Surface.BLEND_ADD){
+				mGl.glDisable(GL10.GL_DEPTH_TEST);
+			}
+		}
+	}
+	
+	private void renderSurfaceEnd(Surface surface){
+		mGl.glDisable(GL10.GL_BLEND);
+		mGl.glEnable(GL10.GL_DEPTH_TEST);
+	}
+	
+	
 	protected class ColorRenderer extends Color.Renderer{
 		@Override
-		public void render(Color color) {
-			mGl.glDisable(GL10.GL_TEXTURE_2D);
+		public void renderStart(Color color) {
 			mGl.glEnable(GL10.GL_COLOR_MATERIAL);
+			renderSurfaceStart(color);
 			Color4 c = color.getColor();
 			mGl.glColor4f(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
 		}
@@ -203,13 +230,18 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		public void setup(Color color) {
 			//VOID
 		}
+
+		@Override
+		public void renderEnd(Color color) {
+			renderSurfaceEnd(color);
+			mGl.glDisable(GL10.GL_COLOR_MATERIAL);
+		}
 	}
 
 	protected class MaterialRenderer extends Material.Renderer{
 		@Override
-		public void render(Material material) {
-			mGl.glDisable(GL10.GL_COLOR_MATERIAL);
-			mGl.glDisable(GL10.GL_TEXTURE_2D);
+		public void renderStart(Material material) {
+			renderSurfaceStart(material);
 			mGl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, material.getAmbientBuffer());
 			mGl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, material.getDiffuseBuffer());
 			mGl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, material.getSpecularBuffer());
@@ -220,15 +252,28 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		public void init(Material material) {
 			//VOID
 		}
+		
+		@Override
+		public void renderEnd(Material material) {
+			renderSurfaceEnd(material);
+		}
 	}
 
 	protected class TextureRenderer extends Texture.Renderer{
 		@Override
-		public void render(Texture texture) {
+		public void renderStart(Texture texture) {
 			mGl.glEnable(GL10.GL_TEXTURE_2D);
 			mGl.glEnable(GL10.GL_COLOR_MATERIAL);
 			mGl.glColor4f(1,1,1,1);
+			renderSurfaceStart(texture);
 			mGl.glBindTexture(GL10.GL_TEXTURE_2D, texture.getDiffuseTextureId());
+		}
+		
+		@Override
+		public void renderEnd(Texture texture) {
+			renderSurfaceEnd(texture);
+			mGl.glDisable(GL10.GL_TEXTURE_2D);
+			mGl.glDisable(GL10.GL_COLOR_MATERIAL);
 		}
 		
 		@Override
@@ -237,6 +282,10 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 			if(bitmap == null){
 				texture.setDiffuseTextureId(0);
 				return;
+			}
+			
+			if(texture.autoDetectAlpha() && bitmap.hasAlpha()){
+				texture.setBlending(Surface.BLEND_ALPHA);
 			}
 			
 			int[] tempTextures = new int[1];

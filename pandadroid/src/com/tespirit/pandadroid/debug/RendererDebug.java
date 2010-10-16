@@ -124,7 +124,7 @@ public class RendererDebug extends Renderer{
 		}
 		if(this.renderBoundingBox && node.getBoundingBox() != null){
 			this.boundingBox.setBox(node.getBoundingBox());
-			this.boundingBoxColor.render();
+			this.boundingBoxColor.renderStart();
 			this.boundingBox.render();
 		}
 		

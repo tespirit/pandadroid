@@ -35,8 +35,13 @@ public class Color extends Surface implements Externalizable{
 	}
 
 	@Override
-	public void render() {
-		Color.renderer.render(this);
+	public void renderStart() {
+		Color.renderer.renderStart(this);
+	}
+	
+	@Override
+	public void renderEnd() {
+		Color.renderer.renderEnd(this);
 	}
 
 	@Override
@@ -50,7 +55,8 @@ public class Color extends Surface implements Externalizable{
 		public void activate(){
 			Color.renderer = this;
 		}
-		public abstract void render(Color color);
+		public abstract void renderStart(Color color);
+		public abstract void renderEnd(Color color);
 		public abstract void setup(Color color);
 	}
 
@@ -60,12 +66,14 @@ public class Color extends Surface implements Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		super.read(in);
 		this.color = new Color4();
     	this.color.set(in.readFloat(),in.readFloat(),in.readFloat(),in.readFloat());
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
+		super.write(out);
 		out.writeFloat(this.color.getRed());
 		out.writeFloat(this.color.getGreen());
 		out.writeFloat(this.color.getBlue());

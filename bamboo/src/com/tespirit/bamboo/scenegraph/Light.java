@@ -48,6 +48,11 @@ public class Light extends RenderableNode implements Resource{
 	}
 	
 	@Override
+	public boolean alphaSort() {
+		return false;
+	}
+	
+	@Override
 	public AxisAlignedBox getBoundingBox() {
 		return null;
 	}

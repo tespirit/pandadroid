@@ -41,6 +41,11 @@ public abstract class Joint extends Node{
 		this.mWorldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
 	}
 	
+	@Override
+	public int updatePriority(){
+		return 1000;
+	}
+	
 	/**
 	 * A convenience function to set up bones for this node and all
 	 * child nodes.

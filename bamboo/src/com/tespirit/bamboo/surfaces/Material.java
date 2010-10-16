@@ -96,8 +96,13 @@ public class Material extends Surface{
 	}
 
 	@Override
-	public void render() {
-		Material.renderer.render(this);
+	public void renderStart() {
+		Material.renderer.renderStart(this);
+	}
+	
+	@Override
+	public void renderEnd() {
+		Material.renderer.renderEnd(this);
 	}
 
 	@Override
@@ -111,7 +116,8 @@ public class Material extends Surface{
 		public void activate(){
 			Material.renderer = this;
 		}
-		public abstract void render(Material material);
+		public abstract void renderStart(Material material);
+		public abstract void renderEnd(Material material);
 		public abstract void init(Material material);
 	}
 }
