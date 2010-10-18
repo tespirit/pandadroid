@@ -17,6 +17,7 @@ import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
+import com.tespirit.pandadroid.opengl1x.AndroidClock;
 import com.tespirit.pandadroid.opengl1x.Renderer;
 
 public class RendererDebug extends Renderer{
@@ -55,7 +56,7 @@ public class RendererDebug extends Renderer{
 	private FloatBuffer point;
 	
 	public RendererDebug(){
-		super(new DebugClock());
+		super(new AndroidClock());
 		this.renderBoundingBox = false;
 		this.renderRenderables = true;
 		this.renderNormals = false;

@@ -180,7 +180,9 @@ public abstract class Joint extends Node{
     	int childCount = in.readInt();
     	this.mChildren = new ArrayList<Joint>(childCount);
     	for(int i = 0; i < childCount; i++){
-    		this.mChildren.add((Joint)in.readObject());
+    		Joint child = (Joint)in.readObject();
+    		this.mChildren.add(child);
+    		this.mChannelCount += child.getChannelCount();
     	}
     }
 	

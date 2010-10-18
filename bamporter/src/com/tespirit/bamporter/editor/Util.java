@@ -1,5 +1,7 @@
 package com.tespirit.bamporter.editor;
 
+import java.util.List;
+
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 
@@ -26,6 +28,16 @@ public class Util {
 	
 	public static String promptString(String message){
 		return JOptionPane.showInputDialog(message);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T promptChoice(String message, List<T> items, T defaultItem){
+		Object[] objects = items.toArray();
+		int index = JOptionPane.showOptionDialog(null, message, "Hmm...", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, objects, defaultItem);
+		if(index == JOptionPane.CLOSED_OPTION){
+			return null;
+		}
+		return (T)objects[index];
 	}
 	
 	public static String getClassName(Object o){

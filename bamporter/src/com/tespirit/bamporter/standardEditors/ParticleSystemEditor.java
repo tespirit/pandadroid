@@ -50,9 +50,13 @@ public class ParticleSystemEditor implements Factory{
 			super(particleSystem, true);
 			this.mParticleSystem = particleSystem;
 			
-			List<Factory> factories = EditorFactory.getFactoriesOf(ParticleForce.class);
+			List<Factory> factories = EditorFactory.getFactoriesOf(ParticleForce.class, false);
 			for(Factory ef : factories){
 				this.addProperty(new ForceButton(ef));
+			}
+			
+			for(int i = 0; i < this.mParticleSystem.getForceCount(); i++){
+				this.addNewEditor(this.mParticleSystem.getForce(i));
 			}
 		}
 		

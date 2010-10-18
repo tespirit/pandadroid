@@ -139,7 +139,7 @@ public class Bamboo implements BambooAsset{
 				throw new Exception("Incompatible Header Version");
 			}
 			this.mType = stream.readByte();
-			if(this.mType != BAMBOO && this.mType != type){
+			if(this.mType != BAMBOO && type != BAMBOO && this.mType != type){
 				throw new Exception("File type incompatible: "+ NAMES[type] + " " + NAMES[this.mType]);
 			}
 			this.mNodeCount = stream.readInt();

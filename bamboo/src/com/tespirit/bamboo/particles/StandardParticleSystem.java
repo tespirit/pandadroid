@@ -122,12 +122,14 @@ public class StandardParticleSystem implements ParticleSystem, Externalizable{
 	
 	@Override
 	public void recycle(){
-		ListNode node = this.mEnd.mPrev;
-		while(node != null){
-			node.mNext.remove();
-			node = node.mPrev;
+		ListNode node = this.mHead.mNext;
+		while(node != this.mEnd){
+			ListNode next = node.mNext;
+			node.remove();
+			node = next;
 		}
-		this.mHead.remove();
+		this.mHead = null;
+		this.mEnd = null;
 	}
 
 	@Override

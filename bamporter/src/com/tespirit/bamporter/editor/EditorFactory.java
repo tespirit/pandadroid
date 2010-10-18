@@ -38,22 +38,14 @@ public class EditorFactory {
 		}
 	}
 	
-	public static List<Factory> getFactoriesOf(Class<?> classy){
+	public static List<Factory> getFactoriesOf(Class<?> classy, boolean includeClassy){
 		ArrayList<Factory> factories = new ArrayList<Factory>(mEditorMap.values().size());
-		ArrayList<Factory> superFactories = new ArrayList<Factory>(mEditorMap.values().size());
 		for(Factory ef : mEditorMap.values()){
 			Class<?> dataClass = ef.getDataClass();
-			if(classy == dataClass){
-				factories.add(ef);
-			} else {
-				superFactories.add(ef);
-			}
-		}
-		//second pass for super classes/interfaces
-		for(Factory ef : superFactories){
-			Class<?> dataClass = ef.getDataClass();
-			if(classy.isAssignableFrom(dataClass)){
-				factories.add(ef);
+			if(includeClassy || classy != dataClass){
+				if(classy.isAssignableFrom(dataClass)){
+					factories.add(ef);
+				}
 			}
 		}
 		return factories;

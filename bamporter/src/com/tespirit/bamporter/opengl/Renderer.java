@@ -247,12 +247,15 @@ public class Renderer extends RenderManager implements GLEventListener{
 	public void display(GLAutoDrawable drawable) {
 		this.mGl = drawable.getGL().getGL2();
 		
+		this.mGl.glDrawBuffer(GL2.GL_BACK);
+		
 		this.mGl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		this.mGl.glLoadIdentity();
 		
 		this.updateScene();
 		this.renderDebug();
 		this.renderScene();
+//		this.mGl.
 	}
 
 	@Override
@@ -333,13 +336,13 @@ public class Renderer extends RenderManager implements GLEventListener{
 			mGl.glEnable(GL2.GL_BLEND);
 			byte blendMethod = surface.getBlendMethod();
 			mGl.glBlendFunc(mBlendSource[blendMethod], mBlendDest[blendMethod]);
-			mGl.glDisable(GL2.GL_DEPTH_WRITEMASK);
+			mGl.glDepthMask(false);
 		}
 	}
 	
 	private void renderSurfaceEnd(Surface surface){
 		mGl.glDisable(GL2.GL_BLEND);
-		mGl.glEnable(GL2.GL_DEPTH_WRITEMASK);
+		mGl.glDepthMask(true);
 	}
 	
 	protected class ColorRenderer extends Color.Renderer{

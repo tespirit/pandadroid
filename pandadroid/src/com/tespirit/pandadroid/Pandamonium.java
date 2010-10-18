@@ -55,10 +55,12 @@ public class Pandamonium extends Activity {
         //touchHandler.makeNodesFlingable();
     	
     	try{
-    		Player player = view.addBambooSingleAnimation(Assets.loadBamboo("candy.bam"));
-    		player.setSkeleton("d_root1");
-    		Debug.addTestAnimation(player);
-    		view.addBamboo(Assets.loadCollada("doug.dae"));
+    		view.addBamboo(Assets.loadBamboo("fire2.bam"));
+    		//Player player = view.addBambooSingleAnimation(Assets.loadBamboo("candy.bam"));
+    		//player.setSkeleton("d_root1");
+    		//Debug.addTestAnimation(player);
+    		//view.addBamboo(Assets.loadCollada("doug.dae"));
+    		view.addSceneNode(this.createTestSG());
     	} catch(Exception e){
     		Debug.print(e);
     		view.addSceneNode(this.createTestSG());

@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.tespirit.bamboo.creation.Primitives;
+import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.render.SpriteNode;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Surface;
@@ -145,6 +146,12 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 		SpriteParticle p = new SpriteParticle();
 		this.mParticles.add(p);
 		return p;
+	}
+	
+	@Override
+	public void setRenderManager(RenderManager renderManager){
+		super.setRenderManager(renderManager);
+		this.registerDynamicLoader(this.mSurface);
 	}
 
 	//IO

@@ -126,6 +126,7 @@ public class PandadroidView extends GLSurfaceView {
 	 * @return
 	 */
 	public List<Player> addBamboo(BambooAsset bamboo){
+		this.mRenderer.addScenes(bamboo.getScenes());
 		ArrayList<Player> players = new ArrayList<Player>(bamboo.getAnimations().size());
 		for(Animation a : bamboo.getAnimations()){
 			players.add(this.addAnimation(a));

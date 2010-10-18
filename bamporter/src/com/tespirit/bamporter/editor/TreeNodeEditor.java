@@ -47,24 +47,24 @@ public abstract class TreeNodeEditor extends DefaultMutableTreeNode implements E
 	 * use this for initialization as it does not call insertEditor.
 	 * @param node
 	 */
-	public void addNewEditor(Object object){
+	public Editor addNewEditor(Object object){
 		Editor editor = EditorFactory.createEditor(object);
 		if(editor instanceof TreeNodeEditor){
 			super.insert((TreeNodeEditor)editor, this.getChildCount());
 		}
+		return editor;
 	}
 	
-	public void addEditor(Object object){
-		this.insertEditor(object, this.getChildCount());
-		
+	public Editor addEditor(Object object){
+		return this.insertEditor(object, this.getChildCount());
 	}
 	
-	public void insertEditor(Object object, int childIndex){
+	public Editor insertEditor(Object object, int childIndex){
 		Editor editor = EditorFactory.createEditor(object);
 		if(editor instanceof TreeNodeEditor){
 			BamporterFrame.getInstance().insertNodeTo((TreeNodeEditor)editor, this, childIndex);
 		}
-		
+		return editor;
 	}
 	
 	public void removeEditor(TreeNodeEditor node){

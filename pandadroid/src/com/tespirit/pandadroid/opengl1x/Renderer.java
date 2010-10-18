@@ -67,7 +67,7 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 		this.mBlendDest[Surface.BLEND_ALPHA] = GL10.GL_ONE_MINUS_SRC_ALPHA;
 		this.mBlendSource[Surface.BLEND_ALPHA] = GL10.GL_SRC_ALPHA;
 		this.mBlendDest[Surface.BLEND_ADD] = GL10.GL_ONE;
-		this.mBlendSource[Surface.BLEND_ADD] = GL10.GL_ONE;
+		this.mBlendSource[Surface.BLEND_ADD] = GL10.GL_SRC_COLOR;
 		
 		this.createRenderers();
 	}
@@ -205,15 +205,13 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 			mGl.glEnable(GL10.GL_BLEND);
 			byte blendMethod = surface.getBlendMethod();
 			mGl.glBlendFunc(mBlendSource[blendMethod], mBlendDest[blendMethod]);
-			if(blendMethod == Surface.BLEND_ADD){
-				mGl.glDisable(GL10.GL_DEPTH_TEST);
-			}
+			mGl.glDepthMask(false);
 		}
 	}
 	
 	private void renderSurfaceEnd(Surface surface){
 		mGl.glDisable(GL10.GL_BLEND);
-		mGl.glEnable(GL10.GL_DEPTH_TEST);
+		mGl.glDepthMask(true);
 	}
 	
 	
@@ -417,6 +415,8 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 			mGl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 			mGl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 			mGl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+
+			mGl.glDisable(GL10.GL_CULL_FACE);
 		}
 	}
 }
