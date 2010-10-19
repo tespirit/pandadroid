@@ -8,7 +8,7 @@ import java.io.ObjectOutput;
 import com.tespirit.bamboo.vectors.RandomRange;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class RandomParticleGenerator extends ParticleGenerator implements Externalizable{
+public class RandomParticleGenerator extends ParticleGenerator<StandardParticle> implements Externalizable{
 	private RandomRange mSpeed;
 	private RandomRange mAngle;
 	private RandomRange mBirthRate;
@@ -73,6 +73,12 @@ public class RandomParticleGenerator extends ParticleGenerator implements Extern
 	
 	public float getLength(){
 		return this.mLength;
+	}
+	
+	@Override
+	protected void initParticle(StandardParticle p){
+		p.setScale(this.getScale());
+		p.setLifeSpan(this.getLifeSpan(), this.getDecayPercent());
 	}
 	
 	@Override

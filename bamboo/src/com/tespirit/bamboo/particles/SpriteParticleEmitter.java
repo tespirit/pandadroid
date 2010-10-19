@@ -14,12 +14,12 @@ import com.tespirit.bamboo.vectors.AxisAlignedBox;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
 
-public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter, Externalizable{
+public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter<StandardParticle>, Externalizable{
 	private Matrix3d mTransform;
 	private Matrix3d mWorldTransform;
 	
 	private Surface mSurface;
-	private ParticleGenerator mGenerator;
+	private ParticleGenerator<StandardParticle> mGenerator;
 	private ParticleSystem mParticles;
 	
 	protected class SpriteParticle extends StandardParticle{
@@ -62,15 +62,20 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 		this.registerDynamicLoader(this.mSurface);
 	}
 	
-	public SpriteParticleEmitter(ParticleGenerator generator){
+	public SpriteParticleEmitter(ParticleGenerator<StandardParticle> generator){
 		this(generator, new StandardParticleSystem());
 	}
 	
-	public SpriteParticleEmitter(ParticleGenerator generator, ParticleSystem particles){
+	public SpriteParticleEmitter(ParticleGenerator<StandardParticle> generator, ParticleSystem particles){
 		this();
 		this.mParticles = new StandardParticleSystem();
 		this.mGenerator = generator;
 		this.mSurface = Surface.getDefaultSurface();
+		this.init();
+	}
+	
+	private void init(){
+		this.mParticles.init(this);
 	}
 	
 	public SpriteParticleEmitter(){
@@ -137,15 +142,13 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	}
 	
 	@Override
-	public ParticleGenerator getParticleGenerator(){
+	public ParticleGenerator<StandardParticle> getParticleGenerator(){
 		return this.mGenerator;
 	}
-
+	
 	@Override
-	public Particle createParticle() {
-		SpriteParticle p = new SpriteParticle();
-		this.mParticles.add(p);
-		return p;
+	public Particle newParticle() {
+		return new SpriteParticle();
 	}
 	
 	@Override
@@ -167,6 +170,7 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 		out.writeObject(this.mParticles);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -175,7 +179,8 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
     		this.mTransform.setValue(in.readFloat(), i);
     	}
 		this.mSurface = (Surface)in.readObject();
-		this.mGenerator = (ParticleGenerator)in.readObject();
+		this.mGenerator = (ParticleGenerator<StandardParticle>)in.readObject();
 		this.mParticles = (ParticleSystem)in.readObject();
+		this.init();
 	}
 }

@@ -334,7 +334,7 @@ public class BamporterFrame extends JFrame{
 		parent.removeAllChildren();
 	}
 	
-	public void registerParticles(ParticleEmitter particle){
+	public void registerParticles(ParticleEmitter<?> particle){
 		if(particle.getParticleGenerator() instanceof RandomParticleGenerator){
 			Editor pe = EditorFactory.createEditor(particle.getParticleGenerator());
 			if(pe instanceof TreeNodeEditor){

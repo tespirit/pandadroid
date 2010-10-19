@@ -27,6 +27,7 @@ import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Light;
 import com.tespirit.bamboo.scenegraph.Node;
+import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Material;
 import com.tespirit.bamboo.surfaces.Surface;
@@ -34,6 +35,7 @@ import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamporter.app.Assets;
+import com.tespirit.bamporter.editor.Util;
 
 public class Renderer extends RenderManager implements GLEventListener{
 	private GLCanvas mCanvas;
@@ -46,6 +48,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 	private Primitives.WireCube mBoundingBox = new Primitives.WireCube();
 	private Primitives.Axis mAxis = new Primitives.Axis();
 	private Color mBoundingBoxColor = new Color();
+	private UVTextureViewer mTexViewer;
 	
 	private int[] mIndexTypes;
 	private int[] mPrimitiveTypes;
@@ -128,6 +131,16 @@ public class Renderer extends RenderManager implements GLEventListener{
 				case '2':
 					mRenderAxis = !mRenderAxis;
 					break;
+				case '3':
+					String name = Util.promptString("Enter the node name to view the uvs.");
+					if(name != null){
+						Node node = Node.getNode(name);
+						if(node instanceof Model){
+							mTexViewer = new UVTextureViewer((Model)node);
+						}
+					} else {
+						mTexViewer = null;
+					}
 				}
 			}
 			
@@ -205,6 +218,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.mGl.glMultMatrixf(transform.getBuffer(), transform.getBufferOffset());
 	}
 
+	private Matrix3d mTexPos = new Matrix3d();
 	private void renderDebug(){
 		this.mGl.glDisable(GL2.GL_LIGHTING);
 		this.mGl.glDisable(GL2.GL_TEXTURE_2D);
@@ -255,7 +269,14 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.updateScene();
 		this.renderDebug();
 		this.renderScene();
-//		this.mGl.
+		if(this.mTexViewer != null){
+			this.mTexPos.getTranslation().setZ(-2.0f);
+			this.mGl.glDisable(GL2.GL_DEPTH_TEST);
+			this.pushMatrix(this.mTexPos);
+			this.mTexViewer.render();
+			this.popMatrix();
+			this.mGl.glEnable(GL2.GL_DEPTH_TEST);
+		}
 	}
 
 	@Override
@@ -405,7 +426,20 @@ public class Renderer extends RenderManager implements GLEventListener{
 		public void init(Texture texture) {
 			try{
 				TextureData textureData = Assets.openTexture(texture.getDiffuseTextureName());
-				mTextures.add(TextureIO.newTexture(textureData));
+				com.jogamp.opengl.util.texture.Texture t = TextureIO.newTexture(textureData);
+				/*
+				 * glTexParameteri( GL_TEXTURE_2D, 
+                 GL_TEXTURE_WRAP_S, 
+		 GL_CLAMP ); 
+glTexParameteri( GL_TEXTURE_2D, 
+                 GL_TEXTURE_WRAP_T, 
+                 GL_REPEAT )
+				 * 
+				 */
+				t.setTexParameteri(GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+
+				t.setTexParameteri(GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+				mTextures.add(t);
 				texture.setDiffuseTextureId(mTextures.size()-1);
 			} catch(Exception e){
 				texture.setDiffuseTextureId(-1);

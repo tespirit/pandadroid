@@ -63,8 +63,8 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 	public void mousePressed(MouseEvent event) {
 		if(event.isAltDown()){
 			if(this.mIsDrag == false){
-				this.mTranslate.init(event.getX(), event.getY(), event.getWhen());
-				this.mRotate.init(event.getX(), event.getY(), event.getWhen());
+				this.mTranslate.begin(event.getX(), event.getY(), event.getWhen());
+				this.mRotate.begin(event.getX(), event.getY(), event.getWhen());
 				this.mZoom.init((float)event.getY(), event.getWhen());
 				this.mIsDrag = true;
 			}
@@ -83,13 +83,13 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 	private void updateControllers(MouseEvent event){
 		switch(this.mButton){
 		case MouseEvent.BUTTON1:
-			this.mRotate.set((float)event.getX(), (float)event.getY(), event.getWhen());
+			this.mRotate.applyChange((float)event.getX(), (float)event.getY(), event.getWhen());
 			break;
 		case MouseEvent.BUTTON2:
 			this.mZoom.set((float)event.getY(), event.getWhen());
 			break;
 		case MouseEvent.BUTTON3:
-			this.mTranslate.set((float)event.getX(), (float)event.getY(), event.getWhen());
+			this.mTranslate.applyChange((float)event.getX(), (float)event.getY(), event.getWhen());
 			break;
 		}
 	}

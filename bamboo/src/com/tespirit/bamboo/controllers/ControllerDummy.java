@@ -32,13 +32,18 @@ public class ControllerDummy implements Controller1d, Controller2d, Controller3d
 	}
 
 	@Override
-	public void init(float x, float y, long time) {
+	public void begin(float x, float y, long time) {
 		// VOID
 	}
 
 	@Override
-	public void set(float x, float y, long time) {
+	public void applyChange(float x, float y, long time) {
 		// VOID
+	}
+	
+	@Override
+	public void end(){
+		//VOID
 	}
 
 	@Override

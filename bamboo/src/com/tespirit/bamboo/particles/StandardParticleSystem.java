@@ -8,74 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StandardParticleSystem implements ParticleSystem, Externalizable{
+	protected Particle[] mPatricles;
+	protected int mActiveCount;
+	protected int mMaxCount;
 
-	private class ListNode{
-		private ListNode mNext;
-		private ListNode mPrev;
-		
-		private ListNode(){
-		}
-		
-		private void insertBefore(ListNode p){
-			p.mNext = this;
-			p.mPrev = this.mPrev;
-			this.mPrev.mNext = p;
-			this.mPrev = p;
-		}
-		
-		protected void update(float deltaTime){
-			//VOID
-		}
-		
-		protected boolean isAlive(){
-			return true;
-		}
-		
-		protected void render(){
-			//VOID
-		}
-		
-		protected void remove(){
-			this.mNext.mPrev = this.mPrev;
-			this.mPrev.mNext = this.mNext;
-			this.mNext = null;
-			this.mPrev = null;
-		}
-	}
-	
-	private class ParticleNode extends ListNode{
-		private Particle mParticle;
-		
-		private ParticleNode(Particle particle){
-			this.mParticle = particle;
-		}
-		
-		protected void update(float deltaTime){
-			for(ParticleForce force : mForces){
-				force.apply(this.mParticle);
-			}
-			this.mParticle.update(deltaTime);
-		}
-		
-		protected boolean isAlive(){
-			return this.mParticle.isAlive();
-		}
-		
-		protected void render(){
-			this.mParticle.render();
-		}
-	}
-	
-	private ListNode mHead;
-	private ListNode mEnd;
 	private List<ParticleForce> mForces;
 	
 	public StandardParticleSystem(){
+		this(1000);
+	}
+	
+	public StandardParticleSystem(int maxCount){
+		this.mMaxCount = maxCount;
+		this.mActiveCount = 0;
 		this.mForces = new ArrayList<ParticleForce>();
-		this.mHead = new ListNode();
-		this.mEnd = new ListNode();
-		this.mHead.mNext = this.mEnd;
-		this.mEnd.mPrev = this.mHead;
 	}
 	
 	public void addForce(ParticleForce force){
@@ -94,58 +40,78 @@ public class StandardParticleSystem implements ParticleSystem, Externalizable{
 		return this.mForces.size();
 	}
 	
+	public int getMaxParticleCount(){
+		return this.mPatricles.length;
+	}
+	
 	public ParticleForce getForce(int i){
 		return this.mForces.get(i);
 	}
 	
+	@Override
 	public void update(float deltaTime){
-		ListNode node = this.mHead.mNext;
-		while(node != this.mEnd){
-			node.update(deltaTime);
-			if(node.isAlive()){
-				node = node.mNext;
+		int i = 0;
+		while(i < this.mActiveCount){
+			Particle p = this.mPatricles[i];
+			for(ParticleForce force : mForces){
+				force.apply(p);
+			}
+			p.update(deltaTime);
+			if(p.isAlive()){
+				i++;
 			} else {
-				ListNode temp = node.mNext;
-				node.remove();
-				node = temp;
+				this.mActiveCount--;
+				this.mPatricles[i] = this.mPatricles[this.mActiveCount];
+				this.mPatricles[this.mActiveCount] = p;
+				this.mActiveCount--;
 			}
 		}
 	}
 	
+	@Override
 	public void render(){
-		ListNode node = this.mHead.mNext;
-		while(node != this.mEnd){
-			node.render();
-			node = node.mNext;
+		for(int i = 0; i < this.mActiveCount; i++){
+			this.mPatricles[i].render();
 		}
 	}
 	
 	@Override
 	public void recycle(){
-		ListNode node = this.mHead.mNext;
-		while(node != this.mEnd){
-			ListNode next = node.mNext;
-			node.remove();
-			node = next;
+		for(int i = 0; i < this.mPatricles.length; i++){
+			this.mPatricles[i] = null;
 		}
-		this.mHead = null;
-		this.mEnd = null;
 	}
-
+	
 	@Override
-	public void add(Particle p) {
-		this.mEnd.insertBefore(new ParticleNode(p));
+	public Particle add() {
+		if(this.mActiveCount < this.mPatricles.length){
+			this.mActiveCount++;
+			return this.mPatricles[this.mActiveCount-1];
+		} else {
+			return null;
+		}
 	}
+	
 
 	@Override
 	public void remove(Particle p) {
-		//TODO: implement this.
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void init(ParticleEmitter<?> p) {
+		this.mPatricles = new Particle[this.mMaxCount];
+		for(int i = 0; i < this.mPatricles.length; i++){
+			this.mPatricles[i] = p.newParticle();
+		}
 	}
 
 	//IO
 	private static final long serialVersionUID = -372026429838597827L;
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(this.mMaxCount);
 		out.writeInt(this.mForces.size());
 		for(ParticleForce force : this.mForces){
 			out.writeObject(force);
@@ -155,6 +121,7 @@ public class StandardParticleSystem implements ParticleSystem, Externalizable{
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		this.mMaxCount = in.readInt();
 		int size = in.readInt();
 		for(int i = 0; i < size; i++){
 			this.mForces.add((ParticleForce)in.readObject());

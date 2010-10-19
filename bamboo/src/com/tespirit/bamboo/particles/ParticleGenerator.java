@@ -8,27 +8,31 @@ import com.tespirit.bamboo.vectors.Vector3d;
  * @author Todd Espiritu Santo
  *
  */
-public abstract class ParticleGenerator{
+public abstract class ParticleGenerator<P extends Particle>{
 	private Vector3d mOffsetPosition;
 	
 	public ParticleGenerator(){
 		this.mOffsetPosition = new Vector3d();
 	}
 	
-	public void update(ParticleEmitter emitter, float deltaTime){
+	public void update(ParticleEmitter<P> emitter, float deltaTime){
 		for(int i = 0; i < this.getBirthAmount(deltaTime); i++){
-			Particle p = emitter.createParticle();
+			@SuppressWarnings("unchecked")
+			P p = (P) emitter.getParticleSysetm().add();
+			if(p == null){
+				return;
+			}
 			this.mOffsetPosition.set(this.getWidthOffset(), 0.0f, this.getLengthOffset());
 			this.mOffsetPosition.add(emitter.getWorldTransform().getTranslation());
 			p.setInitialPosition(this.mOffsetPosition);
 			p.setInitialVelocity(emitter.getWorldTransform().transform(this.getVelocity()));
 			p.setMass(this.getMass());
-			if(p instanceof StandardParticle){
-				StandardParticle sp = (StandardParticle)p;
-				sp.setScale(this.getScale());
-				sp.setLifeSpan(this.getLifeSpan(), this.getDecayPercent());
-			}
+			this.initParticle(p);
 		}
+	}
+	
+	protected void initParticle(P p){
+		//VOID
 	}
 
 	public abstract float getDecayPercent();

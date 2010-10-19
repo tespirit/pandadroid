@@ -21,16 +21,23 @@ public class Controller2dGroup implements Controller2d {
 	}
 
 	@Override
-	public void init(float x, float y, long time) {
+	public void begin(float x, float y, long time) {
 		for(Controller2d controller : this.mControllers){
-			controller.init(x, y, time);
+			controller.begin(x, y, time);
 		}
 	}
 
 	@Override
-	public void set(float x, float y, long time) {
+	public void applyChange(float x, float y, long time) {
 		for(Controller2d controller : this.mControllers){
-			controller.set(x, y, time);
+			controller.applyChange(x, y, time);
+		}
+	}
+	
+	@Override
+	public void end() {
+		for(Controller2d controller : this.mControllers){
+			controller.end();
 		}
 	}
 

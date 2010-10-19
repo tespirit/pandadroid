@@ -147,7 +147,17 @@ public class VertexBuffer implements Externalizable{
 	public boolean nextVector3d(Vector3d out, int type){
 		FloatBuffer fb = this.mBuffers[type];
 		if(fb.hasRemaining()){
-		out.set(fb.get(), fb.get(), fb.get());
+			out.set(fb.get(), fb.get(), fb.get());
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean nextTexcoord(Vector3d out){
+		FloatBuffer fb = this.mBuffers[VertexBuffer.TEXCOORD];
+		if(fb.hasRemaining()){
+			out.set(fb.get(), fb.get(), 0.0f);
 			return true;
 		} else {
 			return false;

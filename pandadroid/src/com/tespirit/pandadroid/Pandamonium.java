@@ -7,11 +7,11 @@ import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.JointRotate;
-import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.modifiers.SkinModifier;
+import com.tespirit.bamboo.particles.ConstantGravity;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
@@ -52,14 +52,10 @@ public class Pandamonium extends Activity {
         
         DefaultTouchHandler touchHandler = new DefaultTouchHandler(view);
         touchHandler.makeCameraRotatable();
-        //touchHandler.makeNodesFlingable();
+        touchHandler.makeNodesFlingable().getParticles().addForce(new ConstantGravity());
     	
     	try{
     		view.addBamboo(Assets.loadBamboo("fire2.bam"));
-    		//Player player = view.addBambooSingleAnimation(Assets.loadBamboo("candy.bam"));
-    		//player.setSkeleton("d_root1");
-    		//Debug.addTestAnimation(player);
-    		//view.addBamboo(Assets.loadCollada("doug.dae"));
     		view.addSceneNode(this.createTestSG());
     	} catch(Exception e){
     		Debug.print(e);

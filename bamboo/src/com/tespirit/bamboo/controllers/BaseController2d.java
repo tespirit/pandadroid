@@ -14,14 +14,14 @@ public abstract class BaseController2d implements Controller2d{
 	UpdateManager mUpdateManager;
 	
 	@Override
-	public void init(float x, float y, long time){
+	public void begin(float x, float y, long time){
 		this.mX = x;
 		this.mY = y;
 		this.mTime = time;
 	}
 
 	@Override
-	public void set(float x, float y, long time) {
+	public void applyChange(float x, float y, long time) {
 		this.mDeltaX += x - this.mX;
 		this.mDeltaY += y - this.mY;
 		this.mDeltaTime = time - this.mTime;
@@ -29,6 +29,11 @@ public abstract class BaseController2d implements Controller2d{
 		this.mY = y;
 		this.mTime = time;
 		mUpdateManager.addSingleUpdater(this);
+	}
+	
+	@Override
+	public void end(){
+		//VOID
 	}
 	
 	public void sendUpdate(){
