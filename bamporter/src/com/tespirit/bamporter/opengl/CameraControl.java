@@ -3,6 +3,8 @@ package com.tespirit.bamporter.opengl;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import com.tespirit.bamboo.controllers.StandardCameraController2d;
 import com.tespirit.bamboo.controllers.StandardCameraController2d.ControlState;
@@ -10,7 +12,7 @@ import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Model;
 
-public class CameraControl implements MouseListener, MouseMotionListener{
+public class CameraControl implements MouseListener, MouseMotionListener, MouseWheelListener{
 	
 	StandardCameraController2d mCameraController;
 	RenderManager mRenderManager;
@@ -75,18 +77,18 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		if(this.mIsDrag){
-			this.updateControllers(event);
+			this.mCameraController.end();
 		}
 		this.mIsDrag = false;
 	}
 	
-	private void updateControllers(MouseEvent event){
+	private void updateController(MouseEvent event){
 		switch(this.mButton){
 		case MouseEvent.BUTTON1:
 			this.mCameraController.setState(ControlState.rotate);
 			break;
 		case MouseEvent.BUTTON2:
-			this.mCameraController.setState(ControlState.zoom);
+			this.mCameraController.setState(ControlState.focusDistance);
 			break;
 		case MouseEvent.BUTTON3:
 			this.mCameraController.setState(ControlState.pan);
@@ -98,12 +100,22 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 	@Override
 	public void mouseDragged(MouseEvent event) {
 		if(this.mIsDrag == true){
-			this.updateControllers(event);
+			this.updateController(event);
 		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent event) {
 		//Void
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		if(e.isAltDown()){
+			this.mCameraController.setState(ControlState.focusDistance);
+			this.mCameraController.begin(0, 0, e.getWhen());
+			this.mCameraController.applyChange(0, e.getWheelRotation(), e.getWhen());
+			this.mCameraController.end();
+		}
 	}
 }

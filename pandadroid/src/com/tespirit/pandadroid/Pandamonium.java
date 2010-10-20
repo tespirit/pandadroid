@@ -7,7 +7,6 @@ import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.JointRotate;
-import com.tespirit.bamboo.controllers.StandardCameraController2d;
 import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;

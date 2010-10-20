@@ -147,6 +147,7 @@ public class Renderer extends RenderManager implements GLEventListener{
 		this.mCameraControl = new CameraControl(this);
 		this.mCanvas.addMouseMotionListener(this.mCameraControl);
 		this.mCanvas.addMouseListener(this.mCameraControl);
+		this.mCanvas.addMouseWheelListener(this.mCameraControl);
 		
 		this.mAnimator = new FPSAnimator(this.mCanvas, 30);
 		this.mAnimator.add(this.mCanvas);
