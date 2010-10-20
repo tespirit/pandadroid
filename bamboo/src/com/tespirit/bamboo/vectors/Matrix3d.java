@@ -521,6 +521,37 @@ public class Matrix3d {
 		return this;
 	}
 	
+	public Matrix3d PolarRotate(float distance, float azmuth, float incline, float twist) {
+		float sinx = (float)Math.sin(Math.toRadians(-incline));
+		float cosx = (float)Math.cos(Math.toRadians(-incline));
+		float siny = (float)Math.sin(Math.toRadians(azmuth));
+		float cosy = (float)Math.cos(Math.toRadians(azmuth));
+		float sinz = (float)Math.sin(Math.toRadians(twist));
+		float cosz = (float)Math.cos(Math.toRadians(twist));
+		
+		this.xAxis.set(cosz*cosy, sinz*cosx+cosz*siny*sinx, sinz*sinx-cosz*siny*cosx);
+		this.yAxis.set(-sinz*cosy, cosz*cosx-sinz*siny*sinx, cosz*sinx+sinz*siny*cosx);
+		this.zAxis.set(siny, -cosy*sinx, cosy*cosx);
+
+		this.translation.copy(this.zAxis);
+		this.translation.scale(distance);
+		return this;
+	}
+	
+	public Matrix3d lookAt(Vector3d point){
+		this.zAxis.sub(point, this.translation);
+		this.zAxis.normalize();
+		if(this.zAxis.getX() != 0.0f || this.zAxis.getZ() != 0.0f){
+			this.xAxis.set(zAxis.getZ(), 0.0f, -zAxis.getX());
+			this.xAxis.normalize();
+			this.yAxis.cross(this.zAxis, this.xAxis);
+		} else {
+			this.xAxis.set(1, 0, 0); //camera is facing straight up.
+			this.yAxis.set(0, 0, -this.zAxis.getY());
+		}
+		return this;
+	}
+	
 	public Matrix3d identity(){
 		Matrix3d.setIdentity(this.m, this.offset);
 		return this;
@@ -547,11 +578,6 @@ public class Matrix3d {
 		return this.xAxis.equals(Matrix3d.IDENTITY.xAxis) &&
 			   this.yAxis.equals(Matrix3d.IDENTITY.yAxis) &&
 			   this.zAxis.equals(Matrix3d.IDENTITY.zAxis);
-	}
-	
-	public Matrix3d aim(Matrix3d m){
-		//TODO: implement
-		return this;
 	}
 	
 	@Override

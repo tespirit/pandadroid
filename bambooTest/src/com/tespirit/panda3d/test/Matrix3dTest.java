@@ -230,6 +230,26 @@ public class Matrix3dTest extends TestCase{
 		Assert.assertTrue(v2.equals(v3));
 	}
 	
+	public void textLookat(){
+		Matrix3d m = new Matrix3d();
+		Vector3d point = new Vector3d(0,0,1);
+		
+		m.lookAt(point);
+		
+		Assert.assertTrue(m.isIdentity());
+		
+		point.set(1, 0, 0);
+		
+		Matrix3d test = new Matrix3d();
+		test.rotateY(90);
+		
+		m.lookAt(point);
+		
+		Assert.assertTrue(m.equals(test));
+		
+		
+	}
+	
 	public void testInvert(){
 		
 		Matrix3d m = new Matrix3d();

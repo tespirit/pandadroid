@@ -51,7 +51,7 @@ public class Pandamonium extends Activity {
         view.createDefaultLight();
         
         DefaultTouchHandler touchHandler = new DefaultTouchHandler(view);
-        touchHandler.makeCameraRotatable();
+        touchHandler.makeCameraRotatable(3);
         touchHandler.makeNodesFlingable().getParticles().addForce(new ConstantGravity());
     	
     	try{

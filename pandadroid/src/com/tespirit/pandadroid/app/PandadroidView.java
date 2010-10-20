@@ -55,7 +55,6 @@ public class PandadroidView extends GLSurfaceView {
 		
 		this.init(context, bgColor);
 		this.mRenderer.setCamera(new Camera());
-		this.getCamera().zoom(-2);//a simple default setting.
 	}
 	
 	private void init(Context context, Color4 bgColor){

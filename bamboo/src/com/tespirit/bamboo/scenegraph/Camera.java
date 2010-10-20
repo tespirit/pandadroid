@@ -10,7 +10,6 @@ import com.tespirit.bamboo.vectors.Vector3d;
 
 public class Camera extends Node implements Updater{
 	private Matrix3d camera;
-	private Matrix3d pivot;
 	private Matrix3d worldTransform;
 	
 	private float fov;
@@ -36,13 +35,37 @@ public class Camera extends Node implements Updater{
 		this.near = near;
 		this.far = far;
 		
-		float[] buffer = new float[Matrix3d.SIZE*3];
+		float[] buffer = Matrix3d.createBuffer(2);
 		this.camera = new Matrix3d(buffer);
-		this.camera.identity();
-		this.pivot = new Matrix3d(buffer, Matrix3d.SIZE);
-		this.pivot.identity();
-		this.worldTransform = new Matrix3d(buffer, Matrix3d.SIZE *2);
+		this.worldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
 	}
+	
+	public void fit(Node node){
+		if(node.getBoundingBox() != null){
+			this.lookAt(node.getBoundingBox().getCenter());
+			
+			//compute the distance
+			float distance = node.getBoundingBox().getRadius()*this.near/this.nearHeight;
+			this.camera.getTranslation().setZ(-distance);
+			
+		} else {
+			this.lookAt(node); //at least center to the world transform
+		}
+	}
+	
+	public void lookAt(Node node){
+		if(node.getBoundingBox() != null){
+			this.lookAt(node.getBoundingBox().getCenter());
+		} else if (node.getWorldTransform() != null){
+			this.lookAt(node.getWorldTransform().getTranslation());
+		}
+	}
+	
+	public void lookAt(Vector3d point){
+		this.camera.lookAt(point);
+	}
+	
+	
 	
 	@Override
 	public Matrix3d getWorldTransform(){
@@ -51,16 +74,12 @@ public class Camera extends Node implements Updater{
 	
 	@Override
 	public void update(Matrix3d transform){
-		this.worldTransform.multiply(transform, this.pivot).multiply(this.camera);
+		this.worldTransform.multiply(transform, this.camera).invert();
 	}
 	
 	@Override
 	public Matrix3d getTransform(){
 		return this.camera;
-	}
-	
-	public Matrix3d getPivotTransform(){
-		return this.pivot;
 	}
 	
 	public float getFov(){
@@ -110,34 +129,6 @@ public class Camera extends Node implements Updater{
 		return this.aspectRatio;
 	}
 	
-	public void pan(float x, float y){
-		this.camera.translate(this.camera.transform(new Vector3d(x, y, 0.0f)));
-	}
-	
-	public void zoom(float z){
-		this.camera.translate(this.camera.transform(new Vector3d(0.0f, 0.0f, z)));
-	}
-	
-	public void roll(float a){
-		this.camera.rotateY(a);
-	}
-	
-	public void pitch(float a){
-		this.camera.rotateX(a);
-	}
-	
-	public void yawn(float a){
-		this.camera.rotateZ(a);
-	}
-	
-	public void aim(Matrix3d m){
-		//TODO: implement
-	}
-	
-	public void aim(Node node){
-		//TODO: implement
-	}
-	
 	public void render(){
 		Camera.renderer.render(this);
 	}
@@ -181,7 +172,7 @@ public class Camera extends Node implements Updater{
 	@Override
 	protected void recycleInternal(){
 		this.camera = null;
-		this.pivot = null;
+		this.worldTransform = null;
 	}
 	
 	public Ray createRay(float x, float y){

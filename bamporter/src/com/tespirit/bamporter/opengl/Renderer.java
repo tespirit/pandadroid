@@ -101,9 +101,6 @@ public class Renderer extends RenderManager implements GLEventListener{
 		
 		//create a default camera!
 		Camera camera = new Camera();
-		camera.zoom(-2);
-		
-		camera.getPivotTransform().rotateX(45);
 		this.setCamera(camera);
 		
 		Lights.addDefaultLight(this);

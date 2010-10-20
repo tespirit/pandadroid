@@ -39,4 +39,34 @@ public class AxisAlignedBoxTest extends TestCase {
 		Assert.assertTrue(v.equals(a.getMax()));
 		
 	}
+	
+	public void testCenter(){
+		AxisAlignedBox a = new AxisAlignedBox();
+		a.setMin(-1,-1,-1);
+		a.setMax(1,1,1);
+		
+		Vector3d v = new Vector3d();
+		
+		Assert.assertTrue(v.equals(a.getCenter()));
+		
+		a.setMin(-2,-1,0);
+		a.setMax(0,1,2);
+		
+		v.set(-1, 0, 1);
+		
+		Assert.assertTrue(v.equals(a.getCenter()));
+		
+	}
+	
+	public void testRadius(){
+		AxisAlignedBox a = new AxisAlignedBox();
+		a.setMin(-1,-1,-1);
+		a.setMax(1,1,1);
+		Assert.assertTrue(Util.floatEquals((float)Math.sqrt(3), a.getRadius()));
+		
+		a.setMin(-2,-3,0);
+		a.setMax(0,1,4);
+		
+		Assert.assertTrue(Util.floatEquals(3.0f, a.getRadius()));
+	}
 }

@@ -16,6 +16,14 @@ public class AxisAlignedBox{
 		this.max.set(maxX, maxY, maxZ);
 	}
 	
+	public Vector3d getCenter(){
+		return new Vector3d().add(this.min, this.max).scale(0.5f);
+	}
+	
+	public float getRadius(){
+		return this.max.distance(this.min)/2.0f;
+	}
+	
 	public void setMin(float x, float y, float z){
 		this.min.set(x, y, z);
 	}

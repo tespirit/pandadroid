@@ -236,14 +236,26 @@ public class Vector3d {
 		return v;
 	}
 	
-	/*
-	 * this scales the vector according to the acceleration it represents given deltaTime.
-	 */
-	public void computeForce(float mass, float deltaTime){
-		deltaTime = mass*2/(deltaTime*deltaTime);
-		this.v[this.offset] *= deltaTime;
-		this.v[this.offset+1] *= deltaTime;
-		this.v[this.offset+2] *= deltaTime;
+	public Vector3d cross(Vector3d a){
+		return this.cross(a, this);
+	}
+	
+	public float distance2(Vector3d v){
+		float x = this.v[this.offset]-v.v[v.offset];
+		float y = this.v[this.offset+1]-v.v[v.offset+1];
+		float z = this.v[this.offset+2]-v.v[v.offset+2];
+		return x*x+y*y+z*z;
+	}
+	
+	public float distance(Vector3d v){
+		return (float)Math.sqrt(this.distance2(v));
+	}
+	
+	public Vector3d cross(Vector3d a, Vector3d b){
+		this.set(a.v[a.offset+1] * b.v[b.offset+2] - a.v[a.offset+2] * b.v[b.offset+1], 
+				 a.v[a.offset+2] * b.v[b.offset] - a.v[a.offset] * b.v[b.offset+2], 
+				 a.v[a.offset] * b.v[b.offset+2] - a.v[a.offset+2] * b.v[b.offset]);
+		return this;
 	}
 	
 	@Override 

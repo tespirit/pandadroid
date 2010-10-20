@@ -5,35 +5,63 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import com.tespirit.bamboo.controllers.Dof3;
-import com.tespirit.bamboo.controllers.RotateController2d;
+import com.tespirit.bamboo.controllers.PolarRotateController2d;
 import com.tespirit.bamboo.controllers.TranslateController1d;
 import com.tespirit.bamboo.controllers.TranslateController2d;
 import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.render.UpdateManager;
+import com.tespirit.bamboo.render.Updater;
 import com.tespirit.bamboo.scenegraph.Camera;
+import com.tespirit.bamboo.scenegraph.Model;
 
 public class CameraControl implements MouseListener, MouseMotionListener{
 	
-	RotateController2d mRotate;
+	private class FitUpdater implements Updater{
+		private Model mModel;
+		
+		public void setModel(Model model){
+			this.mModel = model;
+			mRenderManager.addSingleUpdater(this);
+		}
+
+		@Override
+		public void update() {
+			mRenderManager.getCamera().fit(this.mModel);
+		}
+
+		@Override
+		public void setUpdateManager(UpdateManager updateManager) {
+			//VOID
+		}
+	}
+	
+	
+	PolarRotateController2d mRotate;
 	TranslateController2d mTranslate;
 	TranslateController1d mZoom;
-	
+	RenderManager mRenderManager;
+	FitUpdater mFitUpdater;
 	public CameraControl(RenderManager renderManager){
 		Camera camera = renderManager.getCamera();
-		this.mRotate = new RotateController2d(Dof3.Y, Dof3.X);
+		this.mRenderManager = renderManager;
+		this.mRotate = new PolarRotateController2d(3);
 		this.mRotate.setScale(0.25f);
-		this.mRotate.setControlled(camera.getPivotTransform());
+		this.mRotate.setControlled(camera.getTransform());
+		camera.getTransform().PolarRotate(3, 0, 0, 0);
 		
 		this.mTranslate = new TranslateController2d(Dof3.negativeX, Dof3.Y);
 		this.mTranslate.setScale(0.0025f);
-		this.mTranslate.setControlled(camera.getPivotTransform());
+		this.mTranslate.setControlled(camera.getTransform());
 		
 		this.mZoom = new TranslateController1d(Dof3.Z);
 		this.mZoom.setScale(0.0025f);
-		this.mZoom.setControlled(camera.getPivotTransform());
+		this.mZoom.setControlled(camera.getTransform());
 		
 		renderManager.registerUpdater(this.mRotate);
 		renderManager.registerUpdater(this.mTranslate);
 		renderManager.registerUpdater(this.mZoom);
+		
+		this.mFitUpdater = new FitUpdater();
 		
 		this.mIsDrag = false;
 	}
@@ -69,9 +97,14 @@ public class CameraControl implements MouseListener, MouseMotionListener{
 				this.mIsDrag = true;
 			}
 			this.mButton = event.getButton();
+		} else if (event.isShiftDown() && event.getButton() == MouseEvent.BUTTON1){
+			Model node = this.mRenderManager.selectModel((float)event.getX(), (float)event.getY());
+			if(node != null){
+				this.mFitUpdater.setModel(node);
+			}
 		}
 	}
-
+	
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		if(this.mIsDrag){
