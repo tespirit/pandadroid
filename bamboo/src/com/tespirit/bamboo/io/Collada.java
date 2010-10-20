@@ -349,7 +349,7 @@ public class Collada implements BambooAsset{
         	if(p == null){
         		throw new Exception("Model primitive data not found: "+ml.mPrimitiveId);
         	}
-        	ml.mModel.setPrimative(p);
+        	ml.mModel.setPrimitive(p);
         	ml.mModel.setSurface(this.createSurface(ml.mSurfaceId));
         }
         

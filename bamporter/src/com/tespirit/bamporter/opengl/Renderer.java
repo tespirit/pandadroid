@@ -427,15 +427,6 @@ public class Renderer extends RenderManager implements GLEventListener{
 			try{
 				TextureData textureData = Assets.openTexture(texture.getDiffuseTextureName());
 				com.jogamp.opengl.util.texture.Texture t = TextureIO.newTexture(textureData);
-				/*
-				 * glTexParameteri( GL_TEXTURE_2D, 
-                 GL_TEXTURE_WRAP_S, 
-		 GL_CLAMP ); 
-glTexParameteri( GL_TEXTURE_2D, 
-                 GL_TEXTURE_WRAP_T, 
-                 GL_REPEAT )
-				 * 
-				 */
 				t.setTexParameteri(GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
 
 				t.setTexParameteri(GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);

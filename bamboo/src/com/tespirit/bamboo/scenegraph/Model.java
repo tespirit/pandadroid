@@ -75,7 +75,7 @@ public class Model extends RenderableNode implements Externalizable{
 		return this.mPrimitive;
 	}
 	
-	public void setPrimative(Primitive primitive){
+	public void setPrimitive(Primitive primitive){
 		this.mPrimitive = primitive;
 		this.mPrimitive.computeBoundingBox(this.mBoundingBox);
 		this.registerDynamicLoader(this.mSurface);

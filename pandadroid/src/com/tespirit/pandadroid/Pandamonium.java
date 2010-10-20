@@ -73,7 +73,7 @@ public class Pandamonium extends Activity {
     	mat1.setColor(0.8f, 0.3f, 0.5f);
     	
     	Model m1 = new Model("plane");
-    	m1.setPrimative(new Primitives.Plane());
+    	m1.setPrimitive(new Primitives.Plane());
     	m1.setSurface(t1);
 
     	//adjust matrices
@@ -82,7 +82,7 @@ public class Pandamonium extends Activity {
     	g.appendChild(m1);
 
     	Model m2 = new Model("box");
-    	m2.setPrimative(new Primitives.Cube());
+    	m2.setPrimitive(new Primitives.Cube());
     	
     	//adjust matrix
     	m2.getTransform().translate(-3.0f, 0.0f, 0.0f);
@@ -91,7 +91,7 @@ public class Pandamonium extends Activity {
     	g.appendChild(m2);
     	
     	Model m3 = new Model("box_material");
-    	m3.setPrimative(new Primitives.Cube());
+    	m3.setPrimitive(new Primitives.Cube());
     	m3.setSurface(mat1);
     	
     	m3.getTransform().translate(-1.5f, 1.0f, 0.0f);
@@ -154,7 +154,7 @@ public class Pandamonium extends Activity {
 		
 		Model model = new Model();
 		
-		model.setPrimative(mesh);
+		model.setPrimitive(mesh);
 		
 		SkinModifier skin = new SkinModifier();
 		

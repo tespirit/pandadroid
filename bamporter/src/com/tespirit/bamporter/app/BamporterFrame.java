@@ -191,7 +191,7 @@ public class BamporterFrame extends JFrame{
 		
 		Model axis = new Model();
 		axis.getTransform().scale(0.25f);
-		axis.setPrimative(new Primitives.Axis());
+		axis.setPrimitive(new Primitives.Axis());
 		this.mRenderer.addScene(axis);
 		
 		navScroll.setViewportView(this.mNavigator);
