@@ -236,7 +236,7 @@ public class Matrix3d {
 		
 		b1 = m.xAxis.getY();
 		b2 = m.yAxis.getY();
-		b3 = m.zAxis.getZ();
+		b3 = m.zAxis.getY();
 		
 		c1 = m.xAxis.getZ();
 		c2 = m.yAxis.getZ();

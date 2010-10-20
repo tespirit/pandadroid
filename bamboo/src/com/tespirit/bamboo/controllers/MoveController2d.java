@@ -1,6 +1,7 @@
 package com.tespirit.bamboo.controllers;
 
 import com.tespirit.bamboo.render.RenderManager;
+import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Plane;
@@ -52,10 +53,13 @@ public class MoveController2d extends BaseMatrixController2d{
 	
 	@Override
 	public void update(float x, float y, float deltaX, float deltaY, long time, long deltaTime) {
-		Ray ray = this.mRenderManager.getCamera().createRay(x, y);
-		Vector3d planeNormal = this.mRenderManager.getCamera().getWorldTransform().getZAxis().clone();
+		Camera camera = this.mRenderManager.getCamera();
+		Ray ray = camera.createRay(x, y);
+		//Fast invert!
+		Vector3d planeNormal = new Vector3d(camera.getWorldTransform().getXAxis().getZ(),
+										    camera.getWorldTransform().getYAxis().getZ(),
+										    camera.getWorldTransform().getZAxis().getZ());
 		ray.transformBy(this.mInverter);
-		this.mInverter.transform(planeNormal);
 		this.mPlane.setNormal(planeNormal);
 		Vector3d intersect = mPlane.rayIntersectsAt(ray);
 		if(intersect != null){
