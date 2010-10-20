@@ -63,7 +63,6 @@ public class StandardParticleSystem implements ParticleSystem, Externalizable{
 				this.mActiveCount--;
 				this.mPatricles[i] = this.mPatricles[this.mActiveCount];
 				this.mPatricles[this.mActiveCount] = p;
-				this.mActiveCount--;
 			}
 		}
 	}
