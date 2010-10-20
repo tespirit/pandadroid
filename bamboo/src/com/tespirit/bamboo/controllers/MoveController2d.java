@@ -56,10 +56,9 @@ public class MoveController2d extends BaseMatrixController2d{
 		Camera camera = this.mRenderManager.getCamera();
 		Ray ray = camera.createRay(x, y);
 		//Fast invert!
-		Vector3d planeNormal = new Vector3d(camera.getWorldTransform().getXAxis().getZ(),
-										    camera.getWorldTransform().getYAxis().getZ(),
-										    camera.getWorldTransform().getZAxis().getZ());
+		Vector3d planeNormal = camera.getWorldTransformNoInverse().getZAxis().clone();
 		ray.transformBy(this.mInverter);
+		this.mInverter.transform(planeNormal);
 		this.mPlane.setNormal(planeNormal);
 		Vector3d intersect = mPlane.rayIntersectsAt(ray);
 		if(intersect != null){

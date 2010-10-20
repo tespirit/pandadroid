@@ -14,6 +14,7 @@ import com.tespirit.bamboo.animation.Joint;
 import com.tespirit.bamboo.animation.JointOrient;
 import com.tespirit.bamboo.animation.JointRotate;
 import com.tespirit.bamboo.animation.JointTranslate;
+import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.modifiers.SkinModifier;
 import com.tespirit.bamboo.primitives.IndexBuffer;
 import com.tespirit.bamboo.primitives.Primitive;
@@ -55,6 +56,7 @@ public class Collada implements BambooAsset{
 	private List<Node> mSceneRoots;
 	private List<Animation> mAnimations;
 	private List<Camera> mCameras;
+	private List<Player> mPlayers;
 	
 	protected ArrayList<String> mTexturePaths;
 	
@@ -219,6 +221,7 @@ public class Collada implements BambooAsset{
 		this.mAnimations = new ArrayList<Animation>();
 		this.mSceneRoots = new ArrayList<Node>();
 		this.mCameras = new ArrayList<Camera>();
+		this.mPlayers = new ArrayList<Player>();
 		this.mImportNormals = normals;
 		this.mFlipYTexCoord = flipYTexcoord;
 		this.init(input);
@@ -1492,5 +1495,10 @@ public class Collada implements BambooAsset{
 	@Override
 	public List<Node> getScenes() {
 		return this.mSceneRoots;
+	}
+
+	@Override
+	public List<Player> getPlayers() {
+		return this.mPlayers;
 	}
 }

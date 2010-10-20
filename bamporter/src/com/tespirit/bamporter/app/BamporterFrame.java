@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -34,6 +32,7 @@ import javax.swing.tree.TreePath;
 
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.creation.Primitives;
+import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamboo.particles.ParticleEmitter;
 import com.tespirit.bamboo.particles.SpriteParticleEmitter;
@@ -41,7 +40,6 @@ import com.tespirit.bamboo.particles.RandomParticleGenerator;
 import com.tespirit.bamboo.particles.StandardParticleSystem;
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.render.UpdateManager;
-import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Model;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamporter.app.Assets.SaveTypes;
@@ -352,27 +350,7 @@ public class BamporterFrame extends JFrame{
 	
 	protected void createSpriteParticles() {
 		if(this.mBamboo == null){
-			this.mBamboo = new BambooAsset(){
-				ArrayList<Camera> mCameras = new ArrayList<Camera>();
-				ArrayList<Node> mNodes = new ArrayList<Node>();
-				ArrayList<Animation> mAnimations = new ArrayList<Animation>();
-				
-				@Override
-				public List<Camera> getCameras() {
-					return this.mCameras;
-				}
-
-				@Override
-				public List<Node> getScenes() {
-					return this.mNodes;
-				}
-
-				@Override
-				public List<Animation> getAnimations() {
-					return this.mAnimations;
-				}
-				
-			};
+			this.mBamboo = new Bamboo();
 		}
 		
 		SpriteParticleEmitter p = new SpriteParticleEmitter(new RandomParticleGenerator());

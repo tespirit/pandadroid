@@ -166,7 +166,7 @@ public abstract class RenderManager implements UpdateManager {
 		this.mNewNodes.remove(scene);
 	}
 	
-	public void removeNode(Collection<Node> scenes){
+	public void removeScenes(Collection<Node> scenes){
 		this.mScene.removeAll(scenes);
 		this.mNewNodes.removeAll(scenes);
 	}
@@ -186,7 +186,7 @@ public abstract class RenderManager implements UpdateManager {
 		this.mUpdaters.remove(updater);
 	}
 	
-	public void removeUpdaters(Collection<Updater> updaters){
+	public void removeUpdaters(Collection<? extends Updater> updaters){
 		this.mUpdaters.removeAll(updaters);
 	}
 	

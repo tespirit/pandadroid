@@ -9,6 +9,6 @@ public interface UpdateManager {
 
 	public void addUpdater(Updater updater);
 	public void removeUpdater(Updater updater);
-	public void removeUpdaters(Collection<Updater> updaters);
+	public void removeUpdaters(Collection<? extends Updater> updaters);
 
 }

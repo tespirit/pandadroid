@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.render.Compare;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -159,11 +160,13 @@ public class Bamboo implements BambooAsset{
 	private List<Node> mSceneRoots;
 	private List<Animation> mAnimations;
 	private List<Camera> mCameras;
+	private List<Player> mPlayers;
 	
 	public Bamboo(){
 		this.mSceneRoots = new ArrayList<Node>();
 		this.mAnimations = new ArrayList<Animation>();
 		this.mCameras = new ArrayList<Camera>();
+		this.mPlayers = new ArrayList<Player>();
 	}
 	
 	public Bamboo(InputStream stream) throws Exception{
@@ -196,5 +199,10 @@ public class Bamboo implements BambooAsset{
 	@Override
 	public List<Node> getScenes() {
 		return this.mSceneRoots;
+	}
+	
+	@Override
+	public List<Player> getPlayers(){
+		return this.mPlayers;
 	}
 }

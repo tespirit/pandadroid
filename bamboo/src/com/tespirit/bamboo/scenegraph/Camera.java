@@ -9,18 +9,19 @@ import com.tespirit.bamboo.vectors.Ray;
 import com.tespirit.bamboo.vectors.Vector3d;
 
 public class Camera extends Node implements Updater{
-	private Matrix3d camera;
-	private Matrix3d worldTransform;
+	private Matrix3d mTransform;
+	private Matrix3d mWorldTransform;
+	private Matrix3d mWorldTransformInv;
 	
-	private float fov;
-	private float near;
-	private float far;
-	private int width;
-	private int height;
+	private float mFov;
+	private float mNear;
+	private float mFar;
+	private int mWidth;
+	private int mHeight;
 	
 	/* computed values */
-	private float nearHeight;
-	private float aspectRatio;
+	private float mNearHeight;
+	private float mAspectRatio;
 	
 	public Camera(){
 		this(45.0f);
@@ -31,13 +32,14 @@ public class Camera extends Node implements Updater{
 	}
 	
 	public Camera(float fov, float near, float far){
-		this.fov = fov;
-		this.near = near;
-		this.far = far;
+		this.mFov = fov;
+		this.mNear = near;
+		this.mFar = far;
 		
-		float[] buffer = Matrix3d.createBuffer(2);
-		this.camera = new Matrix3d(buffer);
-		this.worldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
+		float[] buffer = Matrix3d.createBuffer(3);
+		this.mTransform = new Matrix3d(buffer);
+		this.mWorldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
+		this.mWorldTransformInv = new Matrix3d(buffer, Matrix3d.SIZE*2);
 	}
 	
 	public void fit(Node node){
@@ -45,8 +47,8 @@ public class Camera extends Node implements Updater{
 			this.lookAt(node.getBoundingBox().getCenter());
 			
 			//compute the distance
-			float distance = node.getBoundingBox().getRadius()*this.near/this.nearHeight;
-			this.camera.getTranslation().setZ(-distance);
+			float distance = node.getBoundingBox().getRadius()*this.mNear/this.mNearHeight;
+			this.mTransform.getTranslation().setZ(-distance);
 			
 		} else {
 			this.lookAt(node); //at least center to the world transform
@@ -62,50 +64,55 @@ public class Camera extends Node implements Updater{
 	}
 	
 	public void lookAt(Vector3d point){
-		this.camera.lookAt(point);
+		this.mTransform.lookAt(point);
 	}
 	
 	
 	
 	@Override
 	public Matrix3d getWorldTransform(){
-		return this.worldTransform;
+		return this.mWorldTransformInv;
+	}
+	
+	public Matrix3d getWorldTransformNoInverse(){
+		return this.mWorldTransform;
 	}
 	
 	@Override
 	public void update(Matrix3d transform){
-		this.worldTransform.multiply(transform, this.camera).invert();
+		this.mWorldTransform.multiply(transform, this.mTransform);
+		this.mWorldTransformInv.invert(this.mWorldTransform);
 	}
 	
 	@Override
 	public Matrix3d getTransform(){
-		return this.camera;
+		return this.mTransform;
 	}
 	
 	public float getFov(){
-		return this.fov;
+		return this.mFov;
 	}
 	
 	public void setFov(float fov){
-		this.fov = fov;
+		this.mFov = fov;
 		this.markDirty();
 	}
 	
 	public float getNear(){
-		return this.near;
+		return this.mNear;
 	}
 	
 	public void setNear(float near){
-		this.near = near;
+		this.mNear = near;
 		this.markDirty();
 	}
 	
 	public float getFar(){
-		return this.far;
+		return this.mFar;
 	}
 	
 	public void setFar(float far){
-		this.far = far;
+		this.mFar = far;
 		this.markDirty();
 	}
 	
@@ -114,7 +121,7 @@ public class Camera extends Node implements Updater{
 	 * @return
 	 */
 	public float getNearHeight(){
-		return this.nearHeight;
+		return this.mNearHeight;
 	}
 	
 	/**
@@ -122,11 +129,11 @@ public class Camera extends Node implements Updater{
 	 * @return
 	 */
 	public float getNearWidth(){
-		return this.nearHeight * this.aspectRatio;
+		return this.mNearHeight * this.mAspectRatio;
 	}
 	
 	public float getAspectRatio(){
-		return this.aspectRatio;
+		return this.mAspectRatio;
 	}
 	
 	public void render(){
@@ -142,15 +149,15 @@ public class Camera extends Node implements Updater{
 	@Override
 	public void update() {
 		//compute near and far heights
-		this.nearHeight = (float)(this.near * Math.tan(this.fov/2.0));
-		this.aspectRatio = (float)width/(float)height;
-		Camera.renderer.setDisplay(this, width, height);
-		Camera.renderer.setDisplay(this, this.width, this.height);
+		this.mNearHeight = (float)(this.mNear * Math.tan(this.mFov/2.0));
+		this.mAspectRatio = (float)mWidth/(float)mHeight;
+		Camera.renderer.setDisplay(this, mWidth, mHeight);
+		Camera.renderer.setDisplay(this, this.mWidth, this.mHeight);
 	}
 
 	public void setDisplay(int width, int height) {
-		this.width = width;
-		this.height = height;
+		this.mWidth = width;
+		this.mHeight = height;
 		this.update();
 	}
 	
@@ -171,25 +178,24 @@ public class Camera extends Node implements Updater{
 	
 	@Override
 	protected void recycleInternal(){
-		this.camera = null;
-		this.worldTransform = null;
+		this.mTransform = null;
+		this.mWorldTransform = null;
+		this.mWorldTransformInv = null;
 	}
 	
 	public Ray createRay(float x, float y){
-		float halfHeight = (float)this.height/2;
-		float halfWidth = (float)this.width/2;
+		float halfHeight = (float)this.mHeight/2;
+		float halfWidth = (float)this.mWidth/2;
 			
 		float xUnit = (halfWidth - x)/halfWidth;
 		float yUnit = (y - halfHeight)/halfHeight;
 		
 		Ray ray = new Ray();
-		Matrix3d inverse = new Matrix3d(); 
-		ray.setDirection(xUnit*this.nearHeight*this.aspectRatio, 
-						 yUnit*this.nearHeight, 
-						 this.near);
+		ray.setDirection(xUnit*this.mNearHeight*this.mAspectRatio, 
+						 yUnit*this.mNearHeight, 
+						 this.mNear);
 		ray.setPostion(0.0f, 0.0f, 0.0f);
-		inverse.invert(this.worldTransform);
-		ray.transformBy(inverse);
+		ray.transformBy(this.mWorldTransform);
 		return ray;
 	}
 	

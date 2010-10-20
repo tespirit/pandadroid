@@ -7,6 +7,7 @@ import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.JointRotate;
+import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.controllers.MoveFlingController2d;
 import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.Bamboo;
@@ -19,13 +20,11 @@ import com.tespirit.bamboo.primitives.VertexIndices;
 import com.tespirit.bamboo.primitives.VertexBuffer;
 import com.tespirit.bamboo.scenegraph.Group;
 import com.tespirit.bamboo.scenegraph.Model;
-import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Matrix3d;
 
 import com.tespirit.pandadroid.R;
-import com.tespirit.pandadroid.app.Assets;
 import com.tespirit.pandadroid.app.DefaultTouchHandler;
 import com.tespirit.pandadroid.app.PandadroidView;
 import com.tespirit.pandadroid.debug.Debug;
@@ -34,6 +33,16 @@ import android.view.*;
 import android.widget.TextView;
 
 public class Pandamonium extends Activity {
+	
+	private BambooAsset mAsset;
+	private PandadroidView mView;
+	private int mDemo;
+	
+	private static final int DEMO_TEST_SCENE = 0;
+	private static final int DEMO_TEST_SKIN = 1;
+	private static final int DEMO_FILE = 2;
+	private static final int DEMO_COUNT = 3;
+	
 	
     /** Called when the activity is first created. */
     @Override
@@ -45,14 +54,14 @@ public class Pandamonium extends Activity {
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	setContentView(R.layout.main);
        
-        PandadroidView view = (PandadroidView)findViewById(R.id.pandadroid);
-        view.setFocusable(true);
-        view.setFocusableInTouchMode(true);
+        this.mView = (PandadroidView)findViewById(R.id.pandadroid);
+        this.mView.setFocusable(true);
+        this.mView.setFocusableInTouchMode(true);
         Debug.setConsole((TextView)findViewById(R.id.console));
 
-        view.createDefaultLight();
+        this.mView.createDefaultLight();
         
-        DefaultTouchHandler touchHandler = new DefaultTouchHandler(view);
+        DefaultTouchHandler touchHandler = new DefaultTouchHandler(this.mView);
         touchHandler.makeCameraControllable().set(3, 0, 45);
         MoveFlingController2d fling = touchHandler.makeNodesFlingable();
         fling.getParticles().addForce(new ConstantGravity());
@@ -60,16 +69,52 @@ public class Pandamonium extends Activity {
         ground.setHeight(-2.0f);
         fling.getParticles().addForce(ground);
     	
-    	try{
-    		view.addBamboo(Assets.loadBamboo("fire2.bam"));
-    		view.addSceneNode(this.createTestSG());
-    	} catch(Exception e){
-    		Debug.print(e);
-    		view.addSceneNode(this.createTestSG());
-    	}
+        this.mDemo = DEMO_TEST_SCENE;
+        loadAssets();
     }
     
-    public Node createTestSG(){
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    	switch(keyCode){
+    	case KeyEvent.KEYCODE_DPAD_LEFT:
+            this.mDemo = (this.mDemo+1)%DEMO_COUNT;
+            this.loadAssets();
+    		return true;
+    	case KeyEvent.KEYCODE_DPAD_RIGHT:
+            this.mDemo = (this.mDemo+DEMO_COUNT-1)%DEMO_COUNT;
+            this.loadAssets();
+    		return true;
+    	case KeyEvent.KEYCODE_DPAD_CENTER:
+    		this.loadAssets();
+    		return true;
+    	}
+        return false;
+    }
+    
+    private BambooAsset getDemo(){
+    	try{
+	    	switch(this.mDemo){
+	    	case DEMO_TEST_SCENE:
+	    		return this.createTestScene();
+	    	case DEMO_TEST_SKIN:
+	    		return this.createTestSkin();
+	    	case DEMO_FILE:
+	    		break;
+	    	}
+    	} catch(Exception e){
+    		Debug.print(e);
+    	}
+    	return this.createTestScene();
+    }
+    
+    private void loadAssets(){
+    	if(this.mAsset != null){
+    		this.mView.removeBamboo(this.mAsset);
+    	}
+    	this.mAsset = getDemo();
+    	this.mView.addBamboo(this.mAsset);
+    }
+    
+    public BambooAsset createTestScene(){
     	Group g = new Group();
     	
     	Texture t1 = new Texture();
@@ -108,11 +153,13 @@ public class Pandamonium extends Activity {
     	g.getTransform().rotateX(20.0f);
     	g.getTransform().rotateY(-20.0f);
     	
-    	return g;
+    	Bamboo assets = new Bamboo();
+    	assets.getScenes().add(g);
+    	
+    	return assets;
     }
     
-    @SuppressWarnings("unused")
-	private BambooAsset createDemoSkin(){
+	private BambooAsset createTestSkin(){
 		VertexIndices mesh = new VertexIndices(18, 8, new int[]{VertexBuffer.POSITION,VertexBuffer.NORMAL});
 		
 		VertexBuffer vb = mesh.getVertexBuffer();
@@ -241,6 +288,11 @@ public class Pandamonium extends Activity {
 		asset.getScenes().add(joint1);
 		asset.getScenes().add(model);
 		asset.getAnimations().add(animation);
+		Player player = new Player();
+		player.setAnimation(animation);
+		player.setSkeleton(joint1);
+		asset.getPlayers().add(player);
+		player.play();
 		
 		return asset;
 	}

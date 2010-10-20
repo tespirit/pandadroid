@@ -1,8 +1,5 @@
 package com.tespirit.pandadroid.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.creation.Lights;
@@ -108,14 +105,9 @@ public class PandadroidView extends GLSurfaceView {
 		this.mRenderer.addScene(node);
 	}
 	
-	/**
-	 * This assumes there is 1 animation to load.
-	 * @param bamboo
-	 * @return
-	 */
-	public Player addBambooSingleAnimation(BambooAsset bamboo){
-		this.mRenderer.addScenes(bamboo.getScenes());
-		return this.addAnimation(bamboo.getAnimations().get(0));
+	public void removeBamboo(BambooAsset bamboo){
+		this.mRenderer.removeScenes(bamboo.getScenes());
+		this.mRenderer.removeUpdaters(bamboo.getPlayers());
 	}
 	
 	/**
@@ -124,13 +116,11 @@ public class PandadroidView extends GLSurfaceView {
 	 * @param bamboo
 	 * @return
 	 */
-	public List<Player> addBamboo(BambooAsset bamboo){
+	public void addBamboo(BambooAsset bamboo){
 		this.mRenderer.addScenes(bamboo.getScenes());
-		ArrayList<Player> players = new ArrayList<Player>(bamboo.getAnimations().size());
-		for(Animation a : bamboo.getAnimations()){
-			players.add(this.addAnimation(a));
+		for(Updater updater : bamboo.getPlayers()){
+			this.mRenderer.addUpdater(updater);
 		}
-		return players;
 	}
 	
 	public void createDefaultLight(){
