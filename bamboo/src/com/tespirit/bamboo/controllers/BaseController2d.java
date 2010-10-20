@@ -3,15 +3,15 @@ package com.tespirit.bamboo.controllers;
 import com.tespirit.bamboo.render.UpdateManager;
 
 public abstract class BaseController2d implements Controller2d{
-	private float mX;
-	private float mY;
-	private float mDeltaX;
-	private float mDeltaY;
+	protected float mX;
+	protected float mY;
+	protected float mDeltaX;
+	protected float mDeltaY;
 	
-	private long mTime;
-	private long mDeltaTime;
+	protected long mTime;
+	protected long mDeltaTime;
 	
-	UpdateManager mUpdateManager;
+	protected UpdateManager mUpdateManager;
 	
 	@Override
 	public void begin(float x, float y, long time){

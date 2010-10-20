@@ -7,6 +7,7 @@ import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Channel;
 import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.JointRotate;
+import com.tespirit.bamboo.controllers.StandardCameraController2d;
 import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
@@ -51,7 +52,7 @@ public class Pandamonium extends Activity {
         view.createDefaultLight();
         
         DefaultTouchHandler touchHandler = new DefaultTouchHandler(view);
-        touchHandler.makeCameraRotatable(3);
+        touchHandler.makeCameraControllable().set(3, 0, 45);
         touchHandler.makeNodesFlingable().getParticles().addForce(new ConstantGravity());
     	
     	try{

@@ -2,12 +2,10 @@ package com.tespirit.pandadroid.app;
 
 import com.tespirit.bamboo.controllers.Controller2d;
 import com.tespirit.bamboo.controllers.ControllerDummy;
-import com.tespirit.bamboo.controllers.Dof3;
 import com.tespirit.bamboo.controllers.MatrixController2d;
 import com.tespirit.bamboo.controllers.MoveController2d;
 import com.tespirit.bamboo.controllers.MoveFlingController2d;
-import com.tespirit.bamboo.controllers.PolarRotateController2d;
-import com.tespirit.bamboo.controllers.TranslateController2d;
+import com.tespirit.bamboo.controllers.StandardCameraController2d;
 import com.tespirit.bamboo.render.RenderManager;
 import com.tespirit.bamboo.scenegraph.Camera;
 import com.tespirit.bamboo.scenegraph.Node;
@@ -89,28 +87,14 @@ public class DefaultTouchHandler implements OnTouchListener{
 		return true;
 	}
 	
-	public void makeCameraPannable(){
+	public StandardCameraController2d makeCameraControllable(){
 		Camera camera = this.mRenderManager.getCamera();
 		this.mRenderManager.setCamera(camera);
-
-		TranslateController2d ctrl = new TranslateController2d(Dof3.negativeX, Dof3.Y);
-		ctrl.setControlled(camera.getTransform());
-		ctrl.setScale(0.01f);
-		this.setDefaultController(ctrl);
-	}
-	
-	public void makeCameraRotatable(){
-		this.makeCameraRotatable(0.0f);
-	}
-	
-	public void makeCameraRotatable(float distance){
-		Camera camera = this.mRenderManager.getCamera();
-		this.mRenderManager.setCamera(camera);
-		
-		PolarRotateController2d ctrl = new PolarRotateController2d(distance);
-		ctrl.setControlled(camera.getTransform());
+		StandardCameraController2d ctrl = new StandardCameraController2d();
+		ctrl.setControlled(camera);
 		ctrl.setScale(0.25f);
 		this.setDefaultController(ctrl);
+		return ctrl;
 	}
 
 	/**
