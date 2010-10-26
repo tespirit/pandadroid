@@ -5,30 +5,49 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView
-	android:id="@+id/title"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content"
-    android:textSize="12px"
-    android:text="@string/output"
-    android:textColor="@color/titleTextColor"
-/>
-<TextView
-	android:id="@+id/console"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content"
-    android:textSize="10px"
-    android:textColor="@color/consoleTextColor"
-	android:background="@color/consoleColor"
-    android:typeface="monospace" 
-    android:maxLines="10"
-    android:minLines="10"
-/>
-<com.tespirit.pandadroid.app.PandadroidView
-	android:id="@+id/pandadroid"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	pandadroid:debug="true"
-	pandadroid:background_color="#444444"
-/>
+	<TextView
+		android:id="@+id/title"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content"
+	    android:textSize="12px"
+	    android:text="@string/output"
+	    android:textColor="@color/titleTextColor"
+	/>
+	<TextView
+		android:id="@+id/console"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content"
+	    android:textSize="10px"
+	    android:textColor="@color/consoleTextColor"
+		android:background="@color/consoleColor"
+	    android:typeface="monospace" 
+	    android:maxLines="10"
+	    android:minLines="10"
+	/>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:pandadroid="http://schemas.android.com/apk/res/com.tespirit.pandadroid"
+	    android:orientation="horizontal"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    >
+		<Button android:id="@+id/prev"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="&lt;" />
+		<Button android:id="@+id/reset"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="^" />
+		<Button android:id="@+id/next"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="&gt;" />
+	</LinearLayout>
+	<com.tespirit.pandadroid.app.PandadroidView
+		android:id="@+id/pandadroid"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		pandadroid:debug="true"
+		pandadroid:background_color="#444444"
+	/>
 </LinearLayout>

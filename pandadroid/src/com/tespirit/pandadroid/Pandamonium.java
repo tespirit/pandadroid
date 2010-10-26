@@ -31,17 +31,22 @@ import com.tespirit.pandadroid.app.PandadroidView;
 import com.tespirit.pandadroid.debug.Debug;
 
 import android.view.*;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class Pandamonium extends Activity {
 	
 	private BambooAsset mAsset;
 	private PandadroidView mView;
+	private Button mPrev;
+	private Button mReset;
+	private Button mNext;
 	private int mDemo;
 	
 	private static final int DEMO_TEST_SCENE = 0;
 	private static final int DEMO_TEST_SKIN = 1;
-	private static final int DEMO_FILE = 2;
+	private static final int DEMO_CANDY = 2;
 	private static final int DEMO_COUNT = 3;
 	
 	
@@ -55,6 +60,33 @@ public class Pandamonium extends Activity {
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	setContentView(R.layout.main);
        
+    	this.mPrev = (Button)findViewById(R.id.prev);
+    	this.mNext = (Button)findViewById(R.id.next);
+    	this.mReset = (Button)findViewById(R.id.reset);
+    	
+    	this.mPrev.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				mDemo = (mDemo-1)%DEMO_COUNT;
+				loadAssets();
+			}
+    	});
+    	
+    	this.mNext.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				mDemo = (mDemo+1)%DEMO_COUNT;
+				loadAssets();
+			}
+    	});
+    	
+    	this.mReset.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				loadAssets();
+			}
+    	});
+    	
         this.mView = (PandadroidView)findViewById(R.id.pandadroid);
         this.mView.setFocusable(true);
         this.mView.setFocusableInTouchMode(true);
@@ -70,41 +102,25 @@ public class Pandamonium extends Activity {
         ground.setHeight(-2.0f);
         fling.getParticles().addForce(ground);
     	
-        this.mDemo = DEMO_FILE;
+        this.mDemo = DEMO_TEST_SCENE;
         loadAssets();
     }
-    
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-    	switch(keyCode){
-    	case KeyEvent.KEYCODE_DPAD_LEFT:
-            this.mDemo = (this.mDemo+1)%DEMO_COUNT;
-            this.loadAssets();
-    		return true;
-    	case KeyEvent.KEYCODE_DPAD_RIGHT:
-            this.mDemo = (this.mDemo+DEMO_COUNT-1)%DEMO_COUNT;
-            this.loadAssets();
-    		return true;
-    	case KeyEvent.KEYCODE_DPAD_CENTER:
-    		this.loadAssets();
-    		return true;
-    	}
-        return false;
-    }
-    
+  
     private BambooAsset getDemo(){
     	try{
 	    	switch(this.mDemo){
 	    	case DEMO_TEST_SCENE:
+				Debug.print("Loading Test Scene...");
 	    		return this.createTestScene();
 	    	case DEMO_TEST_SKIN:
+				Debug.print("Loading Test Skin...");
 	    		return this.createTestSkin();
-	    	case DEMO_FILE:
+	    	case DEMO_CANDY:
+				Debug.print("Loading Candy Demo...");
 	    		BambooAsset b = Assets.loadBamboo("candy.bam");
-	    		Player p = new Player();
-	    		p.setSkeleton("d_root1");
-	    		p.setAnimation("candy");
-	    		p.play();
-	    		b.getPlayers().add(p);
+	    		if(b.getPlayers().size() > 0){
+	    			b.getPlayers().get(0).play();
+	    		}
 	    		return b;
 	    	}
     	} catch(Exception e){

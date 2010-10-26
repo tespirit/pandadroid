@@ -1,10 +1,8 @@
 package com.tespirit.pandadroid.debug;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.tespirit.bamboo.animation.*;
 import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
@@ -21,8 +19,6 @@ import android.widget.TextView;
 
 public class Debug {
 	private static RendererDebug renderer;
-	private static ArrayList<Player> animations = new ArrayList<Player>();
-	private static int currentAnimation = -1;
 	private static TextView console;
 	private static ArrayBlockingQueue<String> printBuffer = new ArrayBlockingQueue<String>(1000);
 	private static DebugKeys dk = new DebugKeys();
@@ -160,11 +156,6 @@ public class Debug {
 		}
 	}
 	
-	public static void addTestAnimation(Player player){
-		Debug.currentAnimation = 0;
-		Debug.animations.add(player);
-	}
-	
 	static class DebugKeys implements OnKeyListener{
 		
 		public DebugKeys(){
@@ -204,32 +195,7 @@ public class Debug {
 				case KeyEvent.KEYCODE_TAB:
 					Debug.print(Debug.renderer.getSceneIterator());
 					break;
-				case KeyEvent.KEYCODE_N:
-					if(currentAnimation != -1){
-						animations.get(currentAnimation).play();
-						Debug.print("Playing animation " + currentAnimation);
-					}
-					break;
-				case KeyEvent.KEYCODE_M:
-					if(currentAnimation != -1){
-						animations.get(currentAnimation).pause();
-						Debug.print("Stopping animation " + currentAnimation);
-					}
-					break;
-				case KeyEvent.KEYCODE_COMMA:
-					if(currentAnimation > 0){
-						currentAnimation--;
-						Debug.print("Previous animation: "+currentAnimation);
-					}
-					break;
-				case KeyEvent.KEYCODE_PERIOD:
-					if(currentAnimation < animations.size() - 1){
-						currentAnimation++;
-						Debug.print("Next animation: "+currentAnimation);
-					}
-					break;
 				}
-				
 			}
 
 			return true;
