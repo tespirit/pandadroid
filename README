@@ -2,7 +2,7 @@ PandaDroid is the ultimate Android 3d engine for the most ultimate 3d needs of a
 
 BAMporter is a desktop Bamboo asset editor with a plug-in system for extending it into a a game editor.
 
-Bamboo is a 3d data management system that can be sent to a custom renderer   to render data such as meshes, skinned meshes, lighting, camera, etc. It unfortunately is not eatable. So if you're a starving panda, you'll have to go to the store and buy canned bamboo.
+Bamboo is a 3d data management system that can be sent to a custom renderer to render data such as meshes, skinned meshes, lighting, camera, etc. It unfortunately is not eatable. So if you're a starving panda, you'll have to go to the store and buy canned bamboo.
 
 License:
 For the current alpha version, you are free to use this, just make sure to alert me of any bugs (or submit a patch for a bug).
