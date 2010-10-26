@@ -182,6 +182,12 @@ public abstract class RenderManager implements UpdateManager {
 		this.mUpdaters.add(updater);
 	}
 	
+	public void addUpdaters(Collection<? extends Updater> updaters){
+		for(Updater updater : updaters){
+			this.addUpdater(updater);
+		}
+	}
+	
 	public void removeUpdater(Updater updater){
 		this.mUpdaters.remove(updater);
 	}

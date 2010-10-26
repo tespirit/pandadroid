@@ -1,5 +1,6 @@
 package com.tespirit.bamboo.io;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,6 +65,7 @@ public class Collada implements BambooAsset{
 	
 	protected boolean mImportNormals;
 	protected boolean mFlipYTexCoord;
+	protected String mName;
 	
 	private enum NameId{
 		asset,
@@ -217,22 +219,22 @@ public class Collada implements BambooAsset{
 	 * @param normals
 	 * @throws Exception
 	 */
-	public Collada(XmlPullParser input, boolean flipYTexcoord, boolean normals)throws Exception{
+	public Collada(XmlPullParser input, String name, boolean flipYTexcoord, boolean normals)throws Exception{
 		this.mAnimations = new ArrayList<Animation>();
 		this.mSceneRoots = new ArrayList<Node>();
 		this.mCameras = new ArrayList<Camera>();
 		this.mPlayers = new ArrayList<Player>();
 		this.mImportNormals = normals;
 		this.mFlipYTexCoord = flipYTexcoord;
-		this.init(input);
+		this.init(input, name);
 	}
 	
-	public Collada(XmlPullParser input, boolean flipYTexcoord)throws Exception{
-		this(input, flipYTexcoord, true);
+	public Collada(XmlPullParser input, String name, boolean flipYTexcoord)throws Exception{
+		this(input, name, flipYTexcoord, true);
 	}
 	
-	public Collada(XmlPullParser input)throws Exception{
-		this(input, true, true);
+	public Collada(XmlPullParser input, String name)throws Exception{
+		this(input, name, true, true);
 	}
 	
 	private NameId getNameId(String name){
@@ -291,7 +293,7 @@ public class Collada implements BambooAsset{
 		return false;
 	}
 	
-	protected void init(XmlPullParser input) throws Exception{
+	protected void init(XmlPullParser input, String name) throws Exception{
 		
 		this.mSources = new Hashtable<String, Source>();
 		this.mSamplers = new Hashtable<String, Sampler>();
@@ -308,6 +310,12 @@ public class Collada implements BambooAsset{
 		
 		this.mParser = input;
 
+		this.mName = new File(name).getName();
+		int ext = this.mName.lastIndexOf('.');
+		if(ext != -1){
+			this.mName = this.mName.substring(0, ext);
+		}
+		
 		int eventType = this.mParser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT){
         	switch(eventType){
@@ -357,8 +365,7 @@ public class Collada implements BambooAsset{
         }
         
         if(this.mChannelOrder.size() > 0 && this.mMaxAnimationTime >= this.mMinAnimationTime){
-        	
-        	Animation animation = new Animation(this.mChannelOrder.size());
+        	Animation animation = new Animation(this.mName, this.mChannelOrder.size());
         	for(int i = 0; i < this.mChannelOrder.size(); i++){
         		Channel c = this.mChannels.get(this.mChannelOrder.get(i));
         		if(c == null){
@@ -368,6 +375,9 @@ public class Collada implements BambooAsset{
         	}
         	animation.addClip(new Clip("default", this.mMinAnimationTime, this.mMaxAnimationTime));
         	this.mAnimations.add(animation);
+        	Player player = new Player();
+			player.setAnimation(animation);
+			this.mPlayers.add(player);
         }
         this.mParser = null;
 	}

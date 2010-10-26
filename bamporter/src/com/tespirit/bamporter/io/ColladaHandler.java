@@ -25,7 +25,7 @@ public class ColladaHandler extends FileHandler{
 		try{
 			XmlPullParser parser = mXmlParserFactory.newPullParser();
 			parser.setInput(stream, null);
-			BambooAsset asset = new Collada(parser);
+			BambooAsset asset = new Collada(parser, file.getPath());
 			stream.close();
 			return asset;
 		} catch(Exception e){
@@ -46,8 +46,8 @@ public class ColladaHandler extends FileHandler{
 	}
 	
 	private class Collada extends com.tespirit.bamboo.io.Collada{
-		public Collada(XmlPullParser input) throws Exception{			
-			super(input);
+		public Collada(XmlPullParser input, String name) throws Exception{			
+			super(input, name);
 			for(String texturePath : this.mTexturePaths){
 				Assets.addTexturePath(texturePath);
 			}

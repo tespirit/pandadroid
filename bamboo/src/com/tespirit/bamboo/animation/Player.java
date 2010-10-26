@@ -77,6 +77,10 @@ public class Player implements TimeUpdater, Externalizable{
 		}
 	}
 	
+	public Animation getAnimation(){
+		return this.mAnimation;
+	}
+	
 	public void setSkeleton(String skeletonName){
 		Node node = Node.getNode(skeletonName);
 		if(node instanceof Joint){

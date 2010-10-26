@@ -25,6 +25,7 @@ import com.tespirit.bamboo.surfaces.Texture;
 import com.tespirit.bamboo.vectors.Matrix3d;
 
 import com.tespirit.pandadroid.R;
+import com.tespirit.pandadroid.app.Assets;
 import com.tespirit.pandadroid.app.DefaultTouchHandler;
 import com.tespirit.pandadroid.app.PandadroidView;
 import com.tespirit.pandadroid.debug.Debug;
@@ -62,14 +63,14 @@ public class Pandamonium extends Activity {
         this.mView.createDefaultLight();
         
         DefaultTouchHandler touchHandler = new DefaultTouchHandler(this.mView);
-        touchHandler.makeCameraControllable().set(3, 0, 45);
+        touchHandler.makeCameraControllable().set(1.5f, 0, 45);
         MoveFlingController2d fling = touchHandler.makeNodesFlingable();
         fling.getParticles().addForce(new ConstantGravity());
         Ground ground = new Ground();
         ground.setHeight(-2.0f);
         fling.getParticles().addForce(ground);
     	
-        this.mDemo = DEMO_TEST_SCENE;
+        this.mDemo = DEMO_FILE;
         loadAssets();
     }
     
@@ -98,7 +99,13 @@ public class Pandamonium extends Activity {
 	    	case DEMO_TEST_SKIN:
 	    		return this.createTestSkin();
 	    	case DEMO_FILE:
-	    		break;
+	    		BambooAsset b = Assets.loadBamboo("candy.bam");
+	    		Player p = new Player();
+	    		p.setSkeleton("d_root1");
+	    		p.setAnimation("candy");
+	    		p.play();
+	    		b.getPlayers().add(p);
+	    		return b;
 	    	}
     	} catch(Exception e){
     		Debug.print(e);

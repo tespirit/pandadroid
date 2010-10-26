@@ -30,7 +30,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import com.tespirit.bamboo.animation.Animation;
+import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.creation.Primitives;
 import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
@@ -451,6 +451,7 @@ public class BamporterFrame extends JFrame{
 	private void loadBamboo(){
 		this.clearAll();
 		this.mRenderer.addScenes(this.mBamboo.getScenes());
+		this.mRenderer.addUpdaters(this.mBamboo.getPlayers());
 		
 		for(Node node : this.mBamboo.getScenes()){
 			Editor editor = EditorFactory.createEditor(node);
@@ -458,8 +459,8 @@ public class BamporterFrame extends JFrame{
 				this.mSceneNodes.add((TreeNodeEditor)editor);
 			}
 		}
-		for(Animation animation : this.mBamboo.getAnimations()){
-			Editor editor = EditorFactory.createEditor(animation);
+		for(Player player : this.mBamboo.getPlayers()){
+			Editor editor = EditorFactory.createEditor(player);
 			if(editor instanceof TreeNodeEditor){
 				this.mAnimations.add((TreeNodeEditor)editor);
 			}

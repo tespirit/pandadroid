@@ -118,7 +118,7 @@ public class Assets {
 		try{
 			XmlPullParser parser = Xml.newPullParser();
 			parser.setInput(stream, null);
-			BambooAsset asset = new Collada(parser);
+			BambooAsset asset = new Collada(parser, name);
 			stream.close();
 			return asset;
 		}catch (Exception e){

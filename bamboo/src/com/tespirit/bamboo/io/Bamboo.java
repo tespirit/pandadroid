@@ -98,6 +98,7 @@ public class Bamboo implements BambooAsset{
 		header.mNodeCount = asset.getScenes().size();
 		header.mAnimationCount = asset.getAnimations().size();
 		header.mCameraCount = asset.getCameras().size();
+		header.mPlayerCount = asset.getPlayers().size();
 		
 		ObjectOutputStream output = new ObjectOutputStream(stream);
 		header.write(output);
@@ -109,6 +110,9 @@ public class Bamboo implements BambooAsset{
 		}
 		for(Camera camera : asset.getCameras()){
 			output.writeObject(camera);
+		}
+		for(Player player : asset.getPlayers()){
+			output.writeObject(player);
 		}
 	}
 	
@@ -130,6 +134,7 @@ public class Bamboo implements BambooAsset{
 		private int mNodeCount;
 		private int mAnimationCount;
 		private int mCameraCount;
+		private int mPlayerCount;
 		
 		private BambooHeader(byte type){
 			this.mType = type;
@@ -146,6 +151,7 @@ public class Bamboo implements BambooAsset{
 			this.mNodeCount = stream.readInt();
 			this.mAnimationCount = stream.readInt();
 			this.mCameraCount = stream.readInt();
+			this.mPlayerCount = stream.readInt();
 		}
 		
 		private void write(ObjectOutputStream stream) throws Exception{
@@ -154,6 +160,7 @@ public class Bamboo implements BambooAsset{
 			stream.writeInt(this.mNodeCount);
 			stream.writeInt(this.mAnimationCount);
 			stream.writeInt(this.mCameraCount);
+			stream.writeInt(this.mPlayerCount);
 		}
 	}
 	
@@ -170,10 +177,13 @@ public class Bamboo implements BambooAsset{
 	}
 	
 	public Bamboo(InputStream stream) throws Exception{
-		this();
-		
 		ObjectInputStream output = new ObjectInputStream(stream);
 		BambooHeader header = new BambooHeader(output, BambooHeader.BAMBOO);
+		
+		this.mSceneRoots = new ArrayList<Node>(header.mNodeCount);
+		this.mAnimations = new ArrayList<Animation>(header.mAnimationCount);
+		this.mCameras = new ArrayList<Camera>(header.mCameraCount);
+		this.mPlayers = new ArrayList<Player>(header.mPlayerCount);
 		
 		for(int i = 0; i < header.mNodeCount; i++){
 			this.mSceneRoots.add((Node)output.readObject());
@@ -183,6 +193,9 @@ public class Bamboo implements BambooAsset{
 		}
 		for(int i = 0; i < header.mCameraCount; i++){
 			this.mCameras.add((Camera)output.readObject());
+		}
+		for(int i = 0; i < header.mPlayerCount; i++){
+			this.mPlayers.add((Player)output.readObject());
 		}
 	}
 
