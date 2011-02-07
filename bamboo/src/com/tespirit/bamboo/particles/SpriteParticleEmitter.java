@@ -59,7 +59,7 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 			this.mSurface = surface;
 		else
 			this.mSurface = Surface.getDefaultSurface();
-		this.registerDynamicLoader(this.mSurface);
+		this.registerResource(this.mSurface);
 	}
 	
 	public SpriteParticleEmitter(ParticleGenerator<StandardParticle> generator){
@@ -154,7 +154,7 @@ public class SpriteParticleEmitter extends SpriteNode implements ParticleEmitter
 	@Override
 	public void setRenderManager(RenderManager renderManager){
 		super.setRenderManager(renderManager);
-		this.registerDynamicLoader(this.mSurface);
+		this.registerResource(this.mSurface);
 	}
 
 	//IO

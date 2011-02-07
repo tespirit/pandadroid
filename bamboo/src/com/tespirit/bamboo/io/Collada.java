@@ -143,6 +143,7 @@ public class Collada implements BambooAsset{
 		profile_COMMON,
 		technique,
 		diffuse,
+		transparent,
 		texture,
 		color,	
 		image,
@@ -194,9 +195,15 @@ public class Collada implements BambooAsset{
 		}
 	}
 	
-	private class Effect{
+	private class EffectParam{
 		Color4 color;
 		String textureId;
+	}
+	
+	private class Effect {
+		EffectParam diffuse;
+		EffectParam transparent;
+		
 	}
 	
 	private class InvalidRefException extends Exception{
@@ -288,6 +295,20 @@ public class Collada implements BambooAsset{
 				if(this.getTagId() == parentId){
 					return false;
 				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean moveToFirstChild() throws Exception{
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				return true;
+			case XmlPullParser.END_TAG:
+				return false;
 			}
 		}
 		return false;
@@ -454,14 +475,20 @@ public class Collada implements BambooAsset{
 		String effectId = this.mEffectsLink.get(materialId);
 		Effect effect = this.mEffects.get(effectId);
 		if(effect != null){
-			if(effect.textureId != null){
-				Texture texture = new Texture();
-				texture.setDiffuseTextureName(this.mTextureNames.get(effect.textureId));
-				surface = texture;
-			} else if(effect.color != null){
-				Color color = new Color();
-				color.getColor().copy( effect.color);
-				surface = color;
+			if(effect.diffuse != null){
+				if(effect.diffuse.textureId != null){
+					Texture texture = new Texture();
+					texture.setDiffuseTextureName(this.mTextureNames.get(effect.diffuse.textureId));
+					surface = texture;
+					//set blending
+					if(effect.transparent != null && effect.transparent.textureId.equals(effect.diffuse.textureId)){
+						texture.setBlending(Surface.BLEND_ALPHA);
+					}
+				} else if(effect.diffuse.color != null){
+					Color color = new Color();
+					color.getColor().copy( effect.diffuse.color);
+					surface = color;
+				}
 			}
 		}
 		return surface;
@@ -1286,8 +1313,8 @@ public class Collada implements BambooAsset{
 	private void parseLibraryEffects() throws Exception{
 		while(this.moveToChildNode(NameId.effect, NameId.library_effects)){
 			String id = this.getAttr(NameId.id);
-			if(this.moveToChildNode(NameId.diffuse, NameId.effect)){
-				Effect effect = this.parseEffectParam(NameId.diffuse);
+			if(this.moveToChildNode(NameId.technique, NameId.effect) && this.moveToFirstChild()){
+				Effect effect = this.parseEffect();
 				if(effect != null){
 					this.mEffects.put(id, effect);
 				}
@@ -1295,9 +1322,38 @@ public class Collada implements BambooAsset{
 		}
 	}
 	
-	private Effect parseEffectParam(NameId paramId) throws Exception{
-		Effect effect = new Effect();
-		
+	private Effect parseEffect() throws Exception{
+		Effect effect = null;
+		int eventType = this.mParser.getEventType();
+		while(eventType != XmlPullParser.END_DOCUMENT){
+			eventType = this.mParser.next();
+			switch(eventType){
+			case XmlPullParser.START_TAG:
+				switch(this.getTagId()){
+				case diffuse:
+					if(effect == null){
+						effect = new Effect();
+					}
+					effect.diffuse = parseEffectParam(NameId.diffuse); 
+					break;
+				case transparent:
+					if(effect == null){
+						effect = new Effect();
+					}
+					effect.transparent = parseEffectParam(NameId.transparent);
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				return effect;
+			}
+		}
+		return null;
+	}
+	
+	private EffectParam parseEffectParam(NameId paramId) throws Exception{
+		EffectParam effect = new EffectParam();
+
 		int eventType = this.mParser.getEventType();
 		while(eventType != XmlPullParser.END_DOCUMENT){
 			eventType = this.mParser.next();

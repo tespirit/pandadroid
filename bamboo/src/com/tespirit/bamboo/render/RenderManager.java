@@ -233,7 +233,14 @@ public abstract class RenderManager implements UpdateManager {
 		}
 	}
 	
+	public void refreshResource(Resource resource){
+		if(this.mStoredResources.contains(resource)){
+			this.mResources.add(resource);
+		}
+	}
+	
 	public void unloadResource(Resource resource){
+		//TODO: check to see if there is a way to unload a resource.
 		if(this.mStoredResources.contains(resource)){
 			this.mResources.remove(resource);
 			this.mStoredResources.remove(resource);

@@ -128,7 +128,7 @@ public class Light extends RenderableNode implements Resource{
 		this.specular = null;
 		this.worldPosition = null;
 		this.worldTransform = null;
-		this.unregisterDynamicLoader(this);
+		this.unregisterResource(this);
 	}
 	
 	@Override
@@ -139,7 +139,7 @@ public class Light extends RenderableNode implements Resource{
 	@Override
 	public void setRenderManager(RenderManager renderManager){
 		super.setRenderManager(renderManager);
-		this.registerDynamicLoader(this);
+		this.registerResource(this);
 	}
 	
 	@Override

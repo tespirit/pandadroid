@@ -78,7 +78,7 @@ public class Model extends RenderableNode implements Externalizable{
 	public void setPrimitive(Primitive primitive){
 		this.mPrimitive = primitive;
 		this.mPrimitive.computeBoundingBox(this.mBoundingBox);
-		this.registerDynamicLoader(this.mSurface);
+		this.registerResource(this.mSurface);
 	}
 	
 	public Surface getSurface(){
@@ -90,7 +90,7 @@ public class Model extends RenderableNode implements Externalizable{
 			this.mSurface = surface;
 		else
 			this.mSurface = Surface.getDefaultSurface();
-		this.registerDynamicLoader(this.mSurface);
+		this.registerResource(this.mSurface);
 	}
 	
 	@Override
@@ -108,14 +108,14 @@ public class Model extends RenderableNode implements Externalizable{
 	@Override
 	public void setRenderManager(RenderManager renderManager){
 		super.setRenderManager(renderManager);
-		this.registerDynamicLoader(this.mSurface);
-		this.registerDynamicLoader(this.mPrimitive);
+		this.registerResource(this.mSurface);
+		this.registerResource(this.mPrimitive);
 	}
 	
 	@Override
 	protected void recycleInternal(){
-		this.unregisterDynamicLoader(this.mSurface);
-		this.unregisterDynamicLoader(this.mPrimitive);
+		this.unregisterResource(this.mSurface);
+		this.unregisterResource(this.mPrimitive);
 		this.mBoundingBox = null;
 		this.mTransform = null;
 		this.mWorldTransform = null;

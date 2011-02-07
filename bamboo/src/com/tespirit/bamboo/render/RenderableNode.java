@@ -18,13 +18,13 @@ public abstract class RenderableNode extends Node{
 		this.getRenderManager().addRenderable(this);
 	}
 	
-	protected void registerDynamicLoader(Resource dynamicLoader){
+	protected void registerResource(Resource dynamicLoader){
 		if(this.getRenderManager() != null){
 			this.getRenderManager().loadResource(dynamicLoader);
 		}
 	}
 	
-	protected void unregisterDynamicLoader(Resource dynamicLoader){
+	protected void unregisterResource(Resource dynamicLoader){
 		if(this.getRenderManager() != null){
 			this.getRenderManager().unloadResource(dynamicLoader);
 		}
