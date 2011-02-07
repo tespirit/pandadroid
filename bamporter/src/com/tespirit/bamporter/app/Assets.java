@@ -17,7 +17,6 @@ import java.util.Map;
 import javax.media.opengl.GLProfile;
 import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
-import javax.swing.filechooser.FileFilter;
 
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -25,6 +24,7 @@ import com.tespirit.bamboo.io.Bamboo;
 import com.tespirit.bamboo.io.BambooAsset;
 import com.tespirit.bamporter.io.BambooHandler;
 import com.tespirit.bamporter.io.ColladaHandler;
+import com.tespirit.bamporter.io.FileFilterManager;
 import com.tespirit.bamporter.io.FileHandler;
 import com.tespirit.bamporter.editor.Util;
 
@@ -36,7 +36,9 @@ public class Assets {
 	private static GLProfile mGlProfile;
 	
 	private static Map<String, FileHandler> mFileHandlers = new HashMap<String, FileHandler>();
-	private static List<FileFilter> mFilters = new ArrayList<FileFilter>();
+	
+	private static FileFilterManager mBambooFilters = new FileFilterManager();
+	private static FileFilterManager mTextureFilters = new FileFilterManager();
 	
 	private static String ASSET_DIR;
 	private static String HOME_DIR;
@@ -58,6 +60,10 @@ public class Assets {
 		if(new File(Assets.USER_DATA_DIR).isFile()){
 			Util.alertError("Preferences cannot be saved because a file is named the same as the preference folder: " + Assets.USER_DATA_DIR);
 		}
+	
+		mTextureFilters.addExtension("Bitmap", "bmp");
+		mTextureFilters.addExtension("PNG", "png");
+		mTextureFilters.addExtension("JPG", "jpg");
 	}
 	
 	/**
@@ -197,11 +203,15 @@ public class Assets {
 	
 	public static void registerFileHandler(FileHandler fh){
 		mFileHandlers.put(fh.getExtension(), fh);
-		mFilters.add(fh.getFilter());
+		mBambooFilters.addFilter(fh.getFilter());
 	}
 	
-	public static List<FileFilter> getFilters(){
-		return mFilters;
+	public static FileFilterManager getBambooFilterManger(){
+		return mBambooFilters;
+	}
+	
+	public static FileFilterManager getTextureFilterManger(){
+		return mTextureFilters;
 	}
 	
 	public static BambooAsset open(File file) throws Exception{

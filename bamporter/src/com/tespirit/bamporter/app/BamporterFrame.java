@@ -25,7 +25,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -89,14 +88,13 @@ public class BamporterFrame extends JFrame{
 		
 		this.setTitle(TITLE);
 		
-		Assets.init();
-		
 		this.setLayout(new GridLayout(1,1));
 		
 		//initialize the menus!
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem newParticleButton = new JMenuItem("New ParticleGenerator");
+		JMenuItem newButton = new JMenuItem("New");
 		JMenuItem openButton = new JMenuItem("Open");
 		this.mSaveAllButton = new JMenuItem("Save All");
 		this.mSaveScenesButton = new JMenuItem("Save Scenes");
@@ -104,6 +102,8 @@ public class BamporterFrame extends JFrame{
 		JMenuItem mergeAnimationsButton = new JMenuItem("Merge Animations");
 		JMenuItem exitButton = new JMenuItem("Exit");
 		
+		fileMenu.add(newButton);
+		fileMenu.addSeparator();
 		fileMenu.add(openButton);
 		fileMenu.addSeparator();
 		fileMenu.add(this.mSaveAllButton);
@@ -234,6 +234,13 @@ public class BamporterFrame extends JFrame{
 			}
 		});
 		
+		newButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				clearAll();
+			}
+		});
+		
 		openButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -304,9 +311,7 @@ public class BamporterFrame extends JFrame{
 		this.mFileSave.setCurrentDirectory(Preferences.getSaveDirectory());
 		
 		this.mFileSave.setFileFilter(BambooHandler.getInstance().getFilter());
-		for(FileFilter filter : Assets.getFilters()){
-			this.mFileOpen.addChoosableFileFilter(filter);
-		}
+		Assets.getBambooFilterManger().setFilters(this.mFileOpen);
 		
 	}
 	

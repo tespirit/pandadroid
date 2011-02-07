@@ -1,7 +1,12 @@
 package com.tespirit.bamporter.standardEditors;
 
+import java.io.File;
+
 import com.tespirit.bamboo.surfaces.Texture;
-import com.tespirit.bamporter.properties.StringProperty;
+import com.tespirit.bamporter.app.Assets;
+import com.tespirit.bamporter.app.BamporterFrame;
+import com.tespirit.bamporter.app.Preferences;
+import com.tespirit.bamporter.properties.ResourceProperty;
 
 public class TextureEditor extends SurfaceEditor{
 	@Override
@@ -26,16 +31,18 @@ public class TextureEditor extends SurfaceEditor{
 		protected Editor(Texture texture) {
 			super(texture);
 			this.mTexture = texture;
-			this.addProperty(new StringProperty("Diffuse"){
+			this.addProperty(new ResourceProperty("Diffuse", Assets.getTextureFilterManger()){
 
 				@Override
-				public void setValue(String value) {
-					mTexture.setDiffuseTextureName(value);
+				public void setValue(File value) {
+					mTexture.setDiffuseTextureName(value.getName());
+					Assets.addTexturePath(value.getParent());
+					BamporterFrame.getInstance().getRenderManger().refreshResource(mTexture);
 				}
 
 				@Override
-				public String getValue() {
-					return mTexture.getDiffuseTextureName();
+				public File getValue() {
+					return new File(Preferences.getSaveDirectory(), mTexture.getDiffuseTextureName());
 				}
 			});
 		}	

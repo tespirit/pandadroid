@@ -7,32 +7,10 @@ import javax.swing.filechooser.FileFilter;
 import com.tespirit.bamboo.io.BambooAsset;
 
 public abstract class FileHandler {
-	private String mName;
-	private String mExtension;
-	private FileFilter mFilter;
-	
-	class Filter extends FileFilter{
-
-		@Override
-		public boolean accept(File arg0) {
-			if(arg0.isDirectory()){
-				return true;
-			} else {
-				return arg0.getName().toLowerCase().endsWith(mExtension);
-			}
-		}
-
-		@Override
-		public String getDescription() {
-			return mName;
-		}
-	}
+	private FileFilterManager.ExtensionFilter mFilter;
 	
 	protected FileHandler(String name, String extension){
-		extension = extension.toLowerCase();
-		this.mExtension = "." + extension; 
-		this.mName = name + "(*."+extension+")";
-		this.mFilter = new Filter();
+		this.mFilter = new FileFilterManager.ExtensionFilter(name, extension);
 	}
 	
 	public FileFilter getFilter(){
@@ -40,7 +18,7 @@ public abstract class FileHandler {
 	}
 	
 	public String getExtension(){
-		return this.mExtension;
+		return this.mFilter.getExtension();
 	}
 	
 	public abstract BambooAsset open(File file) throws Exception;

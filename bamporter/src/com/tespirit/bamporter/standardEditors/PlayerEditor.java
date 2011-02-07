@@ -1,6 +1,8 @@
 package com.tespirit.bamporter.standardEditors;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.tespirit.bamboo.animation.Clip;
 import com.tespirit.bamboo.animation.Joint;
@@ -33,6 +35,7 @@ public class PlayerEditor implements Factory{
 		private Player mPlayer;
 		private ComboProperty<JointDisplay> mSkeletons;
 		private ComboProperty<ClipDisplay> mClips;
+		private Map<Clip, ClipDisplay> mClipLookup;
 		
 		private class JointDisplay{
 			Joint mJoint;
@@ -72,6 +75,7 @@ public class PlayerEditor implements Factory{
 
 		protected Editor(Player data) {
 			super(data, false);
+			this.mClipLookup = new HashMap<Clip, ClipDisplay>();
 			this.mPlayer = data;
 			this.addEditor(data.getAnimation());
 
@@ -126,6 +130,19 @@ public class PlayerEditor implements Factory{
 			for(int i = 0; i < this.mPlayer.getAnimation().getClipCount(); i++){
 				Clip clip = this.mPlayer.getAnimation().getClip(i);
 				this.mClips.addItem(new ClipDisplay(clip));
+			}
+		}
+		
+		public void addClip(Clip clip){
+			ClipDisplay clippy = new ClipDisplay(clip);
+			this.mClipLookup.put(clip, clippy);
+			this.mClips.addItem(clippy);
+		}
+		
+		public void removeClip(Clip clip){
+			ClipDisplay clippy = this.mClipLookup.get(clip);
+			if(clippy != null){
+				this.mClips.removeItem(clippy);
 			}
 		}
 		

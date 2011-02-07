@@ -85,6 +85,7 @@ public class AnimationEditor implements Factory{
 		public void addNewClip(Clip clip){
 			this.mAnimation.addClip(clip);
 			this.mClipLookup.add(clip.getName());
+			((PlayerEditor.Editor)this.getParent()).addClip(clip);
 			this.addEditor(clip);
 		}
 		
@@ -109,6 +110,7 @@ public class AnimationEditor implements Factory{
 				Clip clip = ((ClipEditor.Editor)node).getClip();
 				this.mClipLookup.remove(clip.getName());
 				this.mAnimation.removeClip(clip);
+				((PlayerEditor.Editor)this.getParent()).removeClip(clip);
 			}
 		}
 		
