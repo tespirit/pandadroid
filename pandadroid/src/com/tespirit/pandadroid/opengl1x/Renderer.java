@@ -282,10 +282,6 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 				return;
 			}
 			
-			if(texture.autoDetectAlpha() && bitmap.hasAlpha()){
-				texture.setBlending(Surface.BLEND_ALPHA);
-			}
-			
 			int[] tempTextures = new int[1];
 			mGl.glGenTextures(1, tempTextures, 0);
 			texture.setDiffuseTextureId(tempTextures[0]);

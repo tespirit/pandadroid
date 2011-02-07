@@ -80,6 +80,10 @@ public class DefaultTouchHandler implements OnTouchListener{
 		case MotionEvent.ACTION_MOVE:
 			this.mCurrent.applyChange(x, y, time);
 			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
+			break;
+		case MotionEvent.ACTION_POINTER_UP:
+			break;
 		default:
 			break;
 		}

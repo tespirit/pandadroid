@@ -46,8 +46,10 @@ public class Pandamonium extends Activity {
 	
 	private static final int DEMO_TEST_SCENE = 0;
 	private static final int DEMO_TEST_SKIN = 1;
-	private static final int DEMO_CANDY = 2;
-	private static final int DEMO_COUNT = 3;
+	private static final int DEMO_DOUG = 2;
+	private static final int DEMO_JOCELYN = 3;
+	private static final int DEMO_CANDY = 4;
+	private static final int DEMO_COUNT = 5;
 	
 	
     /** Called when the activity is first created. */
@@ -101,7 +103,7 @@ public class Pandamonium extends Activity {
         Ground ground = new Ground();
         ground.setHeight(-2.0f);
         fling.getParticles().addForce(ground);
-    	
+        
         this.mDemo = DEMO_TEST_SCENE;
         loadAssets();
     }
@@ -122,6 +124,12 @@ public class Pandamonium extends Activity {
 	    			b.getPlayers().get(0).play();
 	    		}
 	    		return b;
+	    	case DEMO_DOUG:
+	    		Debug.print("Loading Doug Demo...");
+	    		return Assets.loadBamboo("doug.bam");
+	    	case DEMO_JOCELYN:
+	    		Debug.print("Loading Doug Demo...");
+	    		return Assets.loadBamboo("jocelyn.bam");
 	    	}
     	} catch(Exception e){
     		Debug.print(e);
