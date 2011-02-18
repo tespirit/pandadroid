@@ -17,10 +17,10 @@ import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.surfaces.Color;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
-import com.tespirit.pandadroid.opengl1x.AndroidClock;
-import com.tespirit.pandadroid.opengl1x.Renderer;
+import com.tespirit.pandadroid.renderer.AndroidClock;
+import com.tespirit.pandadroid.renderer.GL1Renderer;
 
-public class RendererDebug extends Renderer{
+public class RendererDebug extends GL1Renderer{
 	public boolean renderDebug;
 	public boolean renderNormals;
 	public boolean renderBoundingBox;

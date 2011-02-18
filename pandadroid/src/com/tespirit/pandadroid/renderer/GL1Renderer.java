@@ -1,4 +1,4 @@
-package com.tespirit.pandadroid.opengl1x;
+package com.tespirit.pandadroid.renderer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -24,7 +24,7 @@ import com.tespirit.pandadroid.app.Assets;
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
 
-public class Renderer extends RenderManager implements android.opengl.GLSurfaceView.Renderer{
+public class GL1Renderer extends RenderManager implements android.opengl.GLSurfaceView.Renderer{
 	protected GL10 mGl;
 	protected int mCurrentLightId;
 	
@@ -33,20 +33,20 @@ public class Renderer extends RenderManager implements android.opengl.GLSurfaceV
 	private int[] mBlendSource;
 	private int[] mBlendDest;
 	
-	public Renderer() {
+	public GL1Renderer() {
 		this(new AndroidClock());
 	}
 	
-	public Renderer(Color4 backgroundColor){
+	public GL1Renderer(Color4 backgroundColor){
 		this(new AndroidClock(), backgroundColor);
 	}
 	
-	public Renderer(Clock clock){
+	public GL1Renderer(Clock clock){
 		this(clock, new Color4());
 		
 	}
 	
-	public Renderer(Clock clock, Color4 backgroundColor){
+	public GL1Renderer(Clock clock, Color4 backgroundColor){
 		super(clock, backgroundColor);
 		this.mCurrentLightId = 0;
 		

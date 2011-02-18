@@ -7,7 +7,7 @@ import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Matrix3d;
 import com.tespirit.bamboo.vectors.Vector3d;
 import com.tespirit.pandadroid.app.PandadroidView;
-import com.tespirit.pandadroid.opengl1x.Renderer;
+import com.tespirit.pandadroid.renderer.GL1Renderer;
 
 import android.text.Selection;
 import android.text.Spannable;
@@ -23,7 +23,7 @@ public class Debug {
 	private static ArrayBlockingQueue<String> printBuffer = new ArrayBlockingQueue<String>(1000);
 	private static DebugKeys dk = new DebugKeys();
 	
-	public static Renderer init(PandadroidView pv){
+	public static GL1Renderer init(PandadroidView pv){
 		Debug.renderer = new RendererDebug();
 		pv.setOnKeyListener(Debug.dk);
 		Debug.print("Panda3d debug mode active!");

@@ -1,5 +1,6 @@
 package com.tespirit.pandadroid.app;
 
+import com.tespirit.bamboo.BamLog;
 import com.tespirit.bamboo.animation.Animation;
 import com.tespirit.bamboo.animation.Player;
 import com.tespirit.bamboo.creation.Lights;
@@ -10,19 +11,22 @@ import com.tespirit.bamboo.scenegraph.Node;
 import com.tespirit.bamboo.vectors.Color4;
 import com.tespirit.pandadroid.R;
 import com.tespirit.pandadroid.debug.Debug;
+import com.tespirit.pandadroid.renderer.GL1Renderer;
+import com.tespirit.pandadroid.renderer.GL2Renderer;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class PandadroidView extends GLSurfaceView {
 	private com.tespirit.bamboo.render.RenderManager mRenderer;
 	private boolean mDebug;
-	@SuppressWarnings("unused")
-	private Context mContext;
-
+	
 	public PandadroidView(Context context){
 		super(context);
 		this.mDebug = false;
@@ -55,22 +59,52 @@ public class PandadroidView extends GLSurfaceView {
 	}
 	
 	private void init(Context context, Color4 bgColor){
-		Assets.init(context);
-		this.mContext = context;
+		BamLog.setLogger(new BamLog.Logger() {
+			private static final String TAG = "PandaDroid";
+			
+			@Override
+			public void warning(String message) {
+				Log.w(TAG, message);
+			}
+			
+			@Override
+			public void info(String message) {
+				Log.i(TAG, message);
+			}
+			
+			@Override
+			public void error(Exception exception) {
+				Log.e(TAG, "An exception has occured:", exception);
+			}
+			
+			@Override
+			public void error(String message) {
+				Log.e(TAG, message);
+			}
+			
+			@Override
+			public void debug(String message) {
+				Log.d(TAG, message);
+			}
+		});
 		
-		//TODO:smartly create a renderer based on the availible graphics api.
-		this.initOpenGl1x(bgColor);
+		Assets.init(context);
+		this.initRenderer(context, bgColor);
 	}
 	
-	private void initOpenGl1x(Color4 bgColor){
-		com.tespirit.pandadroid.opengl1x.Renderer gl1x;
-		if(this.mDebug){
-			gl1x = Debug.init(this);
-		} else {
-			gl1x = new com.tespirit.pandadroid.opengl1x.Renderer(bgColor);
-		}
-		this.mRenderer = gl1x;
-		this.setRenderer(gl1x);
+	private void initRenderer(Context context, Color4 bgColor){
+		ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
+        if(info.reqGlEsVersion >= 0x20000){
+        	this.setEGLContextClientVersion(2);
+        	GL2Renderer renderer = new GL2Renderer(bgColor);
+        	this.mRenderer = renderer;
+        	this.setRenderer(renderer);
+        } else {
+        	GL1Renderer renderer = this.mDebug ? Debug.init(this) : new GL1Renderer(bgColor);
+        	this.mRenderer = renderer;
+        	this.setRenderer(renderer);
+        }
 	}
 	
 	public com.tespirit.bamboo.render.RenderManager getRenderer(){

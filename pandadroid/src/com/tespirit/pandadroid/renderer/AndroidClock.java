@@ -1,4 +1,4 @@
-package com.tespirit.pandadroid.opengl1x;
+package com.tespirit.pandadroid.renderer;
 
 import com.tespirit.bamboo.render.Clock;
 
