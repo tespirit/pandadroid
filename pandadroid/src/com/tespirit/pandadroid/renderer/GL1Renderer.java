@@ -189,12 +189,8 @@ public class GL1Renderer extends RenderManager implements android.opengl.GLSurfa
 			
 			mGl.glViewport(0, 0, width, height);
 			mGl.glMatrixMode(GL10.GL_PROJECTION);
-			mGl.glLoadIdentity();
-			mGl.glFrustumf(-camera.getNearWidth(), 
-						  camera.getNearWidth(),
-						  -camera.getNearHeight(),
-						  camera.getNearHeight(), 
-						  camera.getNear(), camera.getFar());
+			mGl.glLoadMatrixf(camera.getProjection().getBuffer(), camera.getProjection().getBufferOffset());
+			mGl.glDepthRangef(camera.getNear(), camera.getFar());
 			mGl.glMatrixMode(GL10.GL_MODELVIEW);
 			mGl.glLoadIdentity();
 		}
