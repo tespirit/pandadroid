@@ -24,6 +24,8 @@ public class VertexBuffer implements Externalizable{
 	
 	public final static int COLOR = 3;
 	
+	public final static int COUNT = 4;
+	
 	private final static int[] STRIDES = {3,3,2,4};
 	
 	/**

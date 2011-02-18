@@ -148,6 +148,9 @@ public class Collada implements BambooAsset{
 		color,	
 		image,
 		init_from,
+		phong,
+		blinn,
+		lambert,
 		
 		error
 	};
@@ -246,14 +249,16 @@ public class Collada implements BambooAsset{
 	
 	private NameId getNameId(String name){
 		try{
-			return NameId.valueOf(mParser.getName());
+			return NameId.valueOf(name);
 		} catch(Exception e){
 			return NameId.error;
 		}
 	}
 	
 	private NameId getTagId(){
-		return this.getNameId(this.mParser.getName());
+		String name = this.mParser.getName();
+		System.out.println("<" + name + ">");
+		return this.getNameId(name);
 	}
 	
 	private String getAttr(NameId id){
@@ -481,7 +486,7 @@ public class Collada implements BambooAsset{
 					texture.setDiffuseTextureName(this.mTextureNames.get(effect.diffuse.textureId));
 					surface = texture;
 					//set blending
-					if(effect.transparent != null && effect.transparent.textureId.equals(effect.diffuse.textureId)){
+					if(effect.transparent != null && effect.diffuse.textureId.equals(effect.transparent.textureId)){
 						texture.setBlending(Surface.BLEND_ALPHA);
 					}
 				} else if(effect.diffuse.color != null){
@@ -1310,13 +1315,19 @@ public class Collada implements BambooAsset{
 		}
 	}
 	
+	private boolean isEffect(NameId id){
+		return id == NameId.phong || id == NameId.blinn || id == NameId.lambert;
+	}
+	
 	private void parseLibraryEffects() throws Exception{
 		while(this.moveToChildNode(NameId.effect, NameId.library_effects)){
 			String id = this.getAttr(NameId.id);
 			if(this.moveToChildNode(NameId.technique, NameId.effect) && this.moveToFirstChild()){
-				Effect effect = this.parseEffect();
-				if(effect != null){
-					this.mEffects.put(id, effect);
+				if(this.isEffect(this.getTagId())){
+					Effect effect = this.parseEffect();
+					if(effect != null){
+						this.mEffects.put(id, effect);
+					}
 				}
 			}
 		}
@@ -1345,7 +1356,10 @@ public class Collada implements BambooAsset{
 				}
 				break;
 			case XmlPullParser.END_TAG:
-				return effect;
+				if(this.isEffect(this.getTagId())){
+					return effect;
+				}
+				break;
 			}
 		}
 		return null;

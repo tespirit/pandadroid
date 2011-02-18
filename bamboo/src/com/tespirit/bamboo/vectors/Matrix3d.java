@@ -538,6 +538,54 @@ public class Matrix3d {
 		return this;
 	}
 	
+	public Matrix3d makeProjection(float width, float height, float zNear, float zFar){
+		float zDist = zFar - zNear;
+		
+		float w = 2f*zNear/width;
+		float h = 2f*zNear/height;
+		
+		float q = -(zFar+zNear)/zDist;
+		float qn = -2*(zNear+zFar)/zDist;
+		
+		/*
+		float xymax = zNear * (float)Math.tan(Math.toRadians(fov));
+		float ymin = -xymax;
+		float xmin = -xymax;
+
+		float width = xymax - xmin;
+		float height = xymax - ymin;
+
+		float depth = zFar - zNear;
+		float q = -(zFar + zNear) / depth;
+		float qn = -2 * (zFar * zNear) / depth;
+
+		float w = 2 * zNear / width;
+		w = w / aspect;
+		float h = 2 * zNear / height;
+		*/
+		
+		m[this.offset]    = w;
+		m[this.offset+1]  = 0;
+		m[this.offset+2]  = 0;
+		m[this.offset+3]  = 0;
+
+		m[this.offset+4]  = 0;
+		m[this.offset+5]  = h;
+		m[this.offset+6]  = 0;
+		m[this.offset+7]  = 0;
+
+		m[this.offset+8]  = 0;
+		m[this.offset+9]  = 0;
+		m[this.offset+10] = q;
+		m[this.offset+11] = qn;
+
+		m[this.offset+12] = 0;
+		m[this.offset+13] = 0;
+		m[this.offset+14] = -1;
+		m[this.offset+15] = 0;
+		return this;
+	}
+	
 	public Matrix3d lookAt(Vector3d point){
 		this.zAxis.sub(point, this.translation);
 		this.zAxis.normalize();

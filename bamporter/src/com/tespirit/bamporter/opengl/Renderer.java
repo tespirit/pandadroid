@@ -338,13 +338,11 @@ public class Renderer extends RenderManager implements GLEventListener{
 			}
 			
 			mGl.glViewport(0, 0, width, height);
+
 			mGl.glMatrixMode(GL2.GL_PROJECTION);
-			mGl.glLoadIdentity();
-			mGl.glFrustumf(-camera.getNearWidth(), 
-						  camera.getNearWidth(),
-						  -camera.getNearHeight(),
-						  camera.getNearHeight(), 
-						  camera.getNear(), camera.getFar());
+			mGl.glLoadMatrixf(camera.getProjection().getBuffer(), camera.getProjection().getBufferOffset());
+			mGl.glDepthRangef(camera.getNear(), camera.getFar());
+			
 			mGl.glMatrixMode(GL2.GL_MODELVIEW);
 			mGl.glLoadIdentity();
 		}
@@ -412,11 +410,14 @@ public class Renderer extends RenderManager implements GLEventListener{
 			int id = texture.getDiffuseTextureId();
 			if(id != -1){
 				com.jogamp.opengl.util.texture.Texture t = mTextures.get(id);
-				mGl.glColor4f(1,1,1,1);
+				mGl.glColor4f(1, 1, 1, 1);
 				mGl.glEnable(GL2.GL_COLOR_MATERIAL);
 				renderSurfaceStart(texture);
 				t.enable();
 				t.bind();
+			} else {
+				mGl.glColor4f(0, 1, 1, 1);
+				mGl.glEnable(GL2.GL_COLOR_MATERIAL);
 			}
 		}
 		

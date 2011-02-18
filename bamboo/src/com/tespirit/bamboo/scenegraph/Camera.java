@@ -12,6 +12,7 @@ public class Camera extends Node implements Updater{
 	private Matrix3d mTransform;
 	private Matrix3d mWorldTransform;
 	private Matrix3d mWorldTransformInv;
+	private Matrix3d mProjection;
 	
 	private float mFov;
 	private float mNear;
@@ -36,10 +37,11 @@ public class Camera extends Node implements Updater{
 		this.mNear = near;
 		this.mFar = far;
 		
-		float[] buffer = Matrix3d.createBuffer(3);
+		float[] buffer = Matrix3d.createBuffer(4);
 		this.mTransform = new Matrix3d(buffer);
 		this.mWorldTransform = new Matrix3d(buffer, Matrix3d.SIZE);
 		this.mWorldTransformInv = new Matrix3d(buffer, Matrix3d.SIZE*2);
+		this.mProjection = new Matrix3d(buffer, Matrix3d.SIZE*3);
 	}
 	
 	public void fit(Node node){
@@ -76,6 +78,10 @@ public class Camera extends Node implements Updater{
 	
 	public Matrix3d getWorldTransformNoInverse(){
 		return this.mWorldTransform;
+	}
+	
+	public Matrix3d getProjection(){
+		return this.mProjection;
 	}
 	
 	@Override
@@ -140,6 +146,8 @@ public class Camera extends Node implements Updater{
 		Camera.renderer.render(this);
 	}
 	
+	//depricated
+	//TODO: always set the projection matrix each render cycle using the getProjection method.
 	private void markDirty(){
 		if(this.getRenderManager() != null){
 			this.getRenderManager().addSingleUpdater(this);
@@ -148,11 +156,14 @@ public class Camera extends Node implements Updater{
 	
 	@Override
 	public void update() {
+		
 		//compute near and far heights
 		this.mNearHeight = (float)(this.mNear * Math.tan(this.mFov/2.0));
 		this.mAspectRatio = (float)mWidth/(float)mHeight;
-		Camera.renderer.setDisplay(this, mWidth, mHeight);
+
+		this.mProjection.makeProjection(this.mNearHeight*this.mAspectRatio, this.mNearHeight, this.mNear, this.mFar);
 		Camera.renderer.setDisplay(this, this.mWidth, this.mHeight);
+
 	}
 
 	public void setDisplay(int width, int height) {
